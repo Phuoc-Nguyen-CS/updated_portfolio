@@ -1,27 +1,30 @@
-import mapleImg from '/src/assets/projects/maple.png';
-import clsImg from '/src/assets/projects/cls.png';
-import opencvImg from '/src/assets/projects/opencv.jpg';
+// projectsData.js
 
 export const projects = [
   {
     title: 'Maple Guild Management Bot',
-    image: mapleImg,
-    description: "Manages a member's weekly contribution to the guild...",
+    image: '/assets/projects/maple.png', // <-- from public folder
+    description: "Manages a member's weekly contribution to the guild. Reduced Junior's workload by 99% every week",
     link: 'https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot',
     tags: ['Python', 'PyTesseract', 'Discord.py', 'OpenCV', 'Pandas'],
   },
   {
     title: 'Real-Estate Website',
-    image: clsImg,
-    description: 'Full-stack commissioned Real-estate website using Supabase...',
+    image: '/assets/projects/cls.png',
+    description: 'Full-stack commissioned Real-estate website using Supabase, hosted on Vercel, and modern carousels made using Swiper.js',
     link: 'https://github.com/Jameboyyy/CLS-Properties',
     tags: ['React', 'Swiper.js', 'Supabase', 'Vercel', 'Figma'],
   },
   {
     title: 'Computer Vision',
-    image: opencvImg,
-    description: "A program that utilized OpenCV to detect hand gestures...",
+    image: '/assets/projects/opencv.jpg',
+    description: "A program that utilized OpenCV to detect hand gestures I've trained which then outputs certain effects on the computer",
     link: 'https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher',
     tags: ['Python', 'OpenCV', 'Computer Vision', 'TensorFlow'],
   },
+];
+
+export const languagesFrameworks = [
+  { category: 'Languages', items: ['JavaScript', 'Python', 'Java', 'C++', 'C'] },
+  { category: 'Frameworks', items: ['React', 'Supabase', 'Tailwind', 'Pandas', 'TensorFlow', 'OpenCV', 'Discord.py', 'PyTesseract'] },
 ];
