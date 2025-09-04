@@ -18,7 +18,7 @@ const bryceImages = Object.values(import.meta.glob('/src/assets/hiking/bryce/*.j
 const hiking = [
   { title: 'Sequoia', image: sequoiaImages[0], images: sequoiaImages },
   { title: 'Yosemite', image: yosemiteImages[0], images: yosemiteImages },
-  { title: 'Crystal Cove', image: crystalCoveImages[0], images: crystalCoveImages},
+  { title: 'Crystal Cove', image: crystalCoveImages[1], images: crystalCoveImages},
   { title: 'Top of the World', image: totwImages[0], images: totwImages },
   { title: 'Slow N\' Steady', image: slowImages[0], images: slowImages },
   { title: 'Temescal Canyon', image: temescalImages[0], images: temescalImages },
