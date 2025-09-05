@@ -26,5 +26,5 @@ export const projects = [
 
 export const languagesFrameworks = [
   { category: 'Languages', items: ['JavaScript', 'Python', 'Java', 'C++', 'C'] },
-  { category: 'Frameworks', items: ['React', 'Supabase', 'Tailwind', 'Pandas', 'TensorFlow', 'OpenCV', 'Discord.py', 'PyTesseract'] },
+  { category: 'Frameworks', items: ['React', 'Supabase', 'Tailwind', 'Pandas', 'TensorFlow', 'OpenCV', 'Discord.py', 'PyTesseract', 'Vite'] },
 ];
