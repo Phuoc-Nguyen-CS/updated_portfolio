@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS } from "./data/commands";
+import { COMMANDS, COMMAND_LIST } from "./data/commands";
 
 interface HistoryItem {
   cmd: string;
@@ -9,12 +9,12 @@ interface HistoryItem {
 function App() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [input, setInput] = useState("");
+  const [historyStack, setHistoryStack] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const [historyStack, setHistoryStack] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,16 +29,30 @@ function App() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // CHANGE: Tab logic now updates 'suggestions' state instead of history
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const currentInput = input.toLowerCase().trim();
+      if (!currentInput) return;
+
+      const matches = COMMAND_LIST.filter((cmd) => cmd.startsWith(currentInput));
+
+      if (matches.length === 1) {
+        setInput(matches[0]);
+        setSuggestions([]);
+      } else if (matches.length > 1) {
+        setSuggestions(matches);
+      }
+    }
+
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (historyStack.length === 0) return;
-
       const newIndex = historyIndex + 1;
       if (newIndex < historyStack.length) {
         setHistoryIndex(newIndex);
-        // We go from recent to oldest
         setInput(historyStack[historyStack.length - 1 - newIndex]);
-      } 
+      }
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
       const newIndex = historyIndex - 1;
@@ -68,6 +82,7 @@ function App() {
       setHistoryIndex(-1);
     }
     setInput("");
+    setSuggestions([]); // Ensure suggestions clear on Enter
   };
 
   return (
@@ -78,6 +93,7 @@ function App() {
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
       <div className="max-w-4xl mx-auto pb-20 relative z-10">
+        {/* Render Command History */}
         {history.map((entry, i) => (
           <div key={i} className="mb-6 animate-in fade-in slide-in-from-left-2 duration-300">
             <div className="flex text-white/40 mb-1">
@@ -90,25 +106,43 @@ function App() {
           </div>
         ))}
 
-        <form onSubmit={handleCommand} className="flex items-center relative">
-          <span className="text-[var(--color-hacker-green)] mr-2 font-bold animate-pulse">❯</span>
+        {/* Active Input Line & Suggestion Container */}
+        <div className="relative">
+          <form onSubmit={handleCommand} className="flex items-center relative">
+            <span className="text-[var(--color-hacker-green)] mr-2 font-bold animate-pulse">❯</span>
 
-          <div className="flex items-center glow-text break-all whitespace-pre-wrap">
-            <span>{input}</span>
-            <span className="bg-[var(--color-hacker-green)] w-2.5 h-5 shadow-[0_0_8px_var(--color-hacker-green)] animate-pulse ml-0.5 pointer-events-none" />
-          </div>
+            <div className="flex items-center glow-text break-all whitespace-pre-wrap">
+              <span>{input}</span>
+              <span className="bg-[var(--color-hacker-green)] w-2.5 h-5 shadow-[0_0_8px_var(--color-hacker-green)] animate-pulse ml-0.5 pointer-events-none" />
+            </div>
 
-          <input
-            ref={inputRef}
-            className="absolute left-0 opacity-0 w-full cursor-text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            autoComplete="off"
-            spellCheck="false"
-            autoFocus
-          />
-        </form>
+            <input
+              ref={inputRef}
+              className="absolute left-0 opacity-0 w-full cursor-text"
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                // CHANGE: Clear suggestions as the user continues to type
+                if (suggestions.length > 0) setSuggestions([]);
+              }}
+              onKeyDown={handleKeyDown}
+              autoComplete="off"
+              spellCheck="false"
+              autoFocus
+            />
+          </form>
+
+          {/* CHANGE: Inline Suggestions UI - Appears below the active input */}
+          {suggestions.length > 1 && (
+            <div className="flex flex-wrap gap-4 mt-2 text-white/30 animate-in fade-in slide-in-from-top-1">
+              {suggestions.map((s) => (
+                <span key={s} className="hover:text-[var(--color-hacker-green)] transition-colors cursor-pointer" onClick={() => setInput(s)}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div ref={bottomRef} className="h-1" />
       </div>

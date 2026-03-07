@@ -47,3 +47,5 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
         return "REDIRECTING TO GITHUB...";
     }
 };
+
+export const COMMAND_LIST = Object.keys(COMMANDS);
