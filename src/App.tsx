@@ -13,6 +13,9 @@ function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const [historyStack, setHistoryStack] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
@@ -23,6 +26,30 @@ function App() {
 
   const handleContainerClick = () => {
     inputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (historyStack.length === 0) return;
+
+      const newIndex = historyIndex + 1;
+      if (newIndex < historyStack.length) {
+        setHistoryIndex(newIndex);
+        // We go from recent to oldest
+        setInput(historyStack[historyStack.length - 1 - newIndex]);
+      } 
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const newIndex = historyIndex - 1;
+      if (newIndex >= 0) {
+        setHistoryIndex(newIndex);
+        setInput(historyStack[historyStack.length - 1 - newIndex]);
+      } else {
+        setHistoryIndex(-1);
+        setInput("");
+      }
+    }
   };
 
   const handleCommand = (e: React.SyntheticEvent) => {
@@ -37,6 +64,8 @@ function App() {
         : `ERR: COMMAND_NOT_FOUND [${cleanInput}]`;
 
       setHistory((prev) => [...prev, { cmd: input, out: output }]);
+      setHistoryStack((prev) => [...prev, input]);
+      setHistoryIndex(-1);
     }
     setInput("");
   };
@@ -74,6 +103,7 @@ function App() {
             className="absolute left-0 opacity-0 w-full cursor-text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             autoComplete="off"
             spellCheck="false"
             autoFocus
