@@ -82,10 +82,30 @@ const BOOT_SEQUENCE = [
                                                                                                     
     `}
   </pre>,
-  "WELCOME GUEST. TYPE 'LS' FOR LIST OF AVAILABLE COMMANDS.",
-  "TO GO TO ANOTHER DIRECTORY [MARKED BY GREEN]. TYPE \"/cd {director_name}\"",
-  "TO GO TO MAIN DIRECTORY. TYPE \"/cd\"",
-  "TO VIEW A FILE. FOLLOW THIS FORMAT \"cat {.txt, .md}\""
+  <div key="crash-course" className="mt-6 border border-white/20 p-4 bg-black/30 max-w-2xl">
+    <p className="font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1">
+      [MIR_OS] QUICK_START_GUIDE
+    </p>
+
+    <div className="grid grid-cols-[120px_1fr] gap-y-2 text-sm sm:text-base">
+      <span className="text-[var(--color-hacker-green)] font-bold">ls</span>
+      <span className="text-white/80">List available files and directories.</span>
+
+      <span className="text-[var(--color-hacker-green)] font-bold">cd &lt;dir&gt;</span>
+      <span className="text-white/80">
+        Open a directory (highlighted in <span className="text-[var(--color-hacker-green)] font-bold">green</span>). Type <code className="bg-white/10 px-1 rounded">cd ..</code> to go back.
+      </span>
+
+      <span className="text-[var(--color-hacker-green)] font-bold">cat &lt;file&gt;</span>
+      <span className="text-white/80">Read a file's contents (e.g., <code className="bg-white/10 px-1 rounded">cat about.txt</code>).</span>
+
+      <span className="text-[var(--color-hacker-green)] font-bold">[TAB] Key</span>
+      <span className="text-white/80">Auto-complete commands and file names while typing.</span>
+
+      <span className="text-[var(--color-hacker-green)] font-bold">restart</span>
+      <span className="text-white/80">Reboot the system and return to this screen.</span>
+    </div>
+  </div>
 ];
 
 export default function App() {

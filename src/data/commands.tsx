@@ -38,7 +38,7 @@ const FILE_CONTENT: Record<string, () => CommandResponse> = {
             <p className="text-[var(--color-hacker-green)]">{">>"} ENERGY_SOURCE</p>
             <ul className="pl-4 opacity-90 text-md">
                 <li>• FUEL_TYPE: 100% Arabica Cold Brew.</li>
-                <li>• COFFEE_DEPENDENCY: if(coffee.empty()) brain.crash();</li>
+                <li>• COFFEE_DEPENDENCY: if(coffee.empty()) brain.dump();</li>
             </ul>
             <p className="text-[var(--color-hacker-green)]">{">>"} MISC_FACTS</p>
             <ul className="pl-4 opacity-90 text-md">
@@ -387,7 +387,7 @@ export const COMMANDS: Record<string, (args?: string[], cwd?: string, setCwd?: (
             return <span className="text-red-500">cd: {target}: No such file or directory</span>;
         }
     },
-    
+
     cat: (args, cwd = "/") => {
         if (!args || args.length === 0) return "cat: missing file operand";
         const file = args[0];
