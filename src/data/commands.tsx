@@ -525,7 +525,7 @@ export const COMMANDS: Record<
 
     // 05. HELP: For those that will definitely need help
     help: () => (
-        <div className="mt-2 space-y-4 max-w-3xl border-l-2 border-yellow-500 pl-4 animate-in fade-in slide-in-from-left-4 duration-500">
+        <div className="mt-2 space-y-4 max-w-3xl border-l-2 border-yellow-500 pl-4 animate-in fade-in slide-in-from-left-4 duration-500 overflow-hidden">
             <div>
                 <p className="text-yellow-400 font-bold uppercase tracking-widest underline decoration-2">
                 // SYSTEM_MANUAL_V0.0.5
@@ -547,7 +547,7 @@ export const COMMANDS: Record<
             {/* CORE NAVIGATION */}
             <section>
                 <p className="text-[var(--color-hacker-green)] font-bold">[ CORE_NAVIGATION ]</p>
-                <div className="grid grid-cols-[80px_1fr] gap-x-2 text-sm mt-1">
+                <div className="grid grid-cols-[max-content_1fr] gap-x-2 text-sm mt-1">
                     <span className="text-white font-mono">ls</span>
                     <span className="text-white/80">List files in the current sector.</span>
                     <span className="text-white font-mono">cd [dir]</span>
@@ -560,19 +560,30 @@ export const COMMANDS: Record<
             </section>
 
             {/* VIM GUIDE */}
-            <section className="bg-white/5 p-2 border border-white/10">
-                <p className="text-yellow-500 font-bold flex items-center gap-2">
+            <section className="bg-white/5 p-3 border border-white/10">
+                <p className="text-yellow-500 font-bold flex items-center gap-2 uppercase tracking-tighter">
                     <span>[*]</span> VIM_QUICKSTART (PC ONLY)
                 </p>
-                <div className="grid grid-cols-[80px_1fr] gap-y-1 text-xs mt-2">
-                    <span className="text-[var(--color-hacker-green)]">i</span>
+
+                {/* Using max-content for the first column prevents bleeding */}
+                <div className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 text-xs mt-3">
+                    <span className="text-[var(--color-hacker-green)] font-mono whitespace-nowrap">i</span>
                     <span className="text-white/80">INSERT MODE: Start typing text.</span>
-                    <span className="text-[var(--color-hacker-green)]">ESC</span>
+
+                    <span className="text-[var(--color-hacker-green)] font-mono whitespace-nowrap">ESC</span>
                     <span className="text-white/80">NORMAL MODE: Enter command mode.</span>
-                    <span className="text-[var(--color-hacker-green)]">:wq</span>
+
+                    <span className="text-[var(--color-hacker-green)] font-mono whitespace-nowrap">:wq</span>
                     <span className="text-white/80">SAVE & EXIT: Write changes and quit.</span>
-                    <span className="text-[var(--color-hacker-green)]">:q</span>
+
+                    <span className="text-[var(--color-hacker-green)] font-mono whitespace-nowrap">:q</span>
                     <span className="text-white/80">QUIT: Discard changes and exit.</span>
+                </div>
+
+                <div className="mt-4 pt-2 border-t border-white/5">
+                    <p className="text-[var(--color-hacker-green)] text-[10px] sm:text-xs font-mono opacity-70">
+                       VIM EXIT SEQUENCE {">>"} <span className="text-white underline">[ESC]</span> then <span className="text-white">:wq</span>
+                    </p>
                 </div>
             </section>
 
