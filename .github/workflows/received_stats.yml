@@ -13,17 +13,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Update stats.json
+      - - name: Update stats.json
         run: |
-            # Get current date
-            CURRENT_DATE=$(date + '%m-%d-%Y')
-            # Create the new JSON content using the payload from the LeetCode repo
-            echo '{
-                "easy": "${{ github.event.client_payload.easy }}",
-                "medium": "${{ github.event.client_payload.medium }}",
-                "hard": "${{ github.event.client_payload.hard }}",
-                "lastUpdated": "'$CURRENT_DATE'"
-            }' > src/data/leetcode_stats.json
+          echo "FMT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          
+      - name: Write File
+        run: |
+          echo '{
+            "easy": "${{ github.event.client_payload.easy }}",
+            "medium": "${{ github.event.client_payload.medium }}",
+            "hard": "${{ github.event.client_payload.hard }}",
+            "lastUpdated": "${{ env.FMT_DATE }}"
+          }' > src/data/leetcode_stats.json
 
       - name: Commit and Push changes
         run: |
