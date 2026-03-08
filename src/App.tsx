@@ -97,7 +97,6 @@ function App() {
   }, [history]);
 
   useEffect(() => {
-    // Only run if we are in booting mode and haven't started this specific cycle
     if (!isBooting || hasBooted.current) return;
     hasBooted.current = true;
 
@@ -116,7 +115,6 @@ function App() {
         ]);
         currentLine++;
 
-        // Slightly faster for a "warm" reboot
         setTimeout(printNextLine, 250);
       } else {
         setIsBooting(false);
@@ -124,7 +122,7 @@ function App() {
     };
 
     printNextLine();
-  }, [isBooting]); // CHANGE: Added isBooting as a dependency
+  }, [isBooting]); 
 
   useEffect(() => {
     if (!isBooting) {
@@ -180,12 +178,11 @@ function App() {
     if (cleanInput === "clear") {
       setHistory([]);
     }
-    // NEW: Restart Logic
     else if (cleanInput === "restart") {
-      setHistory([]); // Clear the screen
-      setHistoryStack([]); // Optional: Clear arrow-key history too
-      setIsBooting(true); // Put the UI back into boot mode
-      hasBooted.current = false; // UNLOCK the boot effect
+      setHistory([]); 
+      setHistoryStack([]);
+      setIsBooting(true);
+      hasBooted.current = false;
     }
     else if (cleanInput !== "") {
       const output = COMMANDS[cleanInput]
