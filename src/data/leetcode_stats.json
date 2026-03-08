@@ -1,6 +1,6 @@
 {
-    "easy": "0",
-    "medium": "0",
-    "hard": "0",
-    "lastUpdated": "Never"
+  "easy": "2",
+  "medium": "1",
+  "hard": "2",
+  "lastUpdated": "$(date +%Y-%m-%d)"
 }
