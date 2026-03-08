@@ -98,14 +98,42 @@ export default function App() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
 
+  // Mobile fix
+  useEffect(() => {
+    const setViewportHeight = () => {
+      const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      // Force scroll to bottom when viewport changes (keyboard toggle)
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    window.visualViewport?.addEventListener("resize", setViewportHeight);
+    window.visualViewport?.addEventListener("scroll", setViewportHeight);
+    setViewportHeight();
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", setViewportHeight);
+      window.visualViewport?.removeEventListener("scroll", setViewportHeight);
+    };
+  }, []);
+  
+  // AUTO-SCROLL LOGIC
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   // --- Effects ---
 
-  /** Auto-scroll to bottom on every history update */
+  // Auto-scroll to bottom on every history update
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
 
-  /** Runs the simulated boot sequence on component mount */
+  useEffect(() => {
+    scrollToBottom();
+  }, [history, suggestions]);
+
+  // Runs the simulated boot sequence on component mount
   useEffect(() => {
     if (!isBooting || hasBooted.current) return;
     hasBooted.current = true;
@@ -131,7 +159,7 @@ export default function App() {
     printNextLine();
   }, [isBooting]);
 
-  /** Focuses the terminal input once booting is finished */
+  // Focuses the terminal input once booting is finished 
   useEffect(() => {
     if (!isBooting) inputRef.current?.focus();
   }, [isBooting]);
@@ -142,7 +170,7 @@ export default function App() {
     if (!isBooting) inputRef.current?.focus();
   };
 
-  /** Handles special keys: Tab (Autocomplete), Up/Down (History) */
+  // Handles special keys: Tab (Autocomplete), Up/Down (History)
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // 1. Tab Autocomplete
     if (e.key === "Tab") {
@@ -184,7 +212,7 @@ export default function App() {
     }
   };
 
-  /** Processes the entered command and updates history */
+  // Processes the entered command and updates history 
   const handleCommand = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const cleanInput = input.toLowerCase().trim();
@@ -215,7 +243,7 @@ export default function App() {
   return (
     <div
       style={{ backgroundColor: 'var(--color-hacker-bg)', color: 'var(--color-hacker-green)' }}
-      className="h-full w-full font-mono cursor-text overflow-y-auto no-scrollbar selection:bg-[var(--color-hacker-green)] selection:text-[var(--color-hacker-bg)]"
+      className="h-full w-full font-mono cursor-text overflow-y-auto no-scrollbar selection:bg-[var(--color-hacker-green)] selection:text-[var(--color-hacker-bg)] overflow-x-hidden"
       onClick={handleContainerClick}
     >
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
@@ -256,6 +284,7 @@ export default function App() {
               <input
                 ref={inputRef}
                 onKeyDown={handleKeyDown}
+                onFocus={() => setTimeout(scrollToBottom, 300)}
                 type="text"
                 style={{ color: 'var(--color-hacker-green)' }}
                 className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
