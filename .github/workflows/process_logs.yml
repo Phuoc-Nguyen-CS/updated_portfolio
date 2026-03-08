@@ -15,7 +15,7 @@ jobs:
           python-version: '3.x'
 
       - name: Run Build Script
-        run: python build_logs.py
+        run: python src/build_logs.py
 
       - name: Commit and Push Changes
         run: |
