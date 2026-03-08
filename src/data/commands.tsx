@@ -236,11 +236,25 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
             </ul>
         </div>
     ),
+    github: () => (
+        <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
+            <p className="text-white font-bold mb-2 underline">// EXTERNAL_SOURCE_REDIRECT</p>
+            <div className="space-y-1 mb-4">
+                <p>TARGET: <span className="text-white">github.com/Phuoc-Nguyen-CS</span></p>
+                <p>STATUS: <span className="text-[var(--color-hacker-green)] font-mono animate-pulse">CONNECTION_READY</span></p>
+            </div>
 
-    github: () => {
-        window.open("https://github.com/Phuoc-Nguyen-CS", "_blank");
-        return "REDIRECTING TO GITHUB...";
-    },
+            <a
+                href="https://github.com/Phuoc-Nguyen-CS"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-3 py-1 border border-[var(--color-hacker-green)] text-[var(--color-hacker-green)] font-bold hover:bg-[var(--color-hacker-green)] hover:text-black transition-all"
+            >
+                [OPEN_REPOS]
+            </a>
+            <p className="text-[10px] text-white/40 mt-2 italic">Note: Handshake will initialize in a new tab.</p>
+        </div>
+    ),
 
     restart: () => "SYSTEM RESTART INITIATED...",
 
