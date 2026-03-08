@@ -29,12 +29,11 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
 
     /* 1. LeetCode / NeetCode Progress */
     leetcode: () => {
-        // We map the JSON data to the UI structure
         const stats = [
             {
                 label: "EASY",
                 count: parseInt(leetcodeData.easy),
-                total: 50, // You can adjust these totals as you wish
+                total: 50,
                 color: "bg-green-500"
             },
             {

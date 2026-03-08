@@ -6,7 +6,7 @@ on:
 jobs:
   update-json:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
       
@@ -15,18 +15,20 @@ jobs:
       
       - name: Update stats.json
         run: |
-          # Create the new JSON content using the payload from the LeetCode repo
-          echo '{
-            "easy": "${{ github.event.client_payload.easy }}",
-            "medium": "${{ github.event.client_payload.medium }}",
-            "hard": "${{ github.event.client_payload.hard }}",
-            "lastUpdated": "$(date +'%Y-%m-%d')"
-          }' > src/data/leetcode_stats.json
+            # Get current date
+            CURRENT_DATE=$(date + '%m-%d-%Y')
+            # Create the new JSON content using the payload from the LeetCode repo
+            echo '{
+                "easy": "${{ github.event.client_payload.easy }}",
+                "medium": "${{ github.event.client_payload.medium }}",
+                "hard": "${{ github.event.client_payload.hard }}",
+                "lastUpdated": "'$CURRENT_DATE'"
+            }' > src/data/leetcode_stats.json
 
       - name: Commit and Push changes
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add src/data/leetcode_stats.json
-          # Only commit if there are actual changes to prevent "nothing to commit" errors
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated LeetCode stats update" && git push)
+            git config --global user.name "GitHub Action"
+            git config --global user.email "action@github.com"
+            git add src/data/leetcode_stats.json
+            # Only commit if there are actual changes to prevent "nothing to commit" errors
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Automated LeetCode stats update" && git push)
