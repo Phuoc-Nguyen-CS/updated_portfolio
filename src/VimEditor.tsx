@@ -1,79 +1,71 @@
-/* =========================================================
-    VIM_EDITOR_COMPONENT
-    A functional React component that mimics the behavior of 
-    the Vi/Vim text editor within the terminal environment.
-    Includes read-only file protections and easter eggs.
-   ========================================================= */
-
 import React, { useState, useEffect, useRef } from "react";
 
 /* ---------------------------------------------------------
-    SYSTEM_CONSTANTS
-    Defines which files are protected from modifications by 
-    the guest user. Matches the Virtual File System (VFS).
+    VIM_FILE_METADATA
+    Centralizes special behaviors for specific files.
    --------------------------------------------------------- */
-const READ_ONLY_FILES = ["about.txt", "resume.pdf", "leetcode.exe", "contact.sh", "github.link"];
+const FILE_SPECIAL_LOGIC: Record<string, {
+    defaultContent: string[];
+    exitMessage?: string;
+    isReadOnly?: boolean;
+}> = {
+    "sos.txt": {
+        defaultContent: [
+            "Day 400.",
+            "I am still trapped in this editor.",
+            "If anyone finds this, please just type :q to set me free."
+        ],
+        exitMessage: "ACHIEVEMENT UNLOCKED: 'FREE AT LAST'"
+    },
+    "resume.txt": {
+        defaultContent: [], 
+        isReadOnly: true
+    },
+    "leetcode.exe": {
+        defaultContent: [],
+        isReadOnly: true
+    }
+};
 
 interface VimEditorProps {
     file: string;
-    onClose: (systemMessage?: string) => void;
+    initialContent?: string[];
+    onClose: (systemMessage?: string, newContent?: string[]) => void;
 }
 
-export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
-    /* ---------------------------------------------------------
-        STATE_MANAGEMENT
-        Tracks editor modes (NORMAL, INSERT, COMMAND), 
-        line-by-line buffer content, and system errors.
-       --------------------------------------------------------- */
+export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onClose }) => {
     const [mode, setMode] = useState<"NORMAL" | "INSERT" | "COMMAND">("NORMAL");
-    const [content, setContent] = useState<string[]>([]);
+    const [content, setContent] = useState<string[]>([""]);
     const [cmdInput, setCmdInput] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const isReadOnly = READ_ONLY_FILES.includes(file);
+    const meta = FILE_SPECIAL_LOGIC[file];
 
     /* ---------------------------------------------------------
-        FILESYSTEM_SYNC
-        Initializes buffer based on file path. 
-        Includes 'sos.txt' easter egg implementation and 
-        read-only file placeholders.
+        SYNC_BUFFER
+        Priority: 1. Session RAM | 2. Special Logic | 3. Blank
        --------------------------------------------------------- */
     useEffect(() => {
-        if (file === "sos.txt") {
-            setContent([
-                "Day 400.",
-                "I am still trapped in this editor.",
-                "I've tried Ctrl+C. I've tried turning off my computer.",
-                "If anyone finds this, please just type :q to set me free."
-            ]);
-        } else if (isReadOnly) {
-            setContent([
-                `# CONTENTS OF ${file.toUpperCase()}`,
-                "This file is locked by root.",
-                "You may view it, but you cannot alter its destiny."
-            ]);
+        if (initialContent) {
+            setContent(initialContent);
+        } else if (meta?.defaultContent) {
+            setContent(meta.defaultContent);
         } else {
             setContent([""]);
         }
         containerRef.current?.focus();
-    }, [file, isReadOnly]);
+    }, [file, initialContent, meta]);
 
-    /* ---------------------------------------------------------
-        INPUT_HANDLER_ENGINE
-        Main logic for processing VIM keybindings and mode 
-        switching. Enforces read-only permissions and handles
-        character insertion/deletion.
-       --------------------------------------------------------- */
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        e.preventDefault(); // Prevent scrolling or browser shortcuts
-        setErrorMsg("");    // Clear any previous errors on new keypress
+        e.preventDefault();
+        setErrorMsg("");
 
-        // 01. NORMAL MODE: Navigation and entry
         if (mode === "NORMAL") {
             if (e.key === "i") {
-                if (isReadOnly) {
+                if (meta?.isReadOnly) {
                     setErrorMsg("W10: Warning: Changing a readonly file");
+                    setTimeout(() => setMode("INSERT"), 800);
                 } else {
                     setMode("INSERT");
                 }
@@ -84,7 +76,6 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
             }
         }
 
-        // 02. INSERT MODE: Text Manipulation
         else if (mode === "INSERT") {
             if (e.key === "Escape") setMode("NORMAL");
             else if (e.key === "Enter") setContent(prev => [...prev, ""]);
@@ -109,32 +100,18 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
             }
         }
 
-        // 03. COMMAND MODE: Execution (e.g., :q, :wq)
         else if (mode === "COMMAND") {
             if (e.key === "Escape") setMode("NORMAL");
             else if (e.key === "Enter") {
+                const cmd = cmdInput.trim();
 
-                // EXIT LOGIC
-                if (cmdInput === "q" || cmdInput === "q!") {
-                    // Easter egg trigger
-                    if (file === "sos.txt") {
-                        onClose("ACHIEVEMENT UNLOCKED: 'FREE AT LAST'");
-                    } else {
-                        onClose();
-                    }
+                // Logic for exit commands
+                if (cmd === "q" || cmd === "q!") {
+                    onClose(meta?.exitMessage); // Uses config message if exists
                 }
-
-                // WRITE LOGIC
-                else if (cmdInput === "w" || cmdInput === "wq") {
-                    if (isReadOnly) {
-                        setErrorMsg("E45: 'readonly' option is set (add ! to override)");
-                        setMode("NORMAL");
-                    } else {
-                        onClose(`"${file}" written. (Changes discarded by VFS)`);
-                    }
+                else if (cmd === "wq" || cmd === "w") {
+                    onClose(`"${file}" written to session buffer.`, content);
                 }
-
-                // INVALID COMMAND
                 else {
                     setErrorMsg(`E492: Not an editor command: ${cmdInput}`);
                     setMode("NORMAL");
@@ -142,7 +119,7 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
             }
             else if (e.key === "Backspace") {
                 setCmdInput(prev => prev.slice(0, -1));
-                if (cmdInput.length === 1) setMode("NORMAL"); // Exit command mode if empty
+                if (cmdInput.length === 1) setMode("NORMAL");
             }
             else if (e.key.length === 1) {
                 setCmdInput(prev => prev + e.key);
@@ -150,13 +127,9 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
         }
     };
 
-    /* ---------------------------------------------------------
-        UI_GENERATION
-        Renders the editor buffer, the iconic blue "~" lines, 
-        and the context-aware status bar.
-       --------------------------------------------------------- */
+    /* Rendering logic remains the same (emptyLines, glow-text, status bar) */
     const emptyLines = Array.from({ length: Math.max(0, 20 - content.length) }).map((_, i) => (
-        <div key={`empty-${i}`} className="text-blue-500 font-bold">~</div>
+        <div key={`empty-${i}`} className="text-blue-500 font-bold opacity-40">~</div>
     ));
 
     return (
@@ -164,36 +137,47 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, onClose }) => {
             ref={containerRef}
             tabIndex={0}
             onKeyDown={handleKeyDown}
-            className="h-full w-full bg-[#1e1e1e] text-gray-200 p-2 font-mono outline-none flex flex-col justify-between absolute inset-0 z-50"
+            className="h-full w-full bg-[var(--color-hacker-bg)] text-[var(--color-hacker-green)] p-0 font-mono outline-none flex flex-col justify-between absolute inset-0 z-50 overflow-hidden"
         >
-            <div className="flex-grow whitespace-pre-wrap pt-2">
-                {content.map((line, i) => (
-                    <div key={i} className="min-h-[1.5rem]">
-                        {line}
-                        {mode === "INSERT" && i === content.length - 1 && (
-                            <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1 align-middle" />
-                        )}
-                    </div>
-                ))}
-                {emptyLines}
+            <div className="flex-grow flex pt-2 glow-text overflow-hidden">
+
+                {/* LINE NUMBER GUTTER */}
+                <div className="w-10 flex flex-col items-end pr-3 border-r border-white/10 select-none text-white/20">
+                    {content.map((_, i) => (
+                        <div key={`num-${i}`} className="min-h-[1.5rem] leading-6">
+                            {i + 1}
+                        </div>
+                    ))}
+                    {emptyLines}
+                </div>
+
+                {/* TEXT AREA */}
+                <div className="flex-grow pl-4 whitespace-pre-wrap overflow-hidden">
+                    {content.map((line, i) => (
+                        <div key={i} className="min-h-[1.5rem] flex items-center leading-6">
+                            {line}
+                            {mode === "INSERT" && i === content.length - 1 && (
+                                <span className="w-2 h-5 bg-[var(--color-hacker-green)] animate-pulse ml-1" />
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* VIM STATUS BAR */}
-            <div className="flex justify-between items-center text-sm bg-black text-white px-2 py-1 border-t border-gray-700">
+            {/* STATUS BAR */}
+            <div className="flex justify-between items-center text-[10px] sm:text-xs bg-[var(--color-hacker-green)] text-black px-2 py-0.5 font-bold uppercase tracking-tighter">
                 <div className="flex gap-4">
                     {mode === "COMMAND" ? (
-                        <span>:{cmdInput}<span className="inline-block w-2 h-4 bg-white animate-pulse align-middle" /></span>
+                        <span>:{cmdInput}<span className="inline-block w-2 h-3 bg-black animate-pulse" /></span>
                     ) : errorMsg ? (
-                        <span className="bg-red-600 text-white px-2 font-bold">{errorMsg}</span>
+                        <span className="bg-red-600 text-white px-2">{errorMsg}</span>
                     ) : mode === "INSERT" ? (
-                        <span className="font-bold">-- INSERT --</span>
+                        <span>-- INSERT --</span>
                     ) : (
-                        <span>"{file}" {isReadOnly ? "[readonly]" : ""} {content.length}L</span>
+                        <span>"{file}" {meta?.isReadOnly ? "[readonly]" : ""} {content.length}L</span>
                     )}
                 </div>
-                <div className="text-gray-400">
-                    {content.length},1  All
-                </div>
+                <div>{content.length},1 ALL</div>
             </div>
         </div>
     );

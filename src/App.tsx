@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS, COMMAND_LIST, EXECUTABLES, VFS, type CommandResponse} from "./data/commands";
+import { COMMANDS, COMMAND_LIST, EXECUTABLES, FILE_CONTENT, VFS, type CommandResponse} from "./data/commands";
 import { VimEditor } from "./VimEditor";
 /**
  * Represents a single entry in the terminal history.
@@ -122,6 +122,7 @@ export default function App() {
   const [isBooting, setIsBooting] = useState(true);
   const [cwd, setCwd] = useState("/");
   const [vimMode, setVimMode] = useState<{ active: boolean; file: string }>({ active: false, file: ""});
+  const [sessionFiles, setSessionFiles] = useState<Record<string, { content: string[], path: string }>>({}); // Stores user created data in session
 
   // Mobile fix
   useEffect(() => {
@@ -197,76 +198,112 @@ export default function App() {
 
   // Handles special keys: Tab (Autocomplete), Up/Down (History)
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // 1. Tab Autocomplete
+    // 01. Tab Autocomplete
+    /* ---------------------------------------------------------
+        TAB_AUTOCOMPLETE_ENGINE
+        Enforces strict Linux-style filtering:
+        - cd: Only suggests directories
+        - cat/vim: Only suggests readable files (from FILE_CONTENT)
+        - ./: Only suggests executable files (from EXECUTABLES)
+       --------------------------------------------------------- */
     if (e.key === "Tab") {
       e.preventDefault();
       const rawInput = input.toLowerCase();
       if (!rawInput) return;
-      
+
       const parts = rawInput.split(" ");
-      // CASE A: Autocomplete a base command (e.g., "l" -> "ls")
+      const currentFolder = VFS[cwd as keyof typeof VFS];
+      if (!currentFolder || !currentFolder.children) return;
+
+      const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
+      const allAvailableItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
+
       if (parts.length === 1) {
-        const matches = COMMAND_LIST.filter((cmd) => cmd.startsWith(parts[0]));
+        const word = parts[0];
+
+        // Autocomplete ./executables
+        if (word.startsWith("./")) {
+          const target = word.slice(2);
+          const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
+          const allItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
+
+          // Only suggest items that are in the EXECUTABLES object
+          const matches = allItems
+            .filter(item => Object.keys(EXECUTABLES).includes(item))
+            .filter(item => item.startsWith(target))
+            .map(item => `./${item}`)
+            .sort(); 
+
+          if (matches.length === 1) {
+            setInput(matches[0]);
+            setSuggestions([]);
+          } else {
+            setSuggestions(matches);
+          }
+          return;
+        }
+
+        // Autocomplete base commands
+        const matches = COMMAND_LIST.filter(c => c.startsWith(word));
         if (matches.length === 1) {
-          setInput(matches[0] + " "); // Adds a space for user to continue typing
+          setInput(matches[0] + " ");
           setSuggestions([]);
-        } else {
-          setSuggestions(matches);
+        } else if (matches.length > 1) {
+          const sortedMatches = matches.sort(((a, b) => a.localeCompare(b)));
+          setSuggestions(sortedMatches);
         }
       }
-
-      // CASE B: Autocompleting a file/directory (e.g., "cd l" -> "cd logs")
       else if (parts.length === 2) {
         const baseCmd = parts[0];
         const target = parts[1];
+        let matches: string[] = [];
 
-        // Only search if the command uses files
-        if (baseCmd === "cd" || baseCmd === "cat" || baseCmd === "vim") {
-          const currentFolder = VFS[cwd as keyof typeof VFS];
+        if (baseCmd === "cd") {
+          matches = allAvailableItems.filter(item => {
+            const path = cwd === "/" ? `/${item}` : `${cwd}/${item}`;
+            return VFS[path as keyof typeof VFS]?.type === "dir" && item.startsWith(target);
+          });
+        } else if (baseCmd === "rm") {
+          matches = Object.keys(sessionFiles)
+            .filter(fileName =>
+              sessionFiles[fileName].path === cwd &&
+              fileName.startsWith(target)
+            ).sort();
+        } else if (baseCmd === "cat" || baseCmd === "vim") {
+          matches = allAvailableItems.filter(item => {
+            const isFile = Object.keys(FILE_CONTENT).includes(item) || localSessionFiles.includes(item);
 
-          if (currentFolder && currentFolder.children) {
-            const matches = currentFolder.children.filter((item) => item.startsWith(target));
+            const prefixMatch = item.toLowerCase().startsWith(target.toLowerCase());
 
-            if (matches.length === 1) {
-              setInput(`${baseCmd} ${matches[0]}`);
-              setSuggestions([]);
-            } else {
-              setSuggestions(matches);
-            }
-          }
+            return isFile && prefixMatch;
+          }).sort();
         }
-      }
 
-      const currentInput = input.toLowerCase().trim();
-      if (!currentInput) return;
-
-      const matches = COMMAND_LIST.filter((cmd) => cmd.startsWith(currentInput));
-      if (matches.length === 1) {
-        setInput(matches[0]);
-        setSuggestions([]);
-      } else if (matches.length > 1) {
-        setSuggestions(matches);
+        if (matches.length === 1) {
+          const isDir = !matches[0].includes(".");
+          setInput(`${baseCmd} ${matches[0]}${isDir ? "/" : ""}`);
+          setSuggestions([]);
+        } else if (matches.length > 1) {
+          setSuggestions(matches);
+        }
       }
     }
 
-    // 2. Command History Navigation (Arrow Up)
+    // 02. COMMAND HISTORY NAVIGATION
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (historyStack.length === 0) return;
-      const newIndex = historyIndex + 1;
-      if (newIndex < historyStack.length) {
-        setHistoryIndex(newIndex);
-        setInput(historyStack[historyStack.length - 1 - newIndex]);
+      const nextIndex = historyIndex + 1;
+      if (nextIndex < historyStack.length) {
+        setHistoryIndex(nextIndex);
+        setInput(historyStack[historyStack.length - 1 - nextIndex]);
       }
-    }
-
-    // 3. Command History Navigation (Arrow Down)
-    else if (e.key === "ArrowDown") {
+    } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      const newIndex = historyIndex - 1;
-      if (newIndex >= 0) {
-        setHistoryIndex(newIndex);
-        setInput(historyStack[historyStack.length - 1 - newIndex]);
+      const nextIndex = historyIndex - 1;
+      if (nextIndex >= 0) {
+        setHistoryIndex(nextIndex);
+        setInput(historyStack[historyStack.length - 1 - nextIndex]);
       } else {
         setHistoryIndex(-1);
         setInput("");
@@ -297,9 +334,33 @@ export default function App() {
       hasBooted.current = false;
       setCwd("/");
     } else if (baseCmd === "vim") {
-      const targetFile = args[0] || "[No Name]";
-      setVimMode({ active: true, file: targetFile });
-      setHistory((prev) => [...prev, { cmd: input, out: "", cwd: cwd}]);
+      const targetFile = args[0];
+      const currentFolder = VFS[cwd as keyof typeof VFS];
+
+      if (!targetFile) {
+        setVimMode({ active: true, file: "[No Name]" });
+      }
+      /* ---------------------------------------------------------
+          LINUX_GUARD: Permission Denied for System Files
+          This prevents users from "going through" your core 
+          portfolio data and breaking the experience.
+          --------------------------------------------------------- */
+      else if (Object.keys(FILE_CONTENT).includes(targetFile)) {
+        const out = (
+          <span className="text-red-500">
+            bash: vim: {targetFile}: Permission denied (system file)
+          </span>
+        );
+        setHistory(prev => [...prev, { cmd: input, out, cwd }]);
+      }
+      // Standard directory check remains
+      else if (currentFolder?.children.includes(targetFile) && !targetFile.includes('.')) {
+        const out = <span className="text-red-500">bash: vim: {targetFile}: Is a directory</span>;
+        setHistory(prev => [...prev, { cmd: input, out, cwd }]);
+      }
+      else {
+        setVimMode({ active: true, file: targetFile });
+      }
     } else {
       let output: CommandResponse;
 
@@ -320,8 +381,13 @@ export default function App() {
       // 2. HANDLE STANDARD COMMANDS (ls, cd, cat)
       else {
         output = COMMANDS[baseCmd]
-          ? COMMANDS[baseCmd](args, cwd, setCwd)
-          : `ERR: COMMAND_NOT_FOUND [${baseCmd}]`;
+          ? COMMANDS[baseCmd](args, cwd, setCwd, sessionFiles, setSessionFiles)
+          : (
+            <div className="text-red-500">
+              <p>ERR: COMMAND_NOT_FOUND [{baseCmd}]</p>
+              <p className="text-white/50 text-xs mt-1">Type <span className="text-yellow-400 underline">help</span> for a list of available protocols.</p>
+            </div>
+          );
       }
 
       // Save the exact string the user typed into history
@@ -346,8 +412,18 @@ export default function App() {
       {vimMode.active ? (
         <VimEditor
           file={vimMode.file}
-          onClose={(msg) => {
+          initialContent={sessionFiles[vimMode.file]?.content}
+          onClose={(msg, newContent) => {
             setVimMode({ active: false, file: "" });
+            if (newContent) {
+              setSessionFiles(prev => ({
+                ...prev,
+                [vimMode.file]: {
+                  content: newContent,
+                  path: cwd // This is the "Anchor" that ls uses to find the file
+                }
+              }));
+            }
             if (msg) {
               setHistory(prev => [...prev, { cmd: "", out: <span className="text-yellow-400">{msg}</span>, cwd }]);
             }
