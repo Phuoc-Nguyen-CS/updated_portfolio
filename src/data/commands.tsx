@@ -13,7 +13,6 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
 
         return (
             <div className="glow-text">
-                <p className="text-white/90 font-bold tracking-widest">SYS_ACCESS: GRANTED</p>
                 <p className="text-white/60">Available modules: {modules}</p>
             </div>
         );
@@ -30,33 +29,18 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
     /* 1. LeetCode / NeetCode Progress */
     leetcode: () => {
         const stats = [
-            {
-                label: "EASY",
-                count: parseInt(leetcodeData.easy),
-                total: 50,
-                color: "bg-green-500"
-            },
-            {
-                label: "MEDIUM",
-                count: parseInt(leetcodeData.medium),
-                total: 100,
-                color: "bg-yellow-500"
-            },
-            {
-                label: "HARD",
-                count: parseInt(leetcodeData.hard),
-                total: 50,
-                color: "bg-red-500"
-            },
+            { label: "EASY", count: parseInt(leetcodeData.easy), total: 100, color: "bg-green-500" },
+            { label: "MEDIUM", count: parseInt(leetcodeData.medium), total: 100, color: "bg-yellow-500" },
+            { label: "HARD", count: parseInt(leetcodeData.hard), total: 100, color: "bg-red-500" },
         ];
 
         return (
             <div className="mt-2 space-y-3 border-l-2 border-[var(--color-hacker-green)] pl-4">
-                <p className="text-white font-bold underline">// ALGORITHMIC_PROGRESS_SYNCED</p>
+                <p className="text-white font-bold underline text-sm sm:text-base">// ALGORITHMIC_PROGRESS_SYNCED</p>
                 {stats.map((stat) => {
                     const percentage = Math.round((stat.count / stat.total) * 100);
                     return (
-                        <div key={stat.label} className="w-64">
+                        <div key={stat.label} className="w-full max-w-[18rem]">
                             <div className="flex justify-between text-xs mb-1">
                                 <span>{stat.label}</span>
                                 <span>{stat.count}/{stat.total}</span>
@@ -71,8 +55,8 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                     );
                 })}
                 <div className="mt-2 space-y-1">
-                    <p className="text-[10px] text-white/40">Source: GitHub/Phuoc-Nguyen-CS/LeetCode</p>
-                    <p className="text-[9px] text-[var(--color-hacker-green)] opacity-60">
+                    <p className="text-xs text-white/40">Source: GitHub/Phuoc-Nguyen-CS/LeetCode</p>
+                    <p className="text-[10px] sm:text-xs text-[var(--color-hacker-green)] opacity-60 uppercase">
                         LAST_SYNC: {leetcodeData.lastUpdated}
                     </p>
                 </div>
@@ -111,14 +95,15 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
             <p className="text-white font-bold underline">// SECURE_COMMUNICATION_LINE</p>
             <p>Initiate direct email transfer?</p>
             <a
-                href="mailto:your-email@example.com?subject=Portfolio%20Inquiry"
+                href="mailto:phuoc.codes@gmail.com?subject=Greetings!"
                 className="inline-block px-3 py-1 bg-[var(--color-hacker-green)] text-black font-bold hover:bg-white transition-colors"
             >
                 EXECUTE: SEND_EMAIL
             </a>
             <div className="pt-2 flex space-y-1 flex-col text-sm opacity-60">
-                <p>LinkedIn: linkedin.com/in/phuoc-nguyen</p>
-                <p>Location: Fullerton, CA</p>
+                <p>Email: phuoc.codes@gmail.com</p>
+                <p>LinkedIn: linkedin.com/in/phuoc-nguyen-codes/</p>
+                <p>Location: Cerritos, CA</p>
             </div>
         </div>
     ),
