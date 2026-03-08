@@ -19,13 +19,23 @@
   body,
   #root {
     height: 100dvh;
+    width: 100vw;
+    /* Ensure strict width */
     margin: 0;
     padding: 0;
     overflow: hidden;
+    /* Prevent body scroll */
     overscroll-behavior: none;
     background-color: var(--color-hacker-bg);
     color: var(--color-hacker-green);
     font-family: var(--font-mono);
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: hidden;
+    /* white-space: pre-wrap; */
+    /* word-break: break-all; */
   }
 }
 
