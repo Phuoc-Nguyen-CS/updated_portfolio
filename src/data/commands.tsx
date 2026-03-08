@@ -66,25 +66,116 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
 
     /* 2. Resume Download */
     resume: () => (
-        <div className="mt-2 space-y-4">
-            <div className="border-b border-white/20 pb-2">
-                <h2 className="text-lg font-bold text-white uppercase tracking-tighter">Phuoc Nguyen</h2>
-                <p className="text-xs opacity-60">Full Stack Developer | Fullerton, CA</p>
+        <div className="mt-2 space-y-6 text-sm sm:text-base max-w-4xl">
+            {/* HEADER SECTION */}
+            <div className="border-b border-white/20 pb-4">
+                <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Phuoc [Peter] Nguyen</h2>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-hacker-green)] opacity-80 mt-1">
+                </div>
             </div>
 
+            {/* EDUCATION */}
             <section>
-                <p className="text-[var(--color-hacker-green)] font-bold underline">EXPERIENCE_LOG</p>
-                <div className="mt-2">
-                    <p className="text-white font-bold text-sm">Junior Developer @ Tech Corp (2025-Present)</p>
-                    <ul className="list-dash pl-4 text-xs opacity-80">
-                        <li>- Architected React-based micro-frontends.</li>
-                        <li>- Reduced API latency by 40% via Redis caching.</li>
-                    </ul>
+                <p className="text-[var(--color-hacker-green)] font-bold underline mb-2">01. EDUCATION_HISTORY</p>
+                <div className="pl-4">
+                    <p className="text-white font-bold">California State University, Fullerton</p>
+                    <p className="text-white/80">Bachelor of Science, Computer Science (GPA: 3.60/4.0)</p>
+                    <p className="text-xs opacity-50 italic">Dean’s List 2021, 2022, 2023 | Graduated May 2023</p>
                 </div>
             </section>
 
-            <div className="pt-4 opacity-50 text-[10px]">
-                [ END OF PREVIEW ] - Type 'contact' to request full PDF version.
+            {/* WORK EXPERIENCE */}
+            <section>
+                <p className="text-[var(--color-hacker-green)] font-bold underline mb-2">02. WORK_EXPERIENCE_LOG</p>
+                <div className="space-y-4 pl-4">
+                    <div>
+                        <div className="flex justify-between items-baseline">
+                            <p className="text-white font-bold">Full-Stack Freelance Developer</p>
+                            <span className="text-xs opacity-50">2025-PRESENT</span>
+                        </div>
+                        <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Modernized real-estate UI/UX using React, Supabase, and Swiper.js.</li>
+                            <li>• Implemented SEO best practices to drive traffic and optimized performance for older devices.</li>
+                            <li>• Managed project via Agile framework to ensure stakeholder value and deployment via Vercel.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div className="flex justify-between items-baseline">
+                            <p className="text-white font-bold">Audio Visual Solutions (IT Technician)</p>
+                            <span className="text-xs opacity-50">2024-2024</span>
+                        </div>
+                        <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Led installation and configuration of mission-critical event hardware.</li>
+                            <li>• Managed complex cable infrastructure to prevent hazards and improve workflow.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            {/* PROJECTS */}
+            <section>
+                <p className="text-[var(--color-hacker-green)] font-bold underline mb-2">03. REPOSITORY_PROJECTS</p>
+                <div className="space-y-4 pl-4">
+                    <div>
+                        <p className="text-white font-bold">Game Activity Automation Tool (Python)</p>
+                        <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Leveraged OpenCV/Tesseract for data extraction and BeautifulSoup4 for web scraping.</li>
+                            <li>• Optimized execution speed by 92% through asynchronous programming.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p className="text-white font-bold">Gesture Detection Program (TensorFlow)</p>
+                        <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Developed real-time hand-tracking software with 95% recognition accuracy.</li>
+                            <li>• Trained custom models using Mediapipe and TensorFlow for unique hand gestures.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            {/* SKILLS & CERTS - FULLY ALIGNED */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* TECH_STACK */}
+                <div>
+                    <p className="text-[var(--color-hacker-green)] font-bold underline mb-3">04. TECH_STACK</p>
+                    <div className="space-y-1 text-xs sm:text-sm">
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono">[LANGS]</span>
+                            <span className="opacity-80">Python, C/C++, JS, SQL, Java, R</span>
+                        </div>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono">[SOFT]</span>
+                            <span className="opacity-80">VSCode, GitHub, Git, Figma, R Studio</span>
+                        </div>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono">[FRAME]</span>
+                            <span className="opacity-80">React, AWS S3, OpenCV, Django, Pandas</span>
+                        </div>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono">[STYLE]</span>
+                            <span className="opacity-80">Tailwind CSS, Bootstrap, CSS, HTML</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* CERTIFICATIONS  */}
+                <div>
+                    <p className="text-[var(--color-hacker-green)] font-bold underline mb-3">05. CERTIFICATIONS</p>
+                    <div className="space-y-3 text-xs sm:text-sm">
+                        <div className="flex items-start">
+                            <span className="text-white w-20 shrink-0 font-mono">[AWS]</span>
+                            <div className="flex flex-col">
+                                <span className="text-white font-bold leading-none">Cloud Practitioner</span>
+                                <span className="text-[var(--color-hacker-green)] text-[10px] tracking-widest mt-1">
+                                    CLF-C02 | 01/08/2026
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div className="pt-4 opacity-75 text-[16px] text-center border-t border-white/10 uppercase tracking-widest">
+                [ END OF SECURE TRANSMISSION ]
             </div>
         </div>
     ),
