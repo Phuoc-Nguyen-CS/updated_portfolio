@@ -114,22 +114,32 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
             <ul className="space-y-2">
                 <li>
                     <a
-                        href="https://github.com/user/repo1"
+                        href="https://github.com/Jameboyyy/CLS-Properties"
                         target="_blank"
                         rel="noreferrer"
                         className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
                     >
-                        {"[01] PROJECT_ALPHA ➜ DEPLOYED_V1.0"}
+                        {"[01] Cebu Real-Estate Property Website"}
                     </a>
                 </li>
                 <li>
                     <a
-                        href="https://github.com/user/repo2"
+                        href="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
                         target="_blank"
                         rel="noreferrer"
                         className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
                     >
-                        {"[02] NEURAL_INTERFACE ➜ IN_PROGRESS"}
+                        {"[02] Maplestory Discord Bot"}
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+                    >
+                        {"[03] Hand Gesture Detection Program"}
                     </a>
                 </li>
             </ul>
