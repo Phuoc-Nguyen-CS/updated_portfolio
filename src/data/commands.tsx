@@ -4,10 +4,9 @@ export type CommandResponse = string | React.ReactNode;
 
 export const COMMANDS: Record<string, () => CommandResponse> = {
     help: () => {
-        // CHANGE: Added .sort() to ensure the modules appear alphabetically
         const modules = Object.keys(COMMANDS)
             .filter((cmd) => cmd !== "help")
-            .sort() // Alphabetical order (A-Z)
+            .sort()
             .map((cmd) => `[${cmd}]`)
             .join(" ");
 
@@ -19,7 +18,7 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
         );
     },
 
-    about: () => "I am a developer specializing in React and modern terminal-based UI architecture.",
+    about: () => "NAME: PHUOC NGUYEN SCHOOL: CALIFORNIA_STATE_UNIVERSITY_FULLERTON",
 
     projects: () => (
         <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
@@ -49,8 +48,6 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
         </div>
     ),
 
-    helloworld: () => "NAME: PHUOC NGUYEN SCHOOL: CALIFORNIA_STATE_UNIVERSITY_FULLERTON",
-
     github: () => {
         window.open("https://github.com/Phuoc-Nguyen-CS", "_blank");
         return "REDIRECTING TO GITHUB...";
@@ -64,3 +61,10 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
 };
 
 export const COMMAND_LIST = Object.keys(COMMANDS);
+
+// Example
+// projects: () => (
+//     <div style={{ borderColor: 'var(--color-hacker-green)' }} className="mt-2 border-l-2 pl-4">
+//         {/* ... content ... */}
+//     </div>
+// )
