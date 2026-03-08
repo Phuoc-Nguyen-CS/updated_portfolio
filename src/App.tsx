@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS, COMMAND_LIST, VFS} from "./data/commands";
+import { COMMANDS, COMMAND_LIST, EXECUTABLES, VFS, type CommandResponse} from "./data/commands";
 import { VimEditor } from "./VimEditor";
 /**
  * Represents a single entry in the terminal history.
@@ -221,7 +221,7 @@ export default function App() {
         const target = parts[1];
 
         // Only search if the command uses files
-        if (baseCmd === "cd" || baseCmd === "cat") {
+        if (baseCmd === "cd" || baseCmd === "cat" || baseCmd === "vim") {
           const currentFolder = VFS[cwd as keyof typeof VFS];
 
           if (currentFolder && currentFolder.children) {
@@ -301,9 +301,28 @@ export default function App() {
       setVimMode({ active: true, file: targetFile });
       setHistory((prev) => [...prev, { cmd: input, out: "", cwd: cwd}]);
     } else {
-      const output = COMMANDS[baseCmd]
-        ? COMMANDS[baseCmd](args, cwd, setCwd)
-        : `ERR: COMMAND_NOT_FOUND [${baseCmd}]`;
+      let output: CommandResponse;
+
+      // 1. HANDLE EXECUTABLES (./filename)
+      if (baseCmd.startsWith("./")) {
+        const file = baseCmd.slice(2); // Strip the './'
+        const currentFolder = VFS[cwd as keyof typeof VFS];
+
+        if (!currentFolder || !currentFolder.children.includes(file)) {
+          output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
+        } else if (EXECUTABLES[file]) {
+          output = EXECUTABLES[file](); // Runs .exe
+        } else {
+          // If they try to execute a text file like ./about.txt
+          output = <span className="text-red-500">bash: {baseCmd}: Permission denied (not executable)</span>;
+        }
+      }
+      // 2. HANDLE STANDARD COMMANDS (ls, cd, cat)
+      else {
+        output = COMMANDS[baseCmd]
+          ? COMMANDS[baseCmd](args, cwd, setCwd)
+          : `ERR: COMMAND_NOT_FOUND [${baseCmd}]`;
+      }
 
       // Save the exact string the user typed into history
       setHistory((prev) => [...prev, { cmd: input, out: output, cwd: cwd}]);
@@ -325,7 +344,16 @@ export default function App() {
 
       {/* Vim Editor */}
       {vimMode.active ? (
-        <VimEditor file={vimMode.file} onClose={() => setVimMode({ active: false, file: "" })} />
+        <VimEditor
+          file={vimMode.file}
+          onClose={(msg) => {
+            setVimMode({ active: false, file: "" });
+            if (msg) {
+              setHistory(prev => [...prev, { cmd: "", out: <span className="text-yellow-400">{msg}</span>, cwd }]);
+            }
+            setTimeout(() => inputRef.current?.focus(), 100);
+          }}
+        />
       ) : (
           <div className="max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10">
 
