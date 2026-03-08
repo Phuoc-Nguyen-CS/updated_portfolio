@@ -371,7 +371,7 @@ export const COMMANDS: Record<
     ) => CommandResponse> = {
 
     // 01. LS: Context Aware listing
-    ls: (args, cwd = "/", setCwd, sessionFiles) => {
+    ls: (_args, cwd = "/", _setCwd, sessionFiles) => {
         const currentFolder = VFS[cwd as keyof typeof VFS];
         if (!currentFolder) return <span className="text-red-500">ERR: DIRECTORY_NOT_FOUND [{cwd}]</span>;
 
@@ -446,7 +446,7 @@ export const COMMANDS: Record<
     },
 
     // 03. CAT: Readable file-only guard
-    cat: (args, cwd = "/", setCwd, sessionFiles) => {
+    cat: (args, cwd = "/", _setCwd, sessionFiles) => {
         if (!args || args.length === 0) return "cat: missing file operand";
 
         // 1. Get the user's input
@@ -493,7 +493,7 @@ export const COMMANDS: Record<
     },
 
     // 04. RM: Remove user created files
-    rm: (args, cwd, setCwd, sessionFiles, setSessionFiles) => {
+    rm: (args, cwd, _setCwd, sessionFiles, setSessionFiles) => {
         if (!args.length) return "rm: missing operand";
         const file = args[0].replace(/\/+$/, "");
 
