@@ -241,7 +241,7 @@ const FILE_CONTENT: Record<string, () => CommandResponse> = {
             <div className="pt-2 flex space-y-1 flex-col text-sm opacity-60">
                 <p>Email: phuoc.codes@gmail.com</p>
                 <p>LinkedIn: linkedin.com/in/phuoc-nguyen-codes/</p>
-                <p>Location: Cerritos, CA</p>
+                <p>Location: Orange County, CA</p>
             </div>
         </div>
     ),
