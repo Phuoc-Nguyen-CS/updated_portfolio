@@ -82,7 +82,7 @@ const BOOT_SEQUENCE = [
                                                                                                     
     `}
   </pre>,
-  "WELCOME OPERATOR. TYPE 'HELP' FOR AVAILABLE COMMANDS.",
+  "WELCOME GUEST. TYPE 'LS' FOR LIST OF AVAILABLE COMMANDS.",
 ];
 
 export default function App() {
@@ -228,7 +228,7 @@ export default function App() {
             <div key={i} className="break-words animate-in fade-in duration-300">
               {entry.cmd && (
                 <div className="flex items-center opacity-50 text-xs md:text-sm">
-                  <span className="mr-2 text-white/40 font-bold">authorized_user@portfolio:~$</span>
+                  <span className="mr-2 text-white/100 font-bold">guest@portfolio:~$</span>
                   <span className="text-white font-bold italic">{entry.cmd}</span>
                 </div>
               )}
