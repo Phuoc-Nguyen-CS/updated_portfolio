@@ -1,26 +1,63 @@
 name: Process Blog Logs
+
 on:
   repository_dispatch:
+    # This matches the event-type we set in the Blog repo's workflow
     types: [blog_update]
+  workflow_dispatch: # Allows you to run this manually from the Actions tab for testing
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      
+      # 1. Checkout the Portfolio code (this repo)
+      - name: Checkout Portfolio
+        uses: actions/checkout@v4
+        with:
+          # We check out into a subfolder so we can manage multiple repos easily
+          path: portfolio
+          # Use a PAT if you want this push to trigger a Vercel build (if Vercel is linked to GitHub)
+          token: ${{ secrets.PORTFOLIO_SYNC_TOKEN }}
+
+      # 2. Checkout the Blog content (your other repo)
+      - name: Checkout Blog Content
+        uses: actions/checkout@v4
+        with:
+          repository: Phuoc-Nguyen-CS/blog
+          path: blog_content
+
+      # 3. Setup Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
+      # 4. Prepare and Run the Script
       - name: Run Build Script
-        run: python src/build_logs.py
+        run: |
+          # Move the downloaded blog files into the expected 'blog' folder in the portfolio
+          mkdir -p portfolio/blog
+          cp -r blog_content/. portfolio/blog/
+          
+          # Navigate into the portfolio and run the script
+          cd portfolio
+          python src/build_logs.py
 
+      # 5. Commit the updated logs.json back to the Portfolio
       - name: Commit and Push Changes
         run: |
+          cd portfolio
           git config --global user.name "MIR_OS_BOT"
           git config --global user.email "bot@mir-os.local"
+          
+          # Stage the specific JSON file
           git add src/data/logs.json
-          git commit -m "chore: dynamic log sync [system update]" || echo "No changes to commit"
-          git push
+          
+          # Only commit if there are actually changes to avoid workflow errors
+          if git diff --staged --quiet; then
+            echo "No changes detected in logs.json. Skipping commit."
+          else
+            git commit -m "chore: dynamic log sync [system update]"
+            git push origin main
+          fi
