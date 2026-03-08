@@ -21,8 +21,25 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
     about: () => (
         <div className="space-y-1">
             <p>NAME: PHUOC NGUYEN</p>
-            <p>UNDERGRADUATE: CALIFORNIA_STATE_UNIVERSITY_FULLERTON</p>
-            <p className="text-white/40 italic text-sm">"Technology is best when bringing people together"</p>
+            <p>UNDERGRADUATE: CSU_FULLERTON ... SUCCESS</p>
+            <p>GRADUATE: CSU_LONG_BEACH ... IN_PROGRESS</p>
+            <p>LOCATION: ORANGE_COUNTY, CA</p>
+            <hr className="border-white/10 my-2" />
+            <p className="text-[var(--color-hacker-green)]">{">>"} ENERGY_SOURCE</p>
+            <ul className="pl-4 opacity-90 text-md">
+                <li>• FUEL_TYPE: 100% Arabica Cold Brew.</li>
+                <li>• COFFEE_DEPENDENCY: if(coffee.empty()) brain.crash();</li>
+            </ul>
+            <p className="text-[var(--color-hacker-green)]">{">>"} MISC_FACTS</p>
+            <ul className="pl-4 opacity-90 text-md">
+                <li>• ACHIEVEMENT_UNLOCKED: Reached Rank 10 Evan in Maplestory (Reboot NA).</li>
+                <li>• QUEST_LOG: Currently grinding my Master's Degree at CSULB.</li>
+                <li>• WORK_STATUS: Solo dev looking for a highly-motivated team. </li>
+                <li>• TRAVEL_LOG: Visited [3] countries, and [4] different states.</li>
+                <li>• LANGUAGE_PACK: Fluent in English and high understanding of Vietnamese.</li>
+                <li>• GREATEST_FEAR: Not being able to leave the VIM editor.</li>
+            </ul>
+            <p className="text-white/80 italic text-sm">"S.O.S Still stuck inside VIM. Send help.."</p>
         </div>
     ),
 
