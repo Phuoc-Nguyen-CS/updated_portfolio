@@ -83,30 +83,56 @@ const BOOT_SEQUENCE = [
                                                                                                     
     `}
   </pre>,
-  <div key="crash-course" className="mt-6 border border-white/20 p-4 bg-black/30 max-w-2xl">
-    <p className="font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1">
-      [MIR_OS] QUICK_START_GUIDE
+  <div key="crash-course" className="mt-6 border border-white/20 p-4 bg-black/30 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <p className="font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between">
+        <span>[MIR_OS] QUICK_START_GUIDE</span>
+        <span className="text-[var(--color-hacker-green)] opacity-50 text-xs">VER_0.0.5</span>
     </p>
 
-    <div className="grid grid-cols-[120px_1fr] gap-y-2 text-sm sm:text-base">
-      <span className="text-[var(--color-hacker-green)] font-bold">ls</span>
-      <span className="text-white/80">List available files and directories.</span>
+    <div className="space-y-4">
+        {/* SECTION 1: NAVIGATION */}
+        <div>
+            <p className="text-md text-white/90 mb-1 uppercase tracking-tighter">// NAVIGATION</p>
+            <div className="grid grid-cols-[120px_1fr] gap-y-1 text-sm">
+                <span className="text-[var(--color-hacker-green)] font-bold">ls</span>
+                <span className="text-white/80">List files in current sector.</span>
+                
+                <span className="text-[var(--color-hacker-green)] font-bold">cd [dir]</span>
+                <span className="text-white/80">Enter directory (e.g., <code className="bg-white/10 px-1">cd projects</code>). Use <code className="bg-white/10 px-1">cd ..</code> to go back.</span>
+            </div>
+        </div>
 
-      <span className="text-[var(--color-hacker-green)] font-bold">cd &lt;dir&gt;</span>
-      <span className="text-white/80">
-        Open a directory (highlighted in <span className="text-[var(--color-hacker-green)] font-bold">green</span>). Type <code className="bg-white/10 px-1 rounded">cd ..</code> to go back.
-      </span>
+        {/* SECTION 2: FILE OPERATIONS */}
+        <div>
+            <p className="text-md text-white/90 mb-1 uppercase tracking-tighter">// FILE_OPERATIONS</p>
+            <div className="grid grid-cols-[120px_1fr] gap-y-1 text-sm">
+                <span className="text-[var(--color-hacker-green)] font-bold">cat [file]</span>
+                <span className="text-white/80">View content (e.g., <code className="bg-white/10 px-1">cat resume.txt</code>).</span>
 
-      <span className="text-[var(--color-hacker-green)] font-bold">cat &lt;file&gt;</span>
-      <span className="text-white/80">Read a file's contents (e.g., <code className="bg-white/10 px-1 rounded">cat about.txt</code>).</span>
+                <span className="text-[var(--color-hacker-green)] font-bold">vim [file]</span>
+                <span className="text-white/80">Edit/Create files (PC only). Type <code className="bg-white/10 px-1">help</code> for Vim keybindings.</span>
 
-      <span className="text-[var(--color-hacker-green)] font-bold">[TAB] Key</span>
-      <span className="text-white/80">Auto-complete commands and file names while typing.</span>
+                <span className="text-[var(--color-hacker-green)] font-bold">rm [file]</span>
+                <span className="text-white/80">Remove user-created files from session RAM.</span>
+            </div>
+        </div>
 
-      <span className="text-[var(--color-hacker-green)] font-bold">restart</span>
-      <span className="text-white/80">Reboot the system and return to this screen.</span>
+        {/* SECTION 3: SYSTEM SHORTCUTS */}
+        <div>
+            <p className="text-md text-white/90 mb-1 uppercase tracking-tighter">// EFFICIENCY_PROTOCOLS</p>
+            <div className="grid grid-cols-[120px_1fr] gap-y-1 text-sm">
+                <span className="text-white font-bold">[TAB]</span>
+                <span className="text-white/80">Autocomplete commands and file names.</span>
+
+                <span className="text-white font-bold">[UP_ARROW]</span>
+                <span className="text-white/80">Cycle through previous command history.</span>
+
+                <span className="text-[var(--color-hacker-green)] font-bold">help</span>
+                <span className="text-white/80 font-bold underline">View full system manual and escape protocols.</span>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
 ];
 
 export default function App() {
