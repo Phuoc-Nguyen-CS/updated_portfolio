@@ -17,7 +17,6 @@ jobs:
         with:
           # We check out into a subfolder so we can manage multiple repos easily
           path: portfolio
-          # Use a PAT if you want this push to trigger a Vercel build (if Vercel is linked to GitHub)
           token: ${{ secrets.PORTFOLIO_SYNC_TOKEN }}
 
       # 2. Checkout the Blog content (your other repo)
@@ -26,6 +25,7 @@ jobs:
         with:
           repository: Phuoc-Nguyen-CS/blog
           path: blog_content
+          token: ${{ secrets.PORTFOLIO_SYNC_TOKEN }}
 
       # 3. Setup Python environment
       - name: Set up Python
