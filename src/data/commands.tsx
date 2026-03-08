@@ -4,8 +4,9 @@ import leetcodeData from "./leetcode_stats.json";
 export type CommandResponse = string | React.ReactNode;
 
 /* =========================================================
-    VFS
-    Maps directories
+    VFS (VIRTUAL FILE SYSTEM)
+    Maps the directory structure and file locations.
+    Distinguishes between 'dir' and file entries.
    ========================================================= */
 export const VFS = {
     "/": {
@@ -49,7 +50,7 @@ const FILE_CONTENT: Record<string, () => CommandResponse> = {
                 <li>• LANGUAGE_PACK: Fluent in English and high understanding of Vietnamese.</li>
                 <li>• GREATEST_FEAR: Not being able to exit the VIM editor.</li>
             </ul>
-            <p className="text-white/80 italic text-sm">"S.O.S Still stuck inside VIM. Send help.."</p>
+            <p className="text-white/80 italic text-sm">"sos.txt"</p>
         </div>
     ),
     "resume.pdf": () => (
@@ -315,8 +316,9 @@ const FILE_CONTENT: Record<string, () => CommandResponse> = {
 };
 
 /* =========================================================
-    COMMANDS
-    List of commands users can access
+    COMMAND LOGIC
+    Defines the executable behavior for terminal commands
+    (ls, cd, cat, etc.). Handles VFS navigation.
    ========================================================= */
 export const COMMANDS: Record<string, (args?: string[], cwd?: string, setCwd?: (path: string) => void) => CommandResponse> = {
 

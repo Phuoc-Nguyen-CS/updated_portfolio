@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { COMMANDS, COMMAND_LIST, VFS} from "./data/commands";
-
+import { VimEditor } from "./VimEditor";
 /**
  * Represents a single entry in the terminal history.
  */
 interface HistoryItem {
   cmd: string; // The command entered by the user
   out: string | React.ReactNode; // The output (string or JSX component)
+  cwd: string; // Snapshot of the directory
 }
 
 /**
@@ -120,6 +121,7 @@ export default function App() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
   const [cwd, setCwd] = useState("/");
+  const [vimMode, setVimMode] = useState<{ active: boolean; file: string }>({ active: false, file: ""});
 
   // Mobile fix
   useEffect(() => {
@@ -170,7 +172,8 @@ export default function App() {
             cmd: "",
             out: typeof BOOT_SEQUENCE[currentLine] === "string"
               ? <span className="text-white/80 italic">{BOOT_SEQUENCE[currentLine]}</span>
-              : BOOT_SEQUENCE[currentLine]
+              : BOOT_SEQUENCE[currentLine],
+            cwd: "/",
           }
         ]);
         currentLine++;
@@ -293,13 +296,17 @@ export default function App() {
       setIsBooting(true);
       hasBooted.current = false;
       setCwd("/");
+    } else if (baseCmd === "vim") {
+      const targetFile = args[0] || "[No Name]";
+      setVimMode({ active: true, file: targetFile });
+      setHistory((prev) => [...prev, { cmd: input, out: "", cwd: cwd}]);
     } else {
       const output = COMMANDS[baseCmd]
         ? COMMANDS[baseCmd](args, cwd, setCwd)
         : `ERR: COMMAND_NOT_FOUND [${baseCmd}]`;
 
       // Save the exact string the user typed into history
-      setHistory((prev) => [...prev, { cmd: input, out: output }]);
+      setHistory((prev) => [...prev, { cmd: input, out: output, cwd: cwd}]);
       setHistoryStack((prev) => [...prev, input]);
       setHistoryIndex(-1);
     }
@@ -316,56 +323,62 @@ export default function App() {
     >
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
-      <div className="max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10">
+      {/* Vim Editor */}
+      {vimMode.active ? (
+        <VimEditor file={vimMode.file} onClose={() => setVimMode({ active: false, file: "" })} />
+      ) : (
+          <div className="max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10">
 
-        {/* Terminal History Output */}
-        <div className="space-y-4">
-          {history.map((entry, i) => (
-            <div key={i} className="break-words animate-in fade-in duration-300">
-              {entry.cmd && (
-                <div className="flex items-center opacity-50 text-xs md:text-sm">
-                  <span className="mr-2 text-white/100 font-bold">guest@portfolio:~{cwd}$</span>
-                  <span className="text-white font-bold italic">{entry.cmd}</span>
+            {/* Terminal History Output */}
+            <div className="space-y-4">
+              {history.map((entry, i) => (
+                <div key={i} className="break-words animate-in fade-in duration-300">
+                  {entry.cmd && (
+                    <div className="flex items-center opacity-50 text-xs md:text-sm">
+                      <span className="mr-2 text-white/100 font-bold">
+                        guest@portfolio:~{entry.cwd === "/" ? "" : entry.cwd}$
+                      </span>
+                      <span className="text-white font-bold italic">{entry.cmd}</span>
+                    </div>
+                  )}
+                  <div className="glow-text mt-1 whitespace-pre-wrap">
+                    {entry.out}
+                  </div>
                 </div>
-              )}
-              <div className="glow-text mt-1 whitespace-pre-wrap">
-                {entry.out}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Tab-Completion Suggestions UI */}
-        {!isBooting && suggestions.length > 0 && (
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
-            {suggestions.map((s) => (
-              <span key={s} className="text-xs md:text-sm">{s}</span>
-            ))}
-          </div>
-        )}
+            {/* Tab-Completion Suggestions UI */}
+            {!isBooting && suggestions.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
+                {suggestions.map((s) => (
+                  <span key={s} className="text-xs md:text-sm">{s}</span>
+                ))}
+              </div>
+            )}
 
-        {/* Command Input Area */}
-        {!isBooting && (
-          <form onSubmit={handleCommand} className="flex items-start mt-4 pb-12 animate-in fade-in duration-700">
-            <span className="mr-2 font-bold shrink-0 animate-pulse">❯</span>
-            <div className="relative flex-grow">
-              <input
-                ref={inputRef}
-                onKeyDown={handleKeyDown}
-                onFocus={() => setTimeout(scrollToBottom, 300)}
-                type="text"
-                style={{ color: 'var(--color-hacker-green)' }}
-                className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                autoComplete="off"
-                autoCapitalize="none"
-                spellCheck="false"
-                autoFocus
-              />
+            {/* Command Input Area */}
+            {!isBooting && (
+              <form onSubmit={handleCommand} className="flex items-start mt-4 pb-12 animate-in fade-in duration-700">
+                <span className="mr-2 font-bold shrink-0 animate-pulse">❯</span>
+                <div className="relative flex-grow">
+                  <input
+                    ref={inputRef}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => setTimeout(scrollToBottom, 300)}
+                    type="text"
+                    style={{ color: 'var(--color-hacker-green)' }}
+                    className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck="false"
+                    autoFocus
+                  />
 
-              {/* Custom Blinking Block Cursor */}
-              {/* <div className="flex break-all min-h-[1.5rem]">
+                  {/* Custom Blinking Block Cursor */}
+                  {/* <div className="flex break-all min-h-[1.5rem]">
                 <span className="invisible">{input}</span>
                 <span
                   style={{
@@ -375,23 +388,24 @@ export default function App() {
                   className="w-2 h-5 animate-pulse shrink-0"
                 />
               </div> */}
-              <div className="flex min-h-[1.5rem] pointer-events-none">
-                <span className="invisible whitespace-pre-wrap break-all">{input}</span>
-                <span
-                  style={{
-                    backgroundColor: 'var(--color-hacker-green)',
-                    boxShadow: '0 0 8px var(--color-hacker-green)'
-                  }}
-                  className="w-2 h-5 animate-pulse shrink-0"
-                />
-              </div>
-            </div>
-          </form>
-        )}
+                  <div className="flex min-h-[1.5rem] pointer-events-none">
+                    <span className="invisible whitespace-pre-wrap break-all">{input}</span>
+                    <span
+                      style={{
+                        backgroundColor: 'var(--color-hacker-green)',
+                        boxShadow: '0 0 8px var(--color-hacker-green)'
+                      }}
+                      className="w-2 h-5 animate-pulse shrink-0"
+                    />
+                  </div>
+                </div>
+              </form>
+            )}
 
-        {/* Scroll Anchor */}
-        <div ref={bottomRef} />
-      </div>
+            {/* Scroll Anchor */}
+            <div ref={bottomRef} />
+          </div>
+      )}
     </div>
   );
 }
