@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS, COMMAND_LIST } from "./data/commands";
+import { COMMANDS, COMMAND_LIST, VFS} from "./data/commands";
 
 /**
  * Represents a single entry in the terminal history.
@@ -83,6 +83,9 @@ const BOOT_SEQUENCE = [
     `}
   </pre>,
   "WELCOME GUEST. TYPE 'LS' FOR LIST OF AVAILABLE COMMANDS.",
+  "TO GO TO ANOTHER DIRECTORY [MARKED BY GREEN]. TYPE \"/cd {director_name}\"",
+  "TO GO TO MAIN DIRECTORY. TYPE \"/cd\"",
+  "TO VIEW A FILE. FOLLOW THIS FORMAT \"cat {.txt, .md}\""
 ];
 
 export default function App() {
@@ -90,13 +93,13 @@ export default function App() {
   const hasBooted = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [input, setInput] = useState("");
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
+  const [cwd, setCwd] = useState("/");
 
   // Mobile fix
   useEffect(() => {
@@ -165,7 +168,6 @@ export default function App() {
   }, [isBooting]);
 
   // --- Handlers ---
-
   const handleContainerClick = () => {
     if (!isBooting) inputRef.current?.focus();
   };
@@ -175,6 +177,43 @@ export default function App() {
     // 1. Tab Autocomplete
     if (e.key === "Tab") {
       e.preventDefault();
+      const rawInput = input.toLowerCase();
+      if (!rawInput) return;
+      
+      const parts = rawInput.split(" ");
+      // CASE A: Autocomplete a base command (e.g., "l" -> "ls")
+      if (parts.length === 1) {
+        const matches = COMMAND_LIST.filter((cmd) => cmd.startsWith(parts[0]));
+        if (matches.length === 1) {
+          setInput(matches[0] + " "); // Adds a space for user to continue typing
+          setSuggestions([]);
+        } else {
+          setSuggestions(matches);
+        }
+      }
+
+      // CASE B: Autocompleting a file/directory (e.g., "cd l" -> "cd logs")
+      else if (parts.length === 2) {
+        const baseCmd = parts[0];
+        const target = parts[1];
+
+        // Only search if the command uses files
+        if (baseCmd === "cd" || baseCmd === "cat") {
+          const currentFolder = VFS[cwd as keyof typeof VFS];
+
+          if (currentFolder && currentFolder.children) {
+            const matches = currentFolder.children.filter((item) => item.startsWith(target));
+
+            if (matches.length === 1) {
+              setInput(`${baseCmd} ${matches[0]}`);
+              setSuggestions([]);
+            } else {
+              setSuggestions(matches);
+            }
+          }
+        }
+      }
+
       const currentInput = input.toLowerCase().trim();
       if (!currentInput) return;
 
@@ -215,22 +254,31 @@ export default function App() {
   // Processes the entered command and updates history 
   const handleCommand = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const cleanInput = input.toLowerCase().trim();
 
-    if (cleanInput === "clear") {
+    // Get raw input and trim the white space
+    const rawInput = input.trim();
+    if (rawInput === "") return;
+
+    // Split the input by spaces to separate the command from the arguments
+    // e.g., "cd logs" -> baseCmd: "cd", args: ["logs"]
+    const inputParts = rawInput.toLowerCase().split(/\s+/);
+    const baseCmd = inputParts[0];
+    const args = inputParts.slice(1);
+
+    if (baseCmd === "clear") {
       setHistory([]);
-    }
-    else if (cleanInput === "restart") {
+    } else if (baseCmd === "restart") {
       setHistory([]);
       setHistoryStack([]);
       setIsBooting(true);
       hasBooted.current = false;
-    }
-    else if (cleanInput !== "") {
-      const output = COMMANDS[cleanInput]
-        ? COMMANDS[cleanInput]()
-        : `ERR: COMMAND_NOT_FOUND [${cleanInput}]`;
+      setCwd("/");
+    } else {
+      const output = COMMANDS[baseCmd]
+        ? COMMANDS[baseCmd](args, cwd, setCwd)
+        : `ERR: COMMAND_NOT_FOUND [${baseCmd}]`;
 
+      // Save the exact string the user typed into history
       setHistory((prev) => [...prev, { cmd: input, out: output }]);
       setHistoryStack((prev) => [...prev, input]);
       setHistoryIndex(-1);
@@ -256,7 +304,7 @@ export default function App() {
             <div key={i} className="break-words animate-in fade-in duration-300">
               {entry.cmd && (
                 <div className="flex items-center opacity-50 text-xs md:text-sm">
-                  <span className="mr-2 text-white/100 font-bold">guest@portfolio:~$</span>
+                  <span className="mr-2 text-white/100 font-bold">guest@portfolio:~{cwd}$</span>
                   <span className="text-white font-bold italic">{entry.cmd}</span>
                 </div>
               )}
@@ -297,8 +345,18 @@ export default function App() {
               />
 
               {/* Custom Blinking Block Cursor */}
-              <div className="flex break-all min-h-[1.5rem]">
+              {/* <div className="flex break-all min-h-[1.5rem]">
                 <span className="invisible">{input}</span>
+                <span
+                  style={{
+                    backgroundColor: 'var(--color-hacker-green)',
+                    boxShadow: '0 0 8px var(--color-hacker-green)'
+                  }}
+                  className="w-2 h-5 animate-pulse shrink-0"
+                />
+              </div> */}
+              <div className="flex min-h-[1.5rem] pointer-events-none">
+                <span className="invisible whitespace-pre-wrap break-all">{input}</span>
                 <span
                   style={{
                     backgroundColor: 'var(--color-hacker-green)',
