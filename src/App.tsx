@@ -7,9 +7,16 @@ interface HistoryItem {
 }
 
 const BOOT_SEQUENCE = [
-  "INITIALIZING PORTFOLIO KERNEL V1.0.0...",
+  "INITIALIZING PORTFOLIO KERNEL V0.0.5...",
+  "CPU: OCTA-CORE NEURAL PROCESSOR DETECTED",
+  "MEM: 64GB VIRTUAL RAM ALLOCATED... OK",
   "CHECKING SYSTEM INTEGRITY... SUCCESS",
+  "------------------------------------------------",
+  "MOUNTING FILE SYSTEM... /dev/sda1 ON /root",
+  "LOADING CORE MODULES: [MIR_OS] [REACT] [TAILWIND]",
   "ESTABLISHING SECURE CONNECTION TO SERVER... SUCCESS",
+  "ENCRYPTING CHANNEL VIA AES-256-GCM... DONE",
+  "PARSING BIOMETRIC DATA... IDENTITY VERIFIED",
   <pre className="text-[10px] leading-none py-4 text-white/40">
     {`
                                                                                                            
@@ -90,26 +97,34 @@ function App() {
   }, [history]);
 
   useEffect(() => {
-    if (hasBooted.current) return;
+    // Only run if we are in booting mode and haven't started this specific cycle
+    if (!isBooting || hasBooted.current) return;
     hasBooted.current = true;
-    
+
     let currentLine = 0;
 
     const printNextLine = () => {
       if (currentLine < BOOT_SEQUENCE.length) {
         setHistory((prev) => [
           ...prev,
-          { cmd: "", out: <span className="text-white/80 italic">{BOOT_SEQUENCE[currentLine]}</span>}
+          {
+            cmd: "",
+            out: typeof BOOT_SEQUENCE[currentLine] === "string"
+              ? <span className="text-white/80 italic">{BOOT_SEQUENCE[currentLine]}</span>
+              : BOOT_SEQUENCE[currentLine]
+          }
         ]);
         currentLine++;
-        setTimeout(printNextLine, Math.random() * 300 + 100);
+
+        // Slightly faster for a "warm" reboot
+        setTimeout(printNextLine, 250);
       } else {
         setIsBooting(false);
       }
     };
+
     printNextLine();
-    // inputRef.current?.focus();
-  }, []);
+  }, [isBooting]); // CHANGE: Added isBooting as a dependency
 
   useEffect(() => {
     if (!isBooting) {
@@ -164,7 +179,15 @@ function App() {
 
     if (cleanInput === "clear") {
       setHistory([]);
-    } else if (cleanInput !== "") {
+    }
+    // NEW: Restart Logic
+    else if (cleanInput === "restart") {
+      setHistory([]); // Clear the screen
+      setHistoryStack([]); // Optional: Clear arrow-key history too
+      setIsBooting(true); // Put the UI back into boot mode
+      hasBooted.current = false; // UNLOCK the boot effect
+    }
+    else if (cleanInput !== "") {
       const output = COMMANDS[cleanInput]
         ? COMMANDS[cleanInput]()
         : `ERR: COMMAND_NOT_FOUND [${cleanInput}]`;
@@ -174,7 +197,7 @@ function App() {
       setHistoryIndex(-1);
     }
     setInput("");
-    setSuggestions([]); 
+    setSuggestions([]);
   };
 
   return (

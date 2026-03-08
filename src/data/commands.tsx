@@ -3,12 +3,21 @@ import React from "react";
 export type CommandResponse = string | React.ReactNode;
 
 export const COMMANDS: Record<string, () => CommandResponse> = {
-    help: () => (
-        <div className="glow-text">
-            <p className="text-white/90">SYS_ACCESS: GRANTED</p>
-            <p className="text-white/60">Available modules: [about] [projects] [clear] [github]</p>
-        </div>
-    ),
+    help: () => {
+        // CHANGE: Added .sort() to ensure the modules appear alphabetically
+        const modules = Object.keys(COMMANDS)
+            .filter((cmd) => cmd !== "help")
+            .sort() // Alphabetical order (A-Z)
+            .map((cmd) => `[${cmd}]`)
+            .join(" ");
+
+        return (
+            <div className="glow-text">
+                <p className="text-white/90">SYS_ACCESS: GRANTED</p>
+                <p className="text-white/60">Available modules: {modules}</p>
+            </div>
+        );
+    },
 
     about: () => "I am a developer specializing in React and modern terminal-based UI architecture.",
 
@@ -45,7 +54,13 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
     github: () => {
         window.open("https://github.com/Phuoc-Nguyen-CS", "_blank");
         return "REDIRECTING TO GITHUB...";
-    }
+    },
+
+    restart: () => {
+        return "SYSTEM RESTART INITIATED...";
+    },
+
+    clear: () => "Clearing terminal buffer..."
 };
 
 export const COMMAND_LIST = Object.keys(COMMANDS);
