@@ -44,11 +44,15 @@
 
   /* CRT Scanline Overlay */
   .scanlines {
-    @apply fixed inset-0 pointer-events-none z-50;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-        rgba(0, 0, 0, 0.1) 50%);
-    background-size: 100% 4px;
-  }
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+  
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+          rgba(0, 0, 0, 0.1) 50%);
+      background-size: 100% 4px;
+    }
 
   /* Neon Glow Effect */
   .glow-text {

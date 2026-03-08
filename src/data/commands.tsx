@@ -29,9 +29,9 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
     /* 1. LeetCode / NeetCode Progress */
     leetcode: () => {
         const stats = [
-            { label: "EASY", count: parseInt(leetcodeData.easy), total: 100, color: "bg-green-500" },
-            { label: "MEDIUM", count: parseInt(leetcodeData.medium), total: 100, color: "bg-yellow-500" },
-            { label: "HARD", count: parseInt(leetcodeData.hard), total: 100, color: "bg-red-500" },
+            { label: "EASY", count: parseInt(leetcodeData.easy), total: 28, color: "bg-green-500" },
+            { label: "MEDIUM", count: parseInt(leetcodeData.medium), total: 101, color: "bg-yellow-500" },
+            { label: "HARD", count: parseInt(leetcodeData.hard), total: 10, color: "bg-red-500" },
         ];
 
         return (
