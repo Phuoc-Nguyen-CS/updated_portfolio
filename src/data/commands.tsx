@@ -93,6 +93,10 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                             <p className="text-white font-bold">Full-Stack Freelance Developer</p>
                             <span className="text-xs opacity-50">2025-PRESENT</span>
                         </div>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono font-bold">[Tools]</span>
+                            <span className="opacity-80">Javascript, React, Supabase, Figma, Swiper.js</span>
+                        </div>
                         <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
                             <li>• Modernized real-estate UI/UX using React, Supabase, and Swiper.js.</li>
                             <li>• Implemented SEO best practices to drive traffic and optimized performance for older devices.</li>
@@ -117,17 +121,39 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                 <p className="text-[var(--color-hacker-green)] font-bold underline mb-2">03. REPOSITORY_PROJECTS</p>
                 <div className="space-y-4 pl-4">
                     <div>
-                        <p className="text-white font-bold">Game Activity Automation Tool (Python)</p>
+                        <p className="text-white font-bold">Game Activity Automation Tool</p>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono font-bold">[Tools]</span>
+                            <span className="opacity-80">Python, Tesseract, BeautifulSoup4, OpenCV</span>
+                        </div>
                         <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Developed a Discord Bot to assist in weekly Game Activity Management.</li>
                             <li>• Leveraged OpenCV/Tesseract for data extraction and BeautifulSoup4 for web scraping.</li>
-                            <li>• Optimized execution speed by 92% through asynchronous programming.</li>
+                            <li>• Discovered a bottleneck and optimized execution speed by 92% through asynchronous programming.</li>
                         </ul>
                     </div>
                     <div>
-                        <p className="text-white font-bold">Gesture Detection Program (TensorFlow)</p>
+                        <p className="text-white font-bold">Gesture Detection Program</p>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono font-bold">[Tools]</span>
+                            <span className="opacity-80">Python, OpenCV, TensorFlow</span>
+                        </div>
                         <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
                             <li>• Developed real-time hand-tracking software with 95% recognition accuracy.</li>
                             <li>• Trained custom models using Mediapipe and TensorFlow for unique hand gestures.</li>
+                            <li>• Gestures could then be translated into computer commands to allow more ways to interact with a computer.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p className="text-white font-bold">Terminal Portfolio</p>
+                        <div className="flex">
+                            <span className="text-white w-20 shrink-0 font-mono font-bold">[Tools]</span>
+                            <span className="opacity-80">Typescript, Vite, Git-Actions, React, Vercel, Tailwind</span>
+                        </div>
+                        <ul className="list-dash pl-4 text-xs sm:text-sm opacity-80 mt-1 space-y-1">
+                            <li>• Developed a portfolio website mimicking a Linux terminal.</li>
+                            <li>• Added functionalities such as: auto-completion, command history, and command suggestions.</li>
+                            <li>• Engineered an automated CI/CD pipeline using Github Actions and Repository Dispatch events to sync real-time updates.</li>
                         </ul>
                     </div>
                 </div>
@@ -139,8 +165,8 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                     <p className="text-[var(--color-hacker-green)] font-bold underline mb-3">04. TECH_STACK</p>
                     <div className="space-y-1 text-xs sm:text-sm">
                         <div className="flex">
-                            <span className="text-white w-20 shrink-0 font-mono">[LANGS]</span>
-                            <span className="opacity-80">Python, C/C++, JS, SQL, Java, R</span>
+                            <span className="text-white w-20 shrink-0 font-mono">[LANG]</span>
+                            <span className="opacity-80">Python, C/C++, Javascript, SQL, Java, R, Typescript</span>
                         </div>
                         <div className="flex">
                             <span className="text-white w-20 shrink-0 font-mono">[SOFT]</span>
@@ -148,7 +174,7 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                         </div>
                         <div className="flex">
                             <span className="text-white w-20 shrink-0 font-mono">[FRAME]</span>
-                            <span className="opacity-80">React, AWS S3, OpenCV, Django, Pandas</span>
+                            <span className="opacity-80">React, AWS S3, OpenCV, Django, Pandas, Vite</span>
                         </div>
                         <div className="flex">
                             <span className="text-white w-20 shrink-0 font-mono">[STYLE]</span>
@@ -210,7 +236,17 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                         rel="noreferrer"
                         className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
                     >
-                        {"[01] Cebu Real-Estate Property Website"}
+                        {"[01] Cebu Real-Estate Property Website (JavaScript)"}
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+                    >
+                        {"[02] Terminal Portfolio (TypeScript)"}
                     </a>
                 </li>
                 <li>
@@ -220,7 +256,7 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                         rel="noreferrer"
                         className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
                     >
-                        {"[02] Maplestory Discord Bot"}
+                        {"[03] Maplestory Discord Bot (Python)"}
                     </a>
                 </li>
                 <li>
@@ -230,7 +266,7 @@ export const COMMANDS: Record<string, () => CommandResponse> = {
                         rel="noreferrer"
                         className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
                     >
-                        {"[03] Hand Gesture Detection Program"}
+                        {"[04] Hand Gesture Detection Program (Python)"}
                     </a>
                 </li>
             </ul>
