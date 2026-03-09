@@ -48,21 +48,28 @@ def build_automated_logs():
                 
                 # Read Content
                 file_path = os.path.join(BLOG_DIR, filename)
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        # Clean lines and remove empty ones
-                        lines = [line.strip() for line in f.readlines() if line.strip()]
-                    
+                content = []
+                
+                # Attempt to read with the most common encodings
+                for enc in ['utf-8-sig', 'utf-16', 'latin-1']:
+                    try:
+                        with open(file_path, "r", encoding=enc) as f:
+                            content = [line.strip() for line in f.readlines() if line.strip()]
+                        if content: break # Successfully read, exit loop
+                    except (UnicodeDecodeError, Exception):
+                        continue
+
+                if content:
                     logs.append({
                         "id": name_no_ext,
                         "title": display_title,
                         "date": date_str,
                         "folder": folder_name,
-                        "content": lines
+                        "content": content
                     })
                     print(f"[+] Synced: {filename}")
-                except Exception as e:
-                    print(f"[!] FAILED reading {filename}: {e}")
+                else:
+                    print(f"[!] FAILED: Could not decode {filename} with any supported encoding.")
             else:
                 print(f"[?] SKIPPING: {filename} (Does not match YYYY-MM-DD pattern)")
 
