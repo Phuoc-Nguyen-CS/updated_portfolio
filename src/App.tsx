@@ -74,24 +74,30 @@ export default function App() {
     hasBooted.current = true;
 
     let currentLine = 0;
+
     const printNextLine = () => {
       if (currentLine < BOOT_SEQUENCE.length) {
+        const log = BOOT_SEQUENCE[currentLine];
+
         setHistory((prev) => [
           ...prev,
           {
             cmd: "",
-            out: typeof BOOT_SEQUENCE[currentLine] === "string"
-              ? <span className="text-white/80 italic">{BOOT_SEQUENCE[currentLine]}</span>
-              : BOOT_SEQUENCE[currentLine],
             cwd: "/",
+            out: typeof log.text === "string"
+              ? <span className={log.color || "text-white/80 italic"}>{log.text}</span>
+              : log.text,
           }
         ]);
+
         currentLine++;
-        setTimeout(printNextLine, 200); // Speed of boot logs
+        // Use the custom delay for this specific line!
+        setTimeout(printNextLine, log.delay);
       } else {
         setIsBooting(false);
       }
     };
+
     printNextLine();
   }, [isBooting]);
 

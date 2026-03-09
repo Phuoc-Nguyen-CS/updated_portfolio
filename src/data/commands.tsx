@@ -4,7 +4,7 @@ import type { CommandResponse } from "./types";
 import { FILE_CONTENT } from "./system_files";
 import { EXECUTABLES } from "./executables";
 import { VFS } from "./vfs";
-
+import { resolvePath } from "../utils/path";
 import { HelpManual, QuickStartGuide } from "./commands/guides";
 
 /* =========================================================
@@ -72,50 +72,27 @@ export const COMMANDS: Record<
                 })}
             </div>
         );
-},
+    },
 
     // 02. CD: Directory-only navigation guard
-   cd: (args, cwd = "/", setCwd) => {
-    if (!args || args.length === 0) {
-        if (setCwd) setCwd("/");
-        return "";
-    }
-    
-    const target = args[0].trim();
+    cd: (args, cwd = "/", setCwd) => {
+        if (!args || args.length === 0) {
+            if (setCwd) setCwd("/");
+            return "";
+        }
 
-    // 1. Handle "cd .."
-    if (target === "..") {
-        if (cwd === "/") return "";
-        const parts = cwd.split("/").filter(Boolean);
-        parts.pop();
-        const newPath = "/" + parts.join("/");
-        if (setCwd) setCwd(newPath === "" ? "/" : newPath);
-        return "";
-    }
+        const target = args[0].trim();
+        const newPath = resolvePath(cwd, target);
 
-    // 2. Build the Absolute Path
-    // We ensure there is exactly one slash between the current dir and the target
-    let newPath = "";
-    if (target.startsWith("/")) {
-        newPath = target; // Absolute path
-    } else {
-        newPath = cwd === "/" ? `/${target}` : `${cwd}/${target}`;
-    }
+        const targetObj = VFS[newPath as keyof typeof VFS];
 
-    // Remove any trailing slashes for the lookup
-    newPath = newPath.replace(/\/+$/, "");
-    if (newPath === "") newPath = "/";
-
-    // 3. THE LOOKUP
-    const targetObj = VFS[newPath as keyof typeof VFS];
-
-    if (targetObj && targetObj.type === "dir") {
-        if (setCwd) setCwd(newPath);
-        return "";
-    } else {
-        return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
-    }
-},
+        if (targetObj && targetObj.type === "dir") {
+            if (setCwd) setCwd(newPath);
+            return "";
+        } else {
+            return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
+        }
+    },
 
     // 03. CAT: Readable file-only guard
     cat: (args, cwd = "/", _setCwd, sessionFiles) => {
@@ -125,22 +102,11 @@ export const COMMANDS: Record<
 
         // 1. Separate the path from the filename
         const parts = inputTarget.split("/");
-        const targetFileName = parts.pop() || ""; // The last part is always the file
-        const targetDirRaw = parts.length > 0 ? parts.join("/") : "";
+        const targetFileName = parts.pop() || "";
+        const targetDirRaw = parts.join("/");
 
-        // 2. Resolve the target directory path
-        let targetDirPath = cwd;
-        if (targetDirRaw !== "") {
-            if (targetDirRaw.startsWith("/")) {
-                targetDirPath = targetDirRaw; // Absolute path (e.g., /logs/march2026)
-            } else {
-                targetDirPath = cwd === "/" ? `/${targetDirRaw}` : `${cwd}/${targetDirRaw}`; // Relative path
-            }
-        }
-
-        // Clean up trailing slashes for the VFS lookup
-        targetDirPath = targetDirPath.replace(/\/+$/, "");
-        if (targetDirPath === "") targetDirPath = "/";
+        // 2. Resolve the target directory path using our new D.R.Y. utility
+        const targetDirPath = resolvePath(cwd, targetDirRaw);
 
         // 3. Find the target folder in the VFS
         const targetFolder = VFS[targetDirPath as keyof typeof VFS];
@@ -149,7 +115,7 @@ export const COMMANDS: Record<
             return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
         }
 
-        // 4. Check Session RAM (User-created files in that specific target path)
+        // 4. Check Session RAM
         const actualSessionKey = Object.keys(sessionFiles || {}).find(
             key => key.toLowerCase() === targetFileName.toLowerCase() && sessionFiles[key].path === targetDirPath
         );
@@ -162,11 +128,10 @@ export const COMMANDS: Record<
             );
         }
 
-        // 5. Match against the VFS target directory (Case-Insensitive)
+        // 5. Match against the VFS target directory
         const actualKey = targetFileName.toLowerCase();
         const vfsMatch = targetFolder.children.find(c => c.toLowerCase() === actualKey);
 
-        // Check if they tried to cat a directory instead of a file
         if (vfsMatch && !vfsMatch.includes('.')) {
             return <span className="text-red-500">cat: {inputTarget}: Is a directory</span>;
         }
@@ -175,7 +140,6 @@ export const COMMANDS: Record<
             return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
         }
 
-        // Return static content from FILE_CONTENT
         const fileContentKey = Object.keys(FILE_CONTENT).find(k => k.toLowerCase() === vfsMatch.toLowerCase()) || vfsMatch;
 
         if (FILE_CONTENT[fileContentKey]) {
