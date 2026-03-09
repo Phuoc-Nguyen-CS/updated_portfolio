@@ -1,5 +1,30 @@
 [
   {
+    "id": "2026-03-09-MIR_OS_01",
+    "title": "Mir Os 01",
+    "date": "2026-03-09",
+    "folder": "March2026",
+    "content": [
+      "# Terminal Portfolio Update [MIR_OS]:",
+      "- TYPE: Code Cleanup & Mobile Optimizations",
+      "- TARGET: Terminal Portfolio",
+      "- STATUS: Deployed",
+      "# THE_OBJECTIVE",
+      "As the project quickly grew, the main files were excessively getting out of hand and finding errors were taking too long. The goal was then to",
+      "break up the code into many components and ensure D.R.Y. was being followed.",
+      "# THE_EXECUTION",
+      "* [CODE_ORGANIZATION]: Took a giant 800-line file and split it up. Now, the virtual file system, the text documents, and the actual terminal commands all live in their own neat, separate files.",
+      "* [SMARTER_NAVIGATION]: Built a custom helper function that mimics how a real computer navigates folders. Now, complex commands like `cd ../../logs` work flawlessly.",
+      "* [MOBILE_FIXES]: Redesigned the 'quickstart' guide into a compact, two-column dashboard so it doesn't take up the whole screen. Also fixed a bug where long text was stretching the screen horizontally on phones.",
+      "# THE_ROADBLOCK",
+      "The terminal's logic for reading commands (`cd`, `cat`, and autocomplete) was getting repetitive. Every command had its own slightly different way of figuring out which folder the user wanted to go to, which left room for bugs and made the code messy.",
+      "# THE_RESOLUTION",
+      "Instead of repeating myself, I extracted that logic into a single 'Path Resolver' tool. Now, all commands share the exact same reliable map to find files. I also set up a cleaner command processor so the main app doesn't have to think about *how* to run a command\u2014it just displays the result.",
+      "# NEXT_STEPS",
+      "Still need to work on the auto suggestion when going through multiple directories and such but I'll save that headache for another day"
+    ]
+  },
+  {
     "id": "2026-03-08-Terminal_Portfolio_Updates",
     "title": "Terminal Portfolio Updates",
     "date": "2026-03-08",
@@ -11,9 +36,9 @@
       "- COMPONENT: VFS, CI/CD, Text Editing",
       "- STATUS: Deployed",
       "# THE_OBJECTIVE",
-      "Today\u2019s goal was twofold: transform the terminal from a static read-only interface into a fully interactive operating system, and build a \"hands-off\" CI/CD pipeline so I can publish blog posts directly from a separate GitHub repository without touching the core React code.",
+      "Today\u2019s goal was to: transform the terminal from a static read-only interface into a fully interactive operating system, and build a \"hands-off\" CI/CD pipeline so I can publish blog posts directly from a separate GitHub repository without touching the core React code.",
       "# THE_EXECUTION",
-      "I successfully engineered and deployed several major system protocols:",
+      "* [GITHUB ACTIONS]: Allowed for seamless CI/CD from one repository update to another. This was used in both updating my leetcode progress and this blog.",
       "* [VIM_EDITOR]: Integrated a functional Vim-like text editor. Users can now create, edit, and save files directly into the terminal's Session RAM using authentic Vim commands (`:i`, `[ESC]`, `:wq`, `:q`).",
       "* [FILE_MANAGEMENT]: Implemented the `rm` command. Users can delete their own session files, but the system actively guards against the deletion of core portfolio metadata (Permission Denied).",
       "* [SYSTEM_MANUAL]: Added a comprehensive `help` command, featuring a visually distinct UI and a Vim Quickstart guide for recruiters unfamiliar with Linux environments.",
