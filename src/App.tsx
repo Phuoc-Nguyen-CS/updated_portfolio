@@ -99,6 +99,12 @@ const BOOT_SEQUENCE = [
 
           <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd [dir]</span>
           <span className="text-white/80">Traverse directories (e.g. <code className="bg-white/10 px-1 rounded">cd projects</code>).</span>
+          
+          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd ..</span>
+          <span className="text-white/80">Go to the previous directory</span>
+          
+          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd</span>
+          <span className="text-white/80">Go to home directory</span>
         </div>
       </div>
 
@@ -306,37 +312,71 @@ export default function App() {
         }
       }
       else if (parts.length === 2) {
-        const baseCmd = parts[0];
-        const target = parts[1];
+        const baseCmd = parts[0].toLowerCase();
+        const target = parts[1]; // e.g., "logs/ma" or "/logs/"
+
+        // Separate the directory path from the partial file/folder name
+        const lastSlashIndex = target.lastIndexOf("/");
+        const searchDirRaw = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex) : "";
+        const partialName = lastSlashIndex !== -1 ? target.substring(lastSlashIndex + 1).toLowerCase() : target.toLowerCase();
+
+        // We keep the prefix (e.g., "/logs/") to stitch the final command back together
+        const prefixToKeep = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex + 1) : "";
+
+        // Resolve the absolute path in the VFS
+        let searchPath = cwd;
+        if (searchDirRaw !== "") {
+          if (searchDirRaw.startsWith("/")) {
+            searchPath = searchDirRaw;
+          } else {
+            searchPath = cwd === "/" ? `/${searchDirRaw}` : `${cwd}/${searchDirRaw}`;
+          }
+        }
+
+        // Clean trailing slashes for VFS lookup
+        searchPath = searchPath.replace(/\/+$/, "");
+        if (searchPath === "") searchPath = "/";
+
+        // Look up the target folder in the VFS
+        const targetFolder = VFS[searchPath as keyof typeof VFS];
+        if (!targetFolder) {
+          setSuggestions([]);
+          return;
+        }
+
+        // Gather static children and session files for THAT specific folder
+        const staticChildren = targetFolder.children || [];
+        const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchPath);
+        const allAvailableItems = Array.from(new Set([...staticChildren, ...localSessionFiles]));
+
         let matches: string[] = [];
 
+        // Filter matches based on command rules
         if (baseCmd === "cd") {
           matches = allAvailableItems.filter(item => {
-            const path = cwd === "/" ? `/${item}` : `${cwd}/${item}`;
-            return VFS[path as keyof typeof VFS]?.type === "dir" && item.startsWith(target);
-          });
-        } else if (baseCmd === "rm") {
-          matches = Object.keys(sessionFiles)
-            .filter(fileName =>
-              sessionFiles[fileName].path === cwd &&
-              fileName.startsWith(target)
-            ).sort();
+            const itemPath = searchPath === "/" ? `/${item}` : `${searchPath}/${item}`;
+            return VFS[itemPath as keyof typeof VFS]?.type === "dir" && item.toLowerCase().startsWith(partialName);
+          }).sort();
         } else if (baseCmd === "cat" || baseCmd === "vim") {
           matches = allAvailableItems.filter(item => {
             const isFile = Object.keys(FILE_CONTENT).includes(item) || localSessionFiles.includes(item);
-
-            const prefixMatch = item.toLowerCase().startsWith(target.toLowerCase());
-
-            return isFile && prefixMatch;
+            return isFile && item.toLowerCase().startsWith(partialName);
           }).sort();
+        } else if (baseCmd === "rm") {
+          matches = localSessionFiles.filter(item => item.toLowerCase().startsWith(partialName)).sort();
         }
 
+        // Apply Autocomplete or display suggestions
         if (matches.length === 1) {
-          const isDir = !matches[0].includes(".");
-          setInput(`${baseCmd} ${matches[0]}${isDir ? "/" : ""}`);
+          const match = matches[0];
+          const isDir = !match.includes(".");
+          // Reconstruct the string: e.g. "cd " + "/logs/" + "march2026" + "/"
+          setInput(`${baseCmd} ${prefixToKeep}${match}${isDir ? "/" : ""}`);
           setSuggestions([]);
         } else if (matches.length > 1) {
           setSuggestions(matches);
+        } else {
+          setSuggestions([]);
         }
       }
     }
@@ -386,32 +426,38 @@ export default function App() {
       hasBooted.current = false;
       setCwd("/");
     } else if (baseCmd === "vim") {
-      const targetFile = args[0];
+      const rawTarget = args[0];
       const currentFolder = VFS[cwd as keyof typeof VFS];
 
-      if (!targetFile) {
+      if (!rawTarget) {
         setVimMode({ active: true, file: "[No Name]" });
-      }
-      /* ---------------------------------------------------------
-          LINUX_GUARD: Permission Denied for System Files
-          This prevents users from "going through" your core 
-          portfolio data and breaking the experience.
-          --------------------------------------------------------- */
-      else if (Object.keys(FILE_CONTENT).includes(targetFile)) {
-        const out = (
-          <span className="text-red-500">
-            bash: vim: {targetFile}: Permission denied (system file)
-          </span>
-        );
-        setHistory(prev => [...prev, { cmd: input, out, cwd }]);
-      }
-      // Standard directory check remains
-      else if (currentFolder?.children.includes(targetFile) && !targetFile.includes('.')) {
-        const out = <span className="text-red-500">bash: vim: {targetFile}: Is a directory</span>;
-        setHistory(prev => [...prev, { cmd: input, out, cwd }]);
-      }
-      else {
-        setVimMode({ active: true, file: targetFile });
+      } else {
+        const parts = rawTarget.split("/");
+        const targetFile = parts.pop() || "";
+
+        /* ---------------------------------------------------------
+            LINUX_GUARD: Permission Denied for System Files
+            Case-insensitive check against ALL core files and executables
+           --------------------------------------------------------- */
+        const isProtected =
+          Object.keys(FILE_CONTENT).some(k => k.toLowerCase() === targetFile.toLowerCase()) ||
+          Object.keys(EXECUTABLES).some(k => k.toLowerCase() === targetFile.toLowerCase());
+
+        if (isProtected) {
+          const out = (
+            <span className="text-red-500">
+              bash: vim: {targetFile}: Permission denied (system file is read-only)
+            </span>
+          );
+          setHistory(prev => [...prev, { cmd: input, out, cwd }]);
+        }
+        else if (currentFolder?.children.includes(targetFile) && !targetFile.includes('.')) {
+          const out = <span className="text-red-500">bash: vim: {targetFile}: Is a directory</span>;
+          setHistory(prev => [...prev, { cmd: input, out, cwd }]);
+        }
+        else {
+          setVimMode({ active: true, file: targetFile });
+        }
       }
     } else {
       let output: CommandResponse;

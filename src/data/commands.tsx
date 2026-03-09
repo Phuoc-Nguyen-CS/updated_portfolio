@@ -16,11 +16,11 @@ export const VFS: Record<string, { type: string; children: string[] }> = {
     },
     "/projects": {
         type: "dir",
-        children: ["README.md", "cebu_real_estate.js", "terminal_portfolio.ts", "maple_discord_bot.py", "gesture_detection.py"]
+        children: ["README.md", "cebu_real_estate.js", "terminal_portfolio.tsx", "maple_discord_bot.py", "gesture_detection.py"]
     },
     "/logs": {
         type: "dir",
-        children: [] // We will fill this dynamically
+        children: []
     }
 };
 
@@ -277,7 +277,7 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
 };
 
 /* =========================================================
-    LOG_INFLATION_ENGINE
+    LOG_BLOG
     This runs immediately when the file is imported.
    ========================================================= */
 logEntries.forEach((entry) => {
@@ -432,6 +432,117 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
             <p className="text-[10px] text-white/40 mt-2 italic">Note: Handshake will initialize in a new tab.</p>
         </div>
     ),
+
+    /* =========================================================
+        PROJECT SIMULATIONS
+       ========================================================= */
+    "maple_discord_bot.py": () => (
+        <div className="mt-2 border-l-2 border-[#5865F2] pl-4 bg-[#5865F2]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
+            <p className="text-[#5865F2] font-bold font-mono uppercase">[*] Initializing Discord.py Wrapper...</p>
+            <p className="text-white/70 font-mono text-xs mt-1">Authenticating token... [OK]</p>
+            <p className="text-white/70 font-mono text-xs">Connecting to Discord Gateway... [OK]</p>
+            <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1 animate-pulse">Scrapping Data for Tesseract to extract</p>
+
+            <div className="mt-4 text-xs space-y-1 border-t border-[#5865F2]/30 pt-2">
+                <p className="text-white font-bold mb-2">REGISTERED_SLASH_COMMANDS:</p>
+                <p className="text-white/70"><span className="text-yellow-400 font-bold">/track</span> [user] - Fetch daily exp gain.</p>
+                <p className="text-white/70"><span className="text-yellow-400 font-bold">/culvert</span> [user] - Fetch weekly culvert scores.</p>
+            </div>
+
+            <a
+                href="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block px-3 py-1 bg-[#5865F2] text-white font-bold hover:bg-white hover:text-[#5865F2] transition-colors text-xs"
+            >
+                [OPEN_SOURCE_CODE]
+            </a>
+        </div>
+    ),
+
+    "gesture_detection.py": () => (
+        <div className="mt-2 border-l-2 border-orange-500 pl-4 bg-orange-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
+            <p className="text-orange-400 font-bold font-mono uppercase">[*] Loading TensorFlow/Keras Models...</p>
+            <p className="text-white/70 font-mono text-xs mt-1">Importing OpenCV2... [OK]</p>
+            <p className="text-white/70 font-mono text-xs">Initializing MediaPipe Hand Tracking... [OK]</p>
+            <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1">Camera Feed: ACTIVE (Simulated)</p>
+
+            <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-orange-300/80">
+                <p className="animate-pulse">{">"} TARGET ACQUIRED: Hand_01</p>
+                <p>{">"} CONFIDENCE_SCORE: 0.982</p>
+                <p>{">"} BOUNDING_BOX: [X: 142, Y: 89, W: 210, H: 250]</p>
+                <p className="text-white font-bold mt-1">{">"} DETECTED_GESTURE: "VOLUME_UP"</p>
+                <p className="text-[var(--color-hacker-green)]">{">"} EXECUTING SYSTEM COMMAND... SUCCESS</p>
+            </div>
+
+            <a
+                href="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block px-3 py-1 bg-orange-500 text-black font-bold hover:bg-white hover:text-orange-600 transition-colors text-xs"
+            >
+                [OPEN_SOURCE_CODE]
+            </a>
+        </div>
+    ),
+
+    "cebu_real_estate.js": () => (
+        <div className="mt-2 border-l-2 border-cyan-500 pl-4 bg-cyan-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
+            <p className="text-cyan-400 font-bold font-mono uppercase">[*] Initializing Next.js / Supabase Client...</p>
+            <p className="text-white/70 font-mono text-xs mt-1">Fetching property listings from Postgres... [OK]</p>
+            <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1">Status: 200 OK (38ms)</p>
+
+            <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-cyan-300/80 overflow-hidden">
+                <pre>{`
+                {
+                    "properties": [
+                        {
+                        "id": "CEB-01",
+                        "type": "Condominium",
+                        "location": "Cebu Park",
+                        "status": "Available"
+                        },
+                        ...
+                    ]
+                }`}
+                </pre>
+            </div>
+
+            <a
+                href="https://github.com/Jameboyyy/CLS-Properties"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block px-3 py-1 bg-cyan-500 text-black font-bold hover:bg-white hover:text-cyan-600 transition-colors text-xs"
+            >
+                [OPEN_SOURCE_CODE]
+            </a>
+        </div>
+    ),
+    "terminal_portfolio.tsx": () => (
+        <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4 bg-[var(--color-hacker-green)]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
+            <p className="text-[var(--color-hacker-green)] font-bold font-mono uppercase">[*] Bootstrapping MIR_OS Environment...</p>
+            <p className="text-white/70 font-mono text-xs mt-1">Compiling React components... [OK]</p>
+            <p className="text-white/70 font-mono text-xs">Injecting Virtual File System (VFS)... [OK]</p>
+            <p className="text-white/70 font-mono text-xs">Mounting Dynamic Blog Data... [OK]</p>
+            <p className="text-yellow-400 font-bold font-mono text-xs mt-1 animate-pulse">SYSTEM STATUS: FULLY_OPERATIONAL</p>
+
+            <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-[var(--color-hacker-green)]/80 border border-[var(--color-hacker-green)]/20">
+                <p>{">"} VITE v5.0.0 ready in 142ms</p>
+                <p>{">"} Local: http://localhost:5173/</p>
+                <p>{">"} TailwindCSS loading... SUCCESSFUL</p>
+                <p className="text-white mt-2 font-bold">{">"} Vercel Hosting... STABLE</p>
+            </div>
+
+            <a
+                href="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block px-3 py-1 bg-[var(--color-hacker-green)] text-black font-bold hover:bg-white transition-colors text-xs"
+            >
+                [OPEN_SOURCE_CODE]
+            </a>
+        </div>
+    ),
 };
 /* =========================================================
     COMMAND LOGIC
@@ -547,47 +658,68 @@ export const COMMANDS: Record<
     cat: (args, cwd = "/", _setCwd, sessionFiles) => {
         if (!args || args.length === 0) return "cat: missing file operand";
 
-        // 1. Get the user's input
-        const inputTarget = args[0].replace(/\/+$/, "");
+        const inputTarget = args[0].trim();
 
-        // 2. Find the ACTUAL key (handling case-insensitivity)
-        const systemKeys = Object.keys(FILE_CONTENT);
-        const sessionKeys = Object.keys(sessionFiles || {});
+        // 1. Separate the path from the filename
+        const parts = inputTarget.split("/");
+        const targetFileName = parts.pop() || ""; // The last part is always the file
+        const targetDirRaw = parts.length > 0 ? parts.join("/") : "";
 
-        const actualKey = [...systemKeys, ...sessionKeys].find(
-            key => key.toLowerCase() === inputTarget.toLowerCase()
-        ) || inputTarget;
+        // 2. Resolve the target directory path
+        let targetDirPath = cwd;
+        if (targetDirRaw !== "") {
+            if (targetDirRaw.startsWith("/")) {
+                targetDirPath = targetDirRaw; // Absolute path (e.g., /logs/march2026)
+            } else {
+                targetDirPath = cwd === "/" ? `/${targetDirRaw}` : `${cwd}/${targetDirRaw}`; // Relative path
+            }
+        }
 
-        const currentFolder = VFS[cwd as keyof typeof VFS];
+        // Clean up trailing slashes for the VFS lookup
+        targetDirPath = targetDirPath.replace(/\/+$/, "");
+        if (targetDirPath === "") targetDirPath = "/";
 
-        // 3. Check Session RAM (Current folder only)
-        if (sessionFiles && sessionFiles[actualKey] && sessionFiles[actualKey].path === cwd) {
+        // 3. Find the target folder in the VFS
+        const targetFolder = VFS[targetDirPath as keyof typeof VFS];
+
+        if (!targetFolder) {
+            return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
+        }
+
+        // 4. Check Session RAM (User-created files in that specific target path)
+        const actualSessionKey = Object.keys(sessionFiles || {}).find(
+            key => key.toLowerCase() === targetFileName.toLowerCase() && sessionFiles[key].path === targetDirPath
+        );
+
+        if (actualSessionKey) {
             return (
                 <div className="whitespace-pre-wrap mt-1">
-                    {sessionFiles[actualKey].content.join("\n")}
+                    {sessionFiles[actualSessionKey].content.join("\n")}
                 </div>
             );
         }
 
-        // 4. Check if it's a directory
-        if (actualKey.indexOf('.') === -1 && currentFolder?.children.includes(actualKey)) {
-            return <span className="text-red-500">cat: {actualKey}: Is a directory</span>;
-        }
+        // 5. Match against the VFS target directory (Case-Insensitive)
+        const actualKey = targetFileName.toLowerCase();
+        const vfsMatch = targetFolder.children.find(c => c.toLowerCase() === actualKey);
 
-        // 5. Check if file exists in the current folder VFS
-        // We compare against the VFS children list (case-insensitive)
-        const vfsMatch = currentFolder?.children.find(c => c.toLowerCase() === inputTarget.toLowerCase());
+        // Check if they tried to cat a directory instead of a file
+        if (vfsMatch && !vfsMatch.includes('.')) {
+            return <span className="text-red-500">cat: {inputTarget}: Is a directory</span>;
+        }
 
         if (!vfsMatch) {
             return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
         }
 
-        // 6. Return static content
-        if (FILE_CONTENT[vfsMatch]) {
-            return FILE_CONTENT[vfsMatch]();
+        // Return static content from FILE_CONTENT
+        const fileContentKey = Object.keys(FILE_CONTENT).find(k => k.toLowerCase() === vfsMatch.toLowerCase()) || vfsMatch;
+
+        if (FILE_CONTENT[fileContentKey]) {
+            return FILE_CONTENT[fileContentKey]();
         }
 
-        return <span className="text-red-500">cat: {vfsMatch}: Permission denied</span>;
+        return <span className="text-red-500">cat: {inputTarget}: Permission denied</span>;
     },
 
     // 04. RM: Remove user created files
