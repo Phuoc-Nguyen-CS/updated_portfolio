@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS, COMMAND_LIST, EXECUTABLES, FILE_CONTENT, VFS, type CommandResponse} from "./data/commands";
+import { COMMANDS, COMMAND_LIST, EXECUTABLES, VFS} from "./data/commands";
+import { FILE_CONTENT } from "./data/system_files";
+import type { CommandResponse } from "./data/types";
 import { VimEditor } from "./VimEditor";
 /**
  * Represents a single entry in the terminal history.
