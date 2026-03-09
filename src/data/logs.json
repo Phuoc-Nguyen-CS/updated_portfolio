@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "2026-03-08-Terminal_Portfolio_Updates",
+    "title": "Terminal Portfolio Updates",
+    "date": "2026-03-08",
+    "folder": "March2026",
+    "content": [
+      "# Terminal Portfolio updates [MIR_OS]:",
+      "* Added VIM like text editor",
+      "* Added rm",
+      "* Added help functions",
+      "* Added CI/CD to blog functionality",
+      "* Fixed a few production issues"
+    ]
+  }
+]
