@@ -173,7 +173,7 @@ export default function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [input, setInput] = useState("cat about.txt");
+  const [input, setInput] = useState("quickstart");
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);

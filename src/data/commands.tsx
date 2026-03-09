@@ -830,19 +830,19 @@ export const COMMANDS: Record<
 
     // 04. QUICKSTART: The Non-Tech Guided Tour
     quickstart: () => {
-        const techArsenalData = [
+        const techData = [
             { label: "LANGUAGES:", value: "TypeScript, JavaScript, Python, C/C++, SQL" },
             { label: "FRONTEND:", value: "React, Next.js, Tailwind CSS" },
             { label: "BACKEND & DB:", value: "Django, Node.js, Supabase, PostgreSQL" },
             { label: "AI & VISION:", value: "TensorFlow, OpenCV, MediaPipe" },
-            { label: "DEV_TOOLS:", value: "Git, Postman, Vercel, Netlify, OCR Tools" }
+            { label: "DEV_TOOLS:", value: "Git, Figma, Postman, Vercel, Netlify, OCR Tools" }
         ];
 
-        const activeProjectsData = [
-            { title: "Cebu Real-Estate Architecture", desc: "Modern property listing platform using Supabase & Next.js." },
+        const projectsData = [
+            { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system." },
+            { title: "Real-Estate Website", desc: "Modern property listing platform using Supabase & Next.js." },
             { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup." },
             { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls." },
-            { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system." }
         ];
 
         return (
@@ -893,7 +893,7 @@ export const COMMANDS: Record<
                         </h3>
                         <div className="text-white/80 text-sm pl-3 border-l-2 border-blue-500/30 space-y-2 font-mono">
 
-                            {techArsenalData.map((item, i) => (
+                            {techData.map((item, i) => (
                                 <div key={i} className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                                     <span className="text-blue-400 font-bold w-28 shrink-0">{item.label}</span>
                                     <span className="text-white">{item.value}</span>
@@ -901,7 +901,7 @@ export const COMMANDS: Record<
                             ))}
 
                             <p className="text-xs text-white/40 italic mt-4 pt-2 border-t border-blue-500/20">
-                                * To view the full document later, type: <code className="text-yellow-400 bg-white/5 px-1 rounded">cat resume.txt</code>
+                                * To view the full document, type: <code className="text-yellow-400 bg-white/5 px-1 rounded">cat resume.txt</code>
                             </p>
                         </div>
                     </div>
@@ -909,10 +909,10 @@ export const COMMANDS: Record<
                     {/* SECTION 3: PROJECTS OVERVIEW */}
                     <div>
                         <h3 className="text-white font-bold text-sm bg-orange-500/20 inline-block px-2 py-1 mb-2 text-orange-300">
-                            03 // ACTIVE_PROJECTS
+                            03 // PROJECTS
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-2 border-orange-500/30">
-                            {activeProjectsData.map((project, i) => (
+                            {projectsData.map((project, i) => (
                                 <div key={i} className="bg-white/5 p-2 border border-white/5 hover:border-orange-500/50 transition-colors">
                                     <p className="text-orange-400 font-bold text-xs">{project.title}</p>
                                     <p className="text-white/60 text-[10px] mt-1">{project.desc}</p>
@@ -920,9 +920,35 @@ export const COMMANDS: Record<
                             ))}
                         </div>
                         <p className="text-xs text-white/40 italic mt-3 pl-3">
-                            * To run project simulations later, type: <code className="text-yellow-400">cd projects</code> then <code className="text-yellow-400">ls</code> followed by <code className="text-yellow-400">./ [file_name]</code>
+                            * To run project simulations later, type: <code className="text-yellow-400">cd projects</code> -{">"} <code className="text-yellow-400">ls</code> -{">"} <code className="text-yellow-400">./ [file_name]</code>
                         </p>
                     </div>
+
+                    {/* SECTION 4: Blog*/}
+                    <section className="mt-6">
+                        <h3 className="text-white font-bold text-sm bg-[var(--color-hacker-green)]/20 inline-block px-2 py-1 mb-2 text-[var(--color-hacker-green)]">
+                            04 // SYSTEM_LOGS
+                        </h3>
+                        <div className="pl-3 border-l-2 border-[var(--color-hacker-green)]/30">
+                            <div className="bg-white/5 p-3 border border-white/5 hover:border-[var(--color-hacker-green)]/50 transition-colors group">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="w-2 h-2 bg-[var(--color-hacker-green)] rounded-full animate-pulse"></span>
+                                    <p className="text-white font-mono text-xs uppercase tracking-widest">Recent Entry Found: [2026-03-08_system_init.md]</p>
+                                </div>
+                                <p className="text-white/60 text-[10px] leading-relaxed">
+                                    Personal dev logs, technical deep-dives, and system update history are stored within the encrypted log directory.
+                                </p>
+                            </div>
+
+                            <p className="text-xs text-white/40 italic mt-3">
+                                * To access, type:
+                                <code className="text-[var(--color-hacker-green)] ml-2">cd logs</code> -{">"}
+                                <code className="text-[var(--color-hacker-green)] ml-1">ls</code> -{">"}
+                                <code className="text-[var(--color-hacker-green)] ml-2">cd [month]</code> -{">"}
+                                <code className="text-[var(--color-hacker-green)] ml-1">cat [file_name]</code>
+                            </p>
+                        </div>
+                    </section>
 
                     {/* FOOTER */}
                     <div className="mt-6 pt-3 border-t border-[var(--color-hacker-green)]/30 text-center flex justify-between items-center">
