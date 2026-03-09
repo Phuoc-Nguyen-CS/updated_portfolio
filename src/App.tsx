@@ -108,7 +108,7 @@ const BOOT_SEQUENCE = [
         <div className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 text-sm sm:text-base">
           <span className="text-[var(--color-hacker-green)] font-bold font-mono">cat [file]</span>
           <span className="text-white/80">Display [.txt, .md] files</span>
-          
+
           <span className="text-[var(--color-hacker-green)] font-bold font-mono">./ [file]</span>
           <span className="text-white/80">Runs .exe files</span>
 
@@ -126,6 +126,35 @@ const BOOT_SEQUENCE = [
           <span>[*] Use <b className="text-white">TAB</b> for Autocomplete</span>
           <span>[*] Use <b className="text-white">UP_ARROW</b> for History</span>
           <span>[*] Type <b className="text-yellow-500">help</b> for Full Manual</span>
+        </div>
+      </div>
+
+      {/* NEW: SUGGESTED EXECUTION SEQUENCE */}
+      <div className="pt-4 mt-2 border-t border-[var(--color-hacker-green)]/30">
+        <p className="text-sm text-yellow-400 font-bold mb-3 flex items-center gap-2 tracking-widest uppercase">
+          <span className="animate-pulse">{">>"}</span> RECOMMENDED_EXECUTION_SEQUENCE:
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-white/10 transition-colors">
+            <span className="text-white font-mono font-bold block mb-1">cat resume.txt</span>
+            <span className="text-white/60">Lets explore some of the things I've created.</span>
+          </div>
+
+          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-white/10 transition-colors">
+            <span className="text-white font-mono font-bold block mb-1">cd logs</span>
+            <span className="text-white/60">Keep up to date with what I'm doing.</span>
+          </div>
+
+          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-white/10 transition-colors">
+            <span className="text-white font-mono font-bold block mb-1">./leetcode.exe</span>
+            <span className="text-white/60">Check my live Leetcode Progression.</span>
+          </div>
+
+          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-white/10 transition-colors">
+            <span className="text-white font-mono font-bold block mb-1">vim test.txt</span>
+            <span className="text-white/60">Test the built-in text editor capabilities.</span>
+          </div>
         </div>
       </div>
     </div>

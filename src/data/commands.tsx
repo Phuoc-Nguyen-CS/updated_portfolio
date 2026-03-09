@@ -1,14 +1,15 @@
 import React from "react";
 import leetcodeData from "./leetcode_stats.json";
+import logEntries from "./logs.json";
 
 export type CommandResponse = string | React.ReactNode;
 
 /* =========================================================
     VFS (VIRTUAL FILE SYSTEM)
-    Maps the directory structure and file locations.
-    Distinguishes between 'dir' and file entries.
+    We use 'any' or a Record type here so we can add 
+    dynamic log folders later.
    ========================================================= */
-export const VFS = {
+export const VFS: Record<string, { type: string; children: string[] }> = {
     "/": {
         type: "dir",
         children: ["about.txt", "resume.txt", "leetcode.exe", "contact.exe", "github.exe", "projects", "logs"]
@@ -19,7 +20,7 @@ export const VFS = {
     },
     "/logs": {
         type: "dir",
-        children: ["2026-03-08_system_init.md"]
+        children: [] // We will fill this dynamically
     }
 };
 
@@ -162,7 +163,7 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
 
                                 <span className="text-[var(--color-hacker-green)] font-bold">DESIGN:</span>
                                 <span className="text-white">Figma</span>
-                                
+
                                 <span className="text-[var(--color-hacker-green)] font-bold">CI/CD</span>
                                 <span className="text-white">Github-Actions</span>
 
@@ -276,6 +277,85 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
 };
 
 /* =========================================================
+    LOG_INFLATION_ENGINE
+    This runs immediately when the file is imported.
+   ========================================================= */
+logEntries.forEach((entry) => {
+    const folderName = entry.folder.toLowerCase();
+    const folderPath = `/logs/${folderName}`;
+    const fileName = `${entry.id}.md`.toLowerCase();
+
+    // 1. Ensure the parent (/logs) knows about the child (March2026)
+    if (VFS["/logs"] && !VFS["/logs"].children.includes(folderName)) {
+        VFS["/logs"].children.push(folderName);
+    }
+
+    // 2. Create the actual directory entry for the child
+    if (!VFS[folderPath]) {
+        VFS[folderPath] = {
+            type: "dir",
+            children: []
+        };
+    }
+
+    // 3. Add the file to the child's children list
+    if (!VFS[folderPath].children.includes(fileName)) {
+        VFS[folderPath].children.push(fileName);
+    }
+
+    // 4. Map the file content
+    FILE_CONTENT[fileName] = () => (
+        <div className="mt-2 max-w-3xl animate-in fade-in slide-in-from-left-2 duration-500">
+            {/* EYE-CATCHING HEADER */}
+            <div className="border-l-4 border-[var(--color-hacker-green)] pl-4 py-1 mb-6 bg-[var(--color-hacker-green)]/5">
+                <h1 className="text-white font-bold text-lg md:text-xl uppercase tracking-wide">
+                    {entry.title}
+                </h1>
+                <div className="flex justify-between items-baseline mt-1">
+                    <p className="text-[var(--color-hacker-green)] text-xs md:text-sm font-mono opacity-90">
+                        [ LOG_DATE: {entry.date} ]
+                    </p>
+                    <p className="text-white/20 text-[10px] font-mono select-none hidden sm:block">
+                        ID:{entry.id}
+                    </p>
+                </div>
+            </div>
+
+            {/* EASY-ON-THE-EYES BODY */}
+            <div className="text-white/80 text-sm md:text-base space-y-3 font-mono leading-relaxed pl-1 md:pl-5">
+                {entry.content.map((line, i) => {
+                    // Sub-headers (#) get a slight highlight
+                    if (line.startsWith('#')) {
+                        return (
+                            <p key={i} className="text-[var(--color-hacker-green)] font-bold text-base border-b border-white/10 pb-1 mt-6 mb-2">
+                                {line.replace('#', '').trim()}
+                            </p>
+                        );
+                    }
+                    if (line.startsWith('*') || line.startsWith('-')) {
+                        return (
+                            <p key={i} className="flex gap-3 pl-2">
+                                <span className="text-[var(--color-hacker-green)] opacity-80 mt-[2px]">»</span>
+                                <span>{line.substring(1).trim()}</span>
+                            </p>
+                        );
+                    }
+                    // Standard text
+                    return <p key={i}>{line}</p>;
+                })}
+            </div>
+
+            {/* SUBTLE FOOTER */}
+            <div className="mt-8 pt-2 border-t border-white/10 flex justify-between items-center opacity-40">
+                <p className="text-[10px] font-mono text-[var(--color-hacker-green)] uppercase">
+                    EOF_REACHED //
+                </p>
+            </div>
+        </div>
+    );
+});
+
+/* =========================================================
     EXECUTABLES (For './')
     What happens when the user EXECUTES the files.
    ========================================================= */
@@ -375,7 +455,6 @@ export const COMMANDS: Record<
         const currentFolder = VFS[cwd as keyof typeof VFS];
         if (!currentFolder) return <span className="text-red-500">ERR: DIRECTORY_NOT_FOUND [{cwd}]</span>;
 
-
         // 1. Grab static files from VFS
         // 2. Filter sessionFiles to only those matching the current path
         const staticChildren = currentFolder.children;
@@ -383,67 +462,88 @@ export const COMMANDS: Record<
             (fileName) => sessionFiles[fileName].path === cwd
         );
 
-        // Combine both arrays and remove duplicates (just in case)
+        // Combine both arrays and remove duplicates
         const combinedItems = Array.from(new Set([...staticChildren, ...localSessionFiles])).sort((a, b) => a.localeCompare(b));
 
+        // UI LOGIC: If we are inside a specific log folder.
+        // use a vertical flex-col layout. Otherwise, use the standard grid.
+        const isBlogDirectory = cwd.startsWith("/logs/");
+        const containerClass = isBlogDirectory
+            ? "flex flex-col space-y-1 mt-2 glow-text"
+            : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text";
+
         return (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text">
+            <div className={containerClass}>
                 {combinedItems.map((item) => {
                     const isDir = !item.includes('.');
 
+                    // Default coloring
                     let colorClass = isDir
                         ? "text-[var(--color-hacker-green)] font-bold"
                         : "text-white";
 
-                    if (item === "README.md" || item === "about.txt" || item === "resume.txt") {
+                    // Specific highlight for root files
+                    if (item.toLowerCase() === "readme.md" || item.toLowerCase() === "about.txt" || item.toLowerCase() === "resume.txt") {
                         colorClass = "text-yellow-400 font-bold animate-pulse brightness-125";
                     }
 
+                    if (isBlogDirectory && !isDir) {
+                        colorClass = "text-green-300";
+                    }
+
                     return (
-                        <span key={item} className={colorClass}>
+                        <span key={item} className={`${colorClass} truncate`}>
+                            {isBlogDirectory && !isDir && <span className="text-green-500/90 mr-2">[-]</span>}
                             {item}{isDir && "/"}
                         </span>
                     );
                 })}
             </div>
         );
-    },
+},
 
     // 02. CD: Directory-only navigation guard
-    cd: (args, cwd = "/", setCwd) => {
-        if (!args || args.length === 0) {
-            if (setCwd) setCwd("/");
-            return "";
-        }
-        
-        const target = args[0].replace(/\/+$/, "");
+   cd: (args, cwd = "/", setCwd) => {
+    if (!args || args.length === 0) {
+        if (setCwd) setCwd("/");
+        return "";
+    }
+    
+    const target = args[0].trim();
 
-        if (target === "..") {
-            if (cwd === "/") return "";
-            const parts = cwd.split("/").filter(Boolean);
-            parts.pop();
-            const newPath = "/" + parts.join("/");
-            if (setCwd) setCwd(newPath === "/" ? "/" : newPath);
-            return "";
-        }
+    // 1. Handle "cd .."
+    if (target === "..") {
+        if (cwd === "/") return "";
+        const parts = cwd.split("/").filter(Boolean);
+        parts.pop();
+        const newPath = "/" + parts.join("/");
+        if (setCwd) setCwd(newPath === "" ? "/" : newPath);
+        return "";
+    }
 
-        // Resolve path
-        const newPath = cwd === "/" ? `/${target}` : `${cwd}/${target}`;
+    // 2. Build the Absolute Path
+    // We ensure there is exactly one slash between the current dir and the target
+    let newPath = "";
+    if (target.startsWith("/")) {
+        newPath = target; // Absolute path
+    } else {
+        newPath = cwd === "/" ? `/${target}` : `${cwd}/${target}`;
+    }
 
-        /* ---------------------------------------------------------
-            LINUX_GUARD: Check if target exists and is a DIRECTORY
-           --------------------------------------------------------- */
-        const targetObj = VFS[newPath as keyof typeof VFS];
-        if (targetObj && targetObj.type === "dir") {
-            if (setCwd) setCwd(newPath);
-            return "";
-        } else if (target.includes('.')) {
-            return <span className="text-red-500">bash: cd: {target}: Not a directory</span>;
-        } else {
-            // Note: We use the original target for the error message for better UX
-            return <span className="text-red-500">bash: cd: {args[0]}: No such file or directory</span>;
-        }
-    },
+    // Remove any trailing slashes for the lookup
+    newPath = newPath.replace(/\/+$/, "");
+    if (newPath === "") newPath = "/";
+
+    // 3. THE LOOKUP
+    const targetObj = VFS[newPath as keyof typeof VFS];
+
+    if (targetObj && targetObj.type === "dir") {
+        if (setCwd) setCwd(newPath);
+        return "";
+    } else {
+        return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
+    }
+},
 
     // 03. CAT: Readable file-only guard
     cat: (args, cwd = "/", _setCwd, sessionFiles) => {
