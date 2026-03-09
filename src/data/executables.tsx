@@ -1,5 +1,4 @@
 // src/data/executables.tsx
-import React from "react";
 import type { CommandResponse } from "./types";
 import leetcodeData from "./leetcode_stats.json";
 

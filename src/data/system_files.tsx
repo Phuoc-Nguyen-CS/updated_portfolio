@@ -1,6 +1,5 @@
 // src/data/system_files.tsx
 import type { CommandResponse } from "./types";
-import React from "react";
 
 /* =========================================================
     FILE_CONTENT

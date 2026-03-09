@@ -1,6 +1,4 @@
 // src/data/boot_sequence.tsx
-import React from "react";
-
 export const BOOT_SEQUENCE = [
     "INITIALIZING PORTFOLIO KERNEL V0.0.5...",
     "CPU: OCTA-CORE NEURAL PROCESSOR DETECTED",

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { CommandResponse } from "./data/types";
-import { COMMANDS, COMMAND_LIST} from "./data/commands";
-import { FILE_CONTENT } from "./data/system_files";
-import { EXECUTABLES } from "./data/executables";
-import { VFS } from "./data/vfs";
+// import type { CommandResponse } from "./data/types";
+// import { COMMANDS, COMMAND_LIST} from "./data/commands";
+// import { FILE_CONTENT } from "./data/system_files";
+// import { EXECUTABLES } from "./data/executables";
+// import { VFS } from "./data/vfs";
 import { VimEditor } from "./VimEditor";
 import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
 import { getAutoComplete} from "./data/data_processing/autocomplete";
