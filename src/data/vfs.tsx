@@ -1,5 +1,4 @@
 // src/data/vfs.tsx
-import React from "react";
 import logEntries from "./logs.json";
 import { FILE_CONTENT } from "./system_files";
 
