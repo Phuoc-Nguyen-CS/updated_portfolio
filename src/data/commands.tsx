@@ -306,7 +306,6 @@ logEntries.forEach((entry) => {
     // 4. Map the file content
     FILE_CONTENT[fileName] = () => (
         <div className="mt-2 max-w-3xl animate-in fade-in slide-in-from-left-2 duration-500">
-            {/* EYE-CATCHING HEADER */}
             <div className="border-l-4 border-[var(--color-hacker-green)] pl-4 py-1 mb-6 bg-[var(--color-hacker-green)]/5">
                 <h1 className="text-white font-bold text-lg md:text-xl uppercase tracking-wide">
                     {entry.title}
@@ -321,7 +320,6 @@ logEntries.forEach((entry) => {
                 </div>
             </div>
 
-            {/* EASY-ON-THE-EYES BODY */}
             <div className="text-white/80 text-sm md:text-base space-y-3 font-mono leading-relaxed pl-1 md:pl-5">
                 {entry.content.map((line, i) => {
                     // Sub-headers (#) get a slight highlight
@@ -335,7 +333,7 @@ logEntries.forEach((entry) => {
                     if (line.startsWith('*') || line.startsWith('-')) {
                         return (
                             <p key={i} className="flex gap-3 pl-2">
-                                <span className="text-[var(--color-hacker-green)] opacity-80 mt-[2px]">»</span>
+                                <span className="text-[var(--color-hacker-green)] opacity-80 mt-[2px]">{">>"}</span>
                                 <span>{line.substring(1).trim()}</span>
                             </p>
                         );
@@ -447,7 +445,7 @@ export const COMMANDS: Record<
         cwd: string,
         setCwd: (path: string) => void,
         sessionFiles: Record<string, { content: string[], path: string }>,
-        setSessionFiles?: React.Dispatch<React.SetStateAction<Record<string, { content: string[], path: string }>>> // <--- ADD THIS
+        setSessionFiles?: React.Dispatch<React.SetStateAction<Record<string, { content: string[], path: string }>>>
     ) => CommandResponse> = {
 
     // 01. LS: Context Aware listing
