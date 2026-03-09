@@ -828,6 +828,112 @@ export const COMMANDS: Record<
         </div>
     ),
 
+    // 04. QUICKSTART: The Non-Tech Guided Tour
+    quickstart: () => {
+        const techArsenalData = [
+            { label: "LANGUAGES:", value: "TypeScript, JavaScript, Python, C/C++, SQL" },
+            { label: "FRONTEND:", value: "React, Next.js, Tailwind CSS" },
+            { label: "BACKEND & DB:", value: "Django, Node.js, Supabase, PostgreSQL" },
+            { label: "AI & VISION:", value: "TensorFlow, OpenCV, MediaPipe" },
+            { label: "DEV_TOOLS:", value: "Git, Postman, Vercel, Netlify, OCR Tools" }
+        ];
+
+        const activeProjectsData = [
+            { title: "Cebu Real-Estate Architecture", desc: "Modern property listing platform using Supabase & Next.js." },
+            { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup." },
+            { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls." },
+            { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system." }
+        ];
+
+        return (
+            <div className="mt-2 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                <div className="border border-[var(--color-hacker-green)]/30 bg-black/40 p-4 md:p-6 shadow-[0_0_15px_rgba(0,255,0,0.05)]">
+
+                    {/* HEADER */}
+                    <div className="border-b border-[var(--color-hacker-green)]/30 pb-3 mb-5">
+                        <h2 className="text-[var(--color-hacker-green)] text-xl font-bold tracking-widest flex items-center gap-2">
+                            <span className="animate-pulse">{">>"}</span> AUTOMATED_PORTFOLIO_TOUR
+                        </h2>
+                        <p className="text-white/60 text-xs font-mono mt-1">
+                            Compiled for non-technical personnel. Bypassing manual navigation protocols...
+                        </p>
+                    </div>
+
+                    {/* SECTION 1: ABOUT */}
+                    <div className="mb-6">
+                        <h3 className="text-white font-bold text-sm bg-[var(--color-hacker-green)]/20 inline-block px-2 py-1 mb-2">
+                            01 // ROOT_OWNER:
+                        </h3>
+                        <div className="text-white/80 text-sm pl-3 border-l-2 border-white/20 space-y-3">
+                            <p>
+                                Hi, I'm Phuoc Nguyen. I'm a developer passionate about building robust applications and designing unique interactive experiences.
+                            </p>
+
+                            <div className="space-y-1.5 mt-2 text-xs sm:text-sm font-mono">
+                                <p className="flex gap-2">
+                                    <span className="text-[var(--color-hacker-green)] font-bold">»</span>
+                                    <span><strong className="text-white">EDUCATION:</strong> CSU Fullerton (GPA: 3.6)</span>
+                                </p>
+                                <p className="flex gap-2">
+                                    <span className="text-[var(--color-hacker-green)] font-bold">»</span>
+                                    <span><strong className="text-white">ACADEMIC_FOCUS:</strong> Data Science, AI, & Big Data</span>
+                                </p>
+                                <p className="flex gap-2">
+                                    <span className="text-[var(--color-hacker-green)] font-bold">»</span>
+                                    <span><strong className="text-white">CURRENT_OBJECTIVE:</strong> Full-Stack Web Development & Automation</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECTION 2: RESUME SUMMARY */}
+                    <div className="mb-6">
+                        <h3 className="text-white font-bold text-sm bg-blue-500/20 inline-block px-2 py-1 mb-2 text-blue-300">
+                            02 // TECHNICAL_SKILLS
+                        </h3>
+                        <div className="text-white/80 text-sm pl-3 border-l-2 border-blue-500/30 space-y-2 font-mono">
+
+                            {techArsenalData.map((item, i) => (
+                                <div key={i} className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                                    <span className="text-blue-400 font-bold w-28 shrink-0">{item.label}</span>
+                                    <span className="text-white">{item.value}</span>
+                                </div>
+                            ))}
+
+                            <p className="text-xs text-white/40 italic mt-4 pt-2 border-t border-blue-500/20">
+                                * To view the full document later, type: <code className="text-yellow-400 bg-white/5 px-1 rounded">cat resume.txt</code>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* SECTION 3: PROJECTS OVERVIEW */}
+                    <div>
+                        <h3 className="text-white font-bold text-sm bg-orange-500/20 inline-block px-2 py-1 mb-2 text-orange-300">
+                            03 // ACTIVE_PROJECTS
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-2 border-orange-500/30">
+                            {activeProjectsData.map((project, i) => (
+                                <div key={i} className="bg-white/5 p-2 border border-white/5 hover:border-orange-500/50 transition-colors">
+                                    <p className="text-orange-400 font-bold text-xs">{project.title}</p>
+                                    <p className="text-white/60 text-[10px] mt-1">{project.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-white/40 italic mt-3 pl-3">
+                            * To run project simulations later, type: <code className="text-yellow-400">cd projects</code> then <code className="text-yellow-400">ls</code> followed by <code className="text-yellow-400">./ [file_name]</code>
+                        </p>
+                    </div>
+
+                    {/* FOOTER */}
+                    <div className="mt-6 pt-3 border-t border-[var(--color-hacker-green)]/30 text-center flex justify-between items-center">
+                        <p className="text-xs text-white/50">SYSTEM.TOUR_COMPLETE</p>
+                        <p className="text-xs text-[var(--color-hacker-green)] animate-pulse font-bold">ENJOY_YOUR_STAY //</p>
+                    </div>
+                </div>
+            </div>
+        );
+    },
+
     /* ---------------------------------------------------------
         RESTART & CLEAR: System utilities
        --------------------------------------------------------- */
