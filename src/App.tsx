@@ -1,8 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { COMMANDS, COMMAND_LIST, EXECUTABLES, VFS} from "./data/commands";
-import { FILE_CONTENT } from "./data/system_files";
 import type { CommandResponse } from "./data/types";
+import { COMMANDS, COMMAND_LIST} from "./data/commands";
+import { FILE_CONTENT } from "./data/system_files";
+import { EXECUTABLES } from "./data/executables";
+import { VFS } from "./data/vfs";
 import { VimEditor } from "./VimEditor";
+import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
+import { getAutoComplete} from "./data/data_processing/autocomplete";
+import { processCommand } from "./data/data_processing/command_processor";
+
 /**
  * Represents a single entry in the terminal history.
  */
@@ -11,163 +17,6 @@ interface HistoryItem {
   out: string | React.ReactNode; // The output (string or JSX component)
   cwd: string; // Snapshot of the directory
 }
-
-/**
- * Mock system boot sequence logs and ASCII art.
- */
-const BOOT_SEQUENCE = [
-  "INITIALIZING PORTFOLIO KERNEL V0.0.5...",
-  "CPU: OCTA-CORE NEURAL PROCESSOR DETECTED",
-  "MEM: 64GB VIRTUAL RAM ALLOCATED... OK",
-  "CHECKING SYSTEM INTEGRITY... SUCCESS",
-  "------------------------------------------------",
-  "MOUNTING FILE SYSTEM... /dev/sda1 ON /root",
-  "LOADING CORE MODULES: [MIR_OS] [TYPESCRIPT] [REACT] [TAILWIND] [VITE]",
-  "ESTABLISHING SECURE CONNECTION TO SERVER... SUCCESS",
-  "ENCRYPTING CHANNEL VIA AES-256-GCM... DONE",
-  "PARSING BIOMETRIC DATA... IDENTITY VERIFIED",
-  <pre key="ascii-art" className="text-[10px] leading-none py-4 text-white/40">
-    {`
-                                                                                                           
-                                                                                                    
-                                                         ..-+:                                      
-                                                        =@%-%%.                                     
-                :#=.        .=#%@@#+======++#%@@%#=..=%#-:-=#@.                                     
-                %**%#:..-*%*=:..............::::-=#@@=.::=+*%@.                                     
-               .@-=+*@@%-..............::::---====#-.--:--=*#@.                                     
-               .@::*@-..............::::---=*====+#::::-+*##%@.                                     
-               .%+%-.   ..........::::---=*=======+%=:--=++##%.                                     
-              .:@+..............::::-----#-=++===++++#****#%@@%.                                    
-             .-@..............::::------=#*+=====+++++**#%%%%%@%.                                   
-            .*%....:.........::::-----=*#========++*++***##%%%#@*.                                  
-            +%....+........:::::----+%%##+=====+#%%%%+***####%##@:                                  
-          .=@:...:+...:+..::::---=*%#*+++%+=+#%%#**+*%***###*###%* 
-          :%*..=%%=.:###*:::::-=#%*+++====%%%#**+====+%#*#%#%*###%                                  
-          -@:*#===##+===+*::-+##+++==-=====**+========+#%%#+#%###@.                                 
-          +@@@=.::--=----=#*#*====---==========*#%%#*+++##+++#@##@.                                 
-          :-:%..:::::--------===---==========#@@@%%%@@*++++++++%@@..                                
-            =#.:::::--------------=========+@@@%%%%%%@@*+++++++++*@#..                              
-          .*@=.:::::------------==========+@#%@%%%@@%%@#+++========+*##%%*...:-+*##%%%%##*+-:.      
-        .-@+%:.:::::---------============+%#-@%#%@@@@%%@++**=----------+@@@%*+=-==+++*****++*#@=    
-      .-@+-%=:::::--------==============+*@-:@#*+-=%%##@*++*##*******@@%+-==++*##*+==--:::##:..     
-    .=%=-=%=:::::-------=============++++%%.:*=---+%%**@*=++**@*#%@@%--=+*##*+==--:::...#+..        
-    +@###@=:::::-----=============+++++++%*..*+--*###++@==++++##:%%:-=+#%#+==---:::...:%=.          
-     .-+@%:::::----==========++++++++++++#*. =#+++++++##==++++*@:%+=++******##+-:.....++            
-       .@#.::::--===*@#+++++++++++++++++++%:  +@+===+%%==+++++*@-%++**#*===+*%#+*#-...#:            
-       :@%.#@+---=+*++=++++++++++++++++++++***##@@%%*+=++++++**@=@+*##*#+--:::.:=*#+*++:            
-       .@@-------===++++++++++++++++++++++++++++++++++++++++**@+%#+#*=***-::....-+*#%#*#-           
-        =@#------===+++++++++++++++++++++++++++++++++++*****#@=%%+*#=--*++...=%+.     ..            
-        .*@+-----===++++++++++++++++++++++++++++++++#######@=*@*+*#=--:+**:*#..                     
-         .=@#-----===+++++++++++++++++++++++++++++*#####%@@@%***#*=--:::#+%-                        
-           .%@+----===+++++++++++++++++++++++++*#####%@%###***##+++++***#*=                         
-            .-@@=---===++++++++++++++******###*+=+#@#******%%#***.      =%.   ....-=+*+=-:..        
-              .-%%+--===++++**#%%%%%%%%@@@%=..:=%%#*+++*+*#***%#:           .-%@*========+*%-.      
-                .:*@%*===+#@@%@@#*++++*%%-..:=%%***#+**===+#****#@+::::-=*#%*--===++++++++++#=      
-                   .:*@@@@%-@%*@*==+##+...-*@%*****##++#=-=+******%@%%##*=--===+++*#%%#=--+#%%.     
-                            :@#=%%+....:=@@#*****#%*==*+==++***+****%=-=====++**##@=                
-                             .#@=::-*%@@#******#+:::---=+*#*+====++**%+=+++**###%#.                 
-                              .-##*+-..%#*****#=:-----=++#++----===++*%***#####@+.                  
-                                ..::-%%@#*****#---+--==+%*+--:----==++*@######%:                    
-                              .-%=----+@*++**+*--=+=-==+*#*++-:----==+*%%##*%*.                     
-                              -@::=---=%=.::::-*===**++*###*+=::---==++#@#@#:.                      
-                              =#--+:--=%=..:::::=***=====*##*-::---===+#@#:.                        
-                              :@==+--=+%%:::::--==---=====+*#=:::--===+#@-                          
-                              ..*@@@%@@@%#.::::----======+*+*##---===+*##@.                         
-                                       =%=%-::----======+++**###%#*####**@%.                        
-                                        **:+%*=========++**#%%@%=%%==+++++@+.                       
-                                        .+@=--+%@@%#**##%@@@+.    *%:--===*@-                       
-                                          .#@#+-==+%@%****#@+.    .-@=:++=#@:                       
-                                            .-+###+-##=--==*@=      .=#%@%*:                        
-                                                    .=%---==+@+.                                    
-                                                      .*@+#**@+.                                    
-                                                        ..::..                                      
-                                                                                                    
-                                                                                                    
-    `}
-  </pre>,
-  <div key="crash-course" className="mt-6 border border-white/20 p-4 bg-black/30 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
-    <p className="text-l font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between">
-      <span>[MIR_OS] QUICK_START_GUIDE</span>
-      <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.5</span>
-    </p>
-
-    <div className="space-y-4">
-      {/* NAVIGATION */}
-      <div>
-        <p className="text-md text-white/90 mb-1 uppercase tracking-tighter">// SYSTEM_NAVIGATION</p>
-        <div className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 text-sm sm:text-base">
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">ls</span>
-          <span className="text-white/80">List directory contents. (Directories are <span className="text-[var(--color-hacker-green)]">Green</span>)</span>
-
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd [dir]</span>
-          <span className="text-white/80">Traverse directories (e.g. <code className="bg-white/10 px-1 rounded">cd projects</code>).</span>
-          
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd ..</span>
-          <span className="text-white/80">Go to the previous directory</span>
-          
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cd</span>
-          <span className="text-white/80">Go to home directory</span>
-        </div>
-      </div>
-
-      {/* OPERATIONS */}
-      <div>
-        <p className="text-md text-white/90 mb-1 uppercase tracking-tighter">// FILE_OPERATIONS</p>
-        <div className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 text-sm sm:text-base">
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">cat [file]</span>
-          <span className="text-white/80">Display [.txt, .md] files</span>
-
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">./ [file]</span>
-          <span className="text-white/80">Runs .exe files</span>
-
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">vim [file]</span>
-          <span className="text-white/80">Initialize editor (Desktop only).</span>
-
-          <span className="text-[var(--color-hacker-green)] font-bold font-mono">rm [file]</span>
-          <span className="text-white/80">Purge user files from session RAM.</span>
-        </div>
-      </div>
-
-      {/* INPUT TIPS */}
-      <div className="pt-2 border-t border-white/10">
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/60">
-          <span>[*] Use <b className="text-white">TAB</b> for Autocomplete</span>
-          <span>[*] Use <b className="text-white">UP_ARROW</b> for History</span>
-          <span>[*] Type <b className="text-yellow-500">help</b> for Full Manual</span>
-        </div>
-      </div>
-
-      {/* NEW: SUGGESTED EXECUTION SEQUENCE */}
-      <div className="pt-4 mt-2 border-t border-[var(--color-hacker-green)]/30">
-        <p className="text-sm text-yellow-400 font-bold mb-3 flex items-center gap-2 tracking-widest uppercase">
-          <span className="animate-pulse">{">>"}</span> RECOMMENDED_EXECUTION_SEQUENCE:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-white/10 transition-colors">
-            <span className="text-white font-mono font-bold block mb-1">cat resume.txt</span>
-            <span className="text-white/60">Lets explore some of the things I've created.</span>
-          </div>
-
-          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-white/10 transition-colors">
-            <span className="text-white font-mono font-bold block mb-1">cd logs</span>
-            <span className="text-white/60">Keep up to date with what I'm doing.</span>
-          </div>
-
-          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-white/10 transition-colors">
-            <span className="text-white font-mono font-bold block mb-1">./leetcode.exe</span>
-            <span className="text-white/60">Check my live Leetcode Progression.</span>
-          </div>
-
-          <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-white/10 transition-colors">
-            <span className="text-white font-mono font-bold block mb-1">vim test.txt</span>
-            <span className="text-white/60">Test the built-in text editor capabilities.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-];
 
 export default function App() {
   // --- Refs & State ---
@@ -258,126 +107,22 @@ export default function App() {
 
   // Handles special keys: Tab (Autocomplete), Up/Down (History)
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // 01. Tab Autocomplete
     /* ---------------------------------------------------------
-        TAB_AUTOCOMPLETE_ENGINE
-        Enforces strict Linux-style filtering:
-        - cd: Only suggests directories
-        - cat/vim: Only suggests readable files (from FILE_CONTENT)
-        - ./: Only suggests executable files (from EXECUTABLES)
-       --------------------------------------------------------- */
+    Enforces strict Linux-style filtering:
+    - cd: Only suggests directories
+    - cat/vim: Only suggests readable files (from FILE_CONTENT)
+    - ./: Only suggests executable files (from EXECUTABLES)
+   --------------------------------------------------------- */
+    // 01. Tab Autocomplete
     if (e.key === "Tab") {
       e.preventDefault();
-      const rawInput = input.toLowerCase();
-      if (!rawInput) return;
+      const result = getAutoComplete(input, cwd, sessionFiles);
 
-      const parts = rawInput.split(" ");
-      const currentFolder = VFS[cwd as keyof typeof VFS];
-      if (!currentFolder || !currentFolder.children) return;
-
-      if (parts.length === 1) {
-        const word = parts[0];
-
-        // Autocomplete ./executables
-        if (word.startsWith("./")) {
-          const target = word.slice(2);
-          const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
-          const allItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
-
-          // Only suggest items that are in the EXECUTABLES object
-          const matches = allItems
-            .filter(item => Object.keys(EXECUTABLES).includes(item))
-            .filter(item => item.startsWith(target))
-            .map(item => `./${item}`)
-            .sort(); 
-
-          if (matches.length === 1) {
-            setInput(matches[0]);
-            setSuggestions([]);
-          } else {
-            setSuggestions(matches);
-          }
-          return;
-        }
-
-        // Autocomplete base commands
-        const matches = COMMAND_LIST.filter(c => c.startsWith(word));
-        if (matches.length === 1) {
-          setInput(matches[0] + " ");
-          setSuggestions([]);
-        } else if (matches.length > 1) {
-          const sortedMatches = matches.sort(((a, b) => a.localeCompare(b)));
-          setSuggestions(sortedMatches);
-        }
+      if (result) {
+        if (result.newInput) setInput(result.newInput);
+        setSuggestions(result.suggestions);
       }
-      else if (parts.length === 2) {
-        const baseCmd = parts[0].toLowerCase();
-        const target = parts[1]; // e.g., "logs/ma" or "/logs/"
-
-        // Separate the directory path from the partial file/folder name
-        const lastSlashIndex = target.lastIndexOf("/");
-        const searchDirRaw = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex) : "";
-        const partialName = lastSlashIndex !== -1 ? target.substring(lastSlashIndex + 1).toLowerCase() : target.toLowerCase();
-
-        // We keep the prefix (e.g., "/logs/") to stitch the final command back together
-        const prefixToKeep = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex + 1) : "";
-
-        // Resolve the absolute path in the VFS
-        let searchPath = cwd;
-        if (searchDirRaw !== "") {
-          if (searchDirRaw.startsWith("/")) {
-            searchPath = searchDirRaw;
-          } else {
-            searchPath = cwd === "/" ? `/${searchDirRaw}` : `${cwd}/${searchDirRaw}`;
-          }
-        }
-
-        // Clean trailing slashes for VFS lookup
-        searchPath = searchPath.replace(/\/+$/, "");
-        if (searchPath === "") searchPath = "/";
-
-        // Look up the target folder in the VFS
-        const targetFolder = VFS[searchPath as keyof typeof VFS];
-        if (!targetFolder) {
-          setSuggestions([]);
-          return;
-        }
-
-        // Gather static children and session files for THAT specific folder
-        const staticChildren = targetFolder.children || [];
-        const targetSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchPath);
-        const targetItems = Array.from(new Set([...staticChildren, ...targetSessionFiles]));
-
-        let matches: string[] = [];
-
-        // Filter matches based on command rules
-        if (baseCmd === "cd") {
-          matches = targetItems.filter(item => {
-            const itemPath = searchPath === "/" ? `/${item}` : `${searchPath}/${item}`;
-            return VFS[itemPath as keyof typeof VFS]?.type === "dir" && item.toLowerCase().startsWith(partialName);
-          }).sort();
-        } else if (baseCmd === "cat" || baseCmd === "vim") {
-          matches = targetItems.filter(item => {
-            const isFile = Object.keys(FILE_CONTENT).includes(item) || targetSessionFiles.includes(item);
-            return isFile && item.toLowerCase().startsWith(partialName);
-          }).sort();
-        } else if (baseCmd === "rm") {
-          matches = targetSessionFiles.filter(item => item.toLowerCase().startsWith(partialName)).sort();
-        }
-
-        // Apply Autocomplete or display suggestions
-        if (matches.length === 1) {
-          const match = matches[0];
-          const isDir = !match.includes(".");
-          // Reconstruct the string: e.g. "cd " + "/logs/" + "march2026" + "/"
-          setInput(`${baseCmd} ${prefixToKeep}${match}${isDir ? "/" : ""}`);
-          setSuggestions([]);
-        } else if (matches.length > 1) {
-          setSuggestions(matches);
-        } else {
-          setSuggestions([]);
-        }
-      }
+      return;
     }
 
     // 02. COMMAND HISTORY NAVIGATION
@@ -405,93 +150,26 @@ export default function App() {
   // Processes the entered command and updates history 
   const handleCommand = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    const result = processCommand(input, cwd, setCwd, sessionFiles, setSessionFiles);
 
-    // Get raw input and trim the white space
-    const rawInput = input.trim();
-    if (rawInput === "") return;
-
-    // Split the input by spaces to separate the command from the arguments
-    // e.g., "cd logs" -> baseCmd: "cd", args: ["logs"]
-    const inputParts = rawInput.toLowerCase().split(/\s+/);
-    const baseCmd = inputParts[0];
-    const args = inputParts.slice(1);
-
-    if (baseCmd === "clear") {
-      setHistory([]);
-    } else if (baseCmd === "restart") {
-      setHistory([]);
-      setHistoryStack([]);
-      setIsBooting(true);
-      hasBooted.current = false;
-      setCwd("/");
-    } else if (baseCmd === "vim") {
-      const rawTarget = args[0];
-      const currentFolder = VFS[cwd as keyof typeof VFS];
-
-      if (!rawTarget) {
-        setVimMode({ active: true, file: "[No Name]" });
-      } else {
-        const parts = rawTarget.split("/");
-        const targetFile = parts.pop() || "";
-
-        /* ---------------------------------------------------------
-            LINUX_GUARD: Permission Denied for System Files
-            Case-insensitive check against ALL core files and executables
-           --------------------------------------------------------- */
-        const isProtected =
-          Object.keys(FILE_CONTENT).some(k => k.toLowerCase() === targetFile.toLowerCase()) ||
-          Object.keys(EXECUTABLES).some(k => k.toLowerCase() === targetFile.toLowerCase());
-
-        if (isProtected) {
-          const out = (
-            <span className="text-red-500">
-              bash: vim: {targetFile}: Permission denied (system file is read-only)
-            </span>
-          );
-          setHistory(prev => [...prev, { cmd: input, out, cwd }]);
-        }
-        else if (currentFolder?.children.includes(targetFile) && !targetFile.includes('.')) {
-          const out = <span className="text-red-500">bash: vim: {targetFile}: Is a directory</span>;
-          setHistory(prev => [...prev, { cmd: input, out, cwd }]);
-        }
-        else {
-          setVimMode({ active: true, file: targetFile });
-        }
+    if (result) {
+      if (result.action === "clear") {
+        setHistory([]);
+      } else if (result.action === "restart") {
+        setHistory([]);
+        setHistoryStack([]);
+        setIsBooting(true);
+        hasBooted.current = false;
+        setCwd("/");
+      } else if (result.action === "vim") {
+        setVimMode({ active: true, file: result.vimFile! });
+      } else if (result.action === "output") {
+        setHistory((prev) => [...prev, { cmd: input, out: result.output!, cwd }]);
+        setHistoryStack((prev) => [...prev, input]);
+        setHistoryIndex(-1);
       }
-    } else {
-      let output: CommandResponse;
-
-      // 1. HANDLE EXECUTABLES (./filename)
-      if (baseCmd.startsWith("./")) {
-        const file = baseCmd.slice(2); // Strip the './'
-        const currentFolder = VFS[cwd as keyof typeof VFS];
-
-        if (!currentFolder || !currentFolder.children.includes(file)) {
-          output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
-        } else if (EXECUTABLES[file]) {
-          output = EXECUTABLES[file](); // Runs .exe
-        } else {
-          // If they try to execute a text file like ./about.txt
-          output = <span className="text-red-500">bash: {baseCmd}: Permission denied (not executable)</span>;
-        }
-      }
-      // 2. HANDLE STANDARD COMMANDS (ls, cd, cat)
-      else {
-        output = COMMANDS[baseCmd]
-          ? COMMANDS[baseCmd](args, cwd, setCwd, sessionFiles, setSessionFiles)
-          : (
-            <div className="text-red-500">
-              <p>ERR: COMMAND_NOT_FOUND [{baseCmd}]</p>
-              <p className="text-white/50 text-xs mt-1">Type <span className="text-yellow-400 underline">help</span> for a list of available protocols.</p>
-            </div>
-          );
-      }
-
-      // Save the exact string the user typed into history
-      setHistory((prev) => [...prev, { cmd: input, out: output, cwd: cwd}]);
-      setHistoryStack((prev) => [...prev, input]);
-      setHistoryIndex(-1);
     }
+
     setInput("");
     setSuggestions([]);
   };
@@ -533,7 +211,7 @@ export default function App() {
             {/* Terminal History Output */}
             <div className="space-y-4">
               {history.map((entry, i) => (
-                <div key={i} className="break-words animate-in fade-in duration-300">
+                <div key={i} className="break-words animate-in fade-in duration-300 max-w-full overflow-x-hidden">
                   {entry.cmd && (
                     <div className="flex items-center opacity-50 text-xs md:text-sm">
                       <span className="mr-2 text-white/100 font-bold">
