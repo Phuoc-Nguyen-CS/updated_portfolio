@@ -273,9 +273,6 @@ export default function App() {
       const currentFolder = VFS[cwd as keyof typeof VFS];
       if (!currentFolder || !currentFolder.children) return;
 
-      const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
-      const allAvailableItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
-
       if (parts.length === 1) {
         const word = parts[0];
 
@@ -346,24 +343,24 @@ export default function App() {
 
         // Gather static children and session files for THAT specific folder
         const staticChildren = targetFolder.children || [];
-        const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchPath);
-        const allAvailableItems = Array.from(new Set([...staticChildren, ...localSessionFiles]));
+        const targetSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchPath);
+        const targetItems = Array.from(new Set([...staticChildren, ...targetSessionFiles]));
 
         let matches: string[] = [];
 
         // Filter matches based on command rules
         if (baseCmd === "cd") {
-          matches = allAvailableItems.filter(item => {
+          matches = targetItems.filter(item => {
             const itemPath = searchPath === "/" ? `/${item}` : `${searchPath}/${item}`;
             return VFS[itemPath as keyof typeof VFS]?.type === "dir" && item.toLowerCase().startsWith(partialName);
           }).sort();
         } else if (baseCmd === "cat" || baseCmd === "vim") {
-          matches = allAvailableItems.filter(item => {
-            const isFile = Object.keys(FILE_CONTENT).includes(item) || localSessionFiles.includes(item);
+          matches = targetItems.filter(item => {
+            const isFile = Object.keys(FILE_CONTENT).includes(item) || targetSessionFiles.includes(item);
             return isFile && item.toLowerCase().startsWith(partialName);
           }).sort();
         } else if (baseCmd === "rm") {
-          matches = localSessionFiles.filter(item => item.toLowerCase().startsWith(partialName)).sort();
+          matches = targetSessionFiles.filter(item => item.toLowerCase().startsWith(partialName)).sort();
         }
 
         // Apply Autocomplete or display suggestions
