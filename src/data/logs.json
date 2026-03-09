@@ -5,12 +5,30 @@
     "date": "2026-03-08",
     "folder": "March2026",
     "content": [
-      "# Terminal Portfolio updates [MIR_OS]:",
-      "* Added VIM like text editor",
-      "* Added rm",
-      "* Added help functions",
-      "* Added CI/CD to blog functionality",
-      "* Fixed a few production issues"
+      "# Terminal Portfolio Update [MIR_OS]:",
+      "- TYPE: System Architecture & Feature Release",
+      "- TARGET: Terminal Portfolio (MIR_OS V0.0.5)",
+      "- COMPONENT: VFS, CI/CD, Text Editing",
+      "- STATUS: Deployed",
+      "# THE_OBJECTIVE",
+      "Today\u2019s goal was twofold: transform the terminal from a static read-only interface into a fully interactive operating system, and build a \"hands-off\" CI/CD pipeline so I can publish blog posts directly from a separate GitHub repository without touching the core React code.",
+      "# THE_EXECUTION",
+      "I successfully engineered and deployed several major system protocols:",
+      "* [VIM_EDITOR]: Integrated a functional Vim-like text editor. Users can now create, edit, and save files directly into the terminal's Session RAM using authentic Vim commands (`:i`, `[ESC]`, `:wq`, `:q`).",
+      "* [FILE_MANAGEMENT]: Implemented the `rm` command. Users can delete their own session files, but the system actively guards against the deletion of core portfolio metadata (Permission Denied).",
+      "* [SYSTEM_MANUAL]: Added a comprehensive `help` command, featuring a visually distinct UI and a Vim Quickstart guide for recruiters unfamiliar with Linux environments.",
+      "* [DYNAMIC_VFS]: Built an \"Inflation Engine\" that dynamically mounts external JSON data into the Virtual File System on boot, allowing commands like `cd` and `ls` to instantly recognize new directories.",
+      "# THE_ROADBLOCK",
+      "Automating the blog sync was a multi-layered debugging session across three environments (Local Windows, Linux GitHub Actions, and Vercel).",
+      "Vercel's strict TypeScript compiler blocked deployments due to unused function parameters. Meanwhile, the Python build script crashed because Windows PowerShell injected hidden UTF-16 Byte Order Marks (BOM) into my `.md` files. Finally, dynamically created folders threw \"No such directory\" errors because the terminal's input parser was aggressively lowercasing the user's input, causing case-sensitive mismatches in the Virtual File System.",
+      "# THE_RESOLUTION",
+      "I hardened the entire pipeline:",
+      "* Silenced Vercel's strict TS errors using the underscore prefix standard (`_args`).",
+      "* Rewrote the Python file reader to fallback seamlessly between `utf-8-sig` and `utf-16`, using Regex to handle varying filename formats.",
+      "* Refactored the VFS to automatically convert all generated folders to lowercase, creating a foolproof navigation experience.",
+      "* Upgraded the `ls` command to contextually switch to a vertical layout when viewing blog directories to handle long filenames cleanly.",
+      "# NEXT_STEPS",
+      "The systems seems to be stable now. Next I would like to maybe add a theme changer as the green might not be for everyone."
     ]
   }
 ]
