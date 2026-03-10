@@ -1,10 +1,11 @@
 // src/data/guides.tsx
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { fireCommand } from "../../utils/terminal";
 
 /* =========================================================
     HELP MANUAL
    ========================================================= */
+
 export const HelpManual = () => {
     const coreCommands = [
         { cmd: "ls", desc: "List files in the current sector." },
@@ -83,6 +84,16 @@ export const HelpManual = () => {
     QUICKSTART GUIDE
    ========================================================= */
 export const QuickStartGuide = () => {
+    const hasFired = useRef(false); 
+
+    useEffect(() => {
+
+        if (!hasFired.current) {
+            fireCommand("ls");
+            hasFired.current = true; 
+        }
+    }, []);
+
     const techData = [
         { label: "LANGUAGES:", value: "TypeScript, JavaScript, Python, C/C++, SQL" },
         { label: "FRONTEND:", value: "React, Next.js, Tailwind CSS" },
@@ -184,13 +195,10 @@ export const QuickStartGuide = () => {
                 <div className="mt-8 pt-4 border-t border-[var(--color-hacker-green)]/30 text-center flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-white/50">SYSTEM.TOUR_COMPLETE</p>
 
-                    {/* The Giant Clickable ls Button */}
-                    <button
-                        onClick={() => fireCommand("ls")}
-                        className="bg-[var(--color-hacker-green)] text-black px-6 py-2 font-bold font-mono text-sm hover:bg-white transition-colors uppercase tracking-widest animate-pulse"
-                    >
-                        Initialize File System (ls)
-                    </button>
+                    <div className="flex items-center gap-2 text-[var(--color-hacker-green)] font-mono text-xs uppercase tracking-widest">
+                        <span className="w-2 h-2 bg-[var(--color-hacker-green)] rounded-full animate-ping"></span>
+                        File System Active
+                    </div>
                 </div>
             </div>
         </div>
