@@ -1,15 +1,15 @@
 // src/utils/path_resolver.ts
 
 export const resolvePath = (cwd: string, targetPath: string): string => {
-    // 1. Defaults & Home Directory
+    // Defaults & Home Directory
     if (!targetPath || targetPath === "~") return "/";
 
-    // 2. Start from Root (if absolute) OR Current Directory (if relative)
+    // Start from Root (if absolute) OR Current Directory (if relative)
     let pathStack = targetPath.startsWith("/")
         ? []
         : cwd.split("/").filter(Boolean);
 
-    // 3. Process the target path step-by-step
+    // Process the target path step-by-step
     const targetParts = targetPath.split("/").filter(Boolean);
 
     for (const part of targetParts) {
@@ -21,6 +21,6 @@ export const resolvePath = (cwd: string, targetPath: string): string => {
         }
     }
 
-    // 4. Rebuild the final absolute path (e.g., "/projects" or "/")
+    // Rebuild the final absolute path
     return "/" + pathStack.join("/");
 };

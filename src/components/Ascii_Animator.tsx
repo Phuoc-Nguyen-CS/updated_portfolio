@@ -28,9 +28,9 @@ export const AsciiAnimator: React.FC<AsciiAnimatorProps> = ({
             setDisplayedText(cleanArt.slice(0, currentIndex));
 
             // Scroll to the cursor
-            if (cursorRef.current) {
-                cursorRef.current.scrollIntoView({ behavior: "auto", block: "center" })
-            }
+            // if (cursorRef.current) {
+            //     cursorRef.current.scrollIntoView({ behavior: "auto", block: "center" })
+            // }
             if (currentIndex >= cleanArt.length) {
                 setIsFinished(true);
                 clearInterval(interval);
@@ -41,7 +41,7 @@ export const AsciiAnimator: React.FC<AsciiAnimatorProps> = ({
     }, [cleanArt, charsPerTick, speedMs]);
 
     return (
-        <div className="relative hidden md:block">
+        <div className="relative w-full overflow-x-hidden">
             {/* invisible place holder to center the art */}
             <pre className="py-4 text-[10px] leading-none opacity-0 pointer-events-none select-none" aria-hidden="true">
                 {cleanArt}
@@ -52,7 +52,7 @@ export const AsciiAnimator: React.FC<AsciiAnimatorProps> = ({
                 {displayedText}
                 {!isFinished && (
                     <span
-                        ref={cursorRef} /* 3. Added the missing ref here! */
+                        ref={cursorRef}
                         className="inline-block w-2 h-3 ml-1 bg-white/60 animate-pulse"
                     />
                 )}

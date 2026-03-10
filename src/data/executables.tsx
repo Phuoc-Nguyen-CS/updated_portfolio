@@ -109,7 +109,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         </div>
     ),
 
-    "/project/gesture_detection.py": () => (
+    "/projects/gesture_detection.py": () => (
         <div className="mt-2 border-l-2 border-orange-500 pl-4 bg-orange-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
             <p className="text-orange-400 font-bold font-mono uppercase">[*] Loading TensorFlow/Keras Models...</p>
             <p className="text-white/70 font-mono text-xs mt-1">Importing OpenCV2... [OK]</p>

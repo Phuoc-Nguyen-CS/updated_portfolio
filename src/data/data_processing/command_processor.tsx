@@ -30,7 +30,7 @@ export const processCommand = (
     if (baseCmd === "clear") return { action: "clear" };
     if (baseCmd === "restart") return { action: "restart" };
 
-    // --- 2. UPGRADED VIM GUARD ---
+    // --- VIM GUARD ---
     if (baseCmd === "vim") {
         const rawTarget = args[0];
         if (!rawTarget) return { action: "vim", vimFile: "[No Name]" };
@@ -57,7 +57,7 @@ export const processCommand = (
 
     let output: CommandResponse;
 
-    // --- 3. UPGRADED EXECUTABLES GUARD ---
+    // --- EXECUTABLES GUARD ---
     if (baseCmd.startsWith("./")) {
         // Even if they type ./projects/leetcode.exe, we extract the target and resolve it
         const rawTarget = baseCmd.slice(2);
@@ -71,7 +71,7 @@ export const processCommand = (
             output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
         }
     }
-    // 4. Standard Commands
+    // Standard Commands
     else {
         output = COMMANDS[baseCmd]
             ? COMMANDS[baseCmd](args, cwd, setCwd, sessionFiles, setSessionFiles)

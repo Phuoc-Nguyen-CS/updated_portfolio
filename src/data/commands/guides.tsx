@@ -1,5 +1,6 @@
 // src/data/guides.tsx
 import React from "react";
+import { fireCommand } from "../../utils/terminal";
 
 /* =========================================================
     HELP MANUAL
@@ -91,10 +92,10 @@ export const QuickStartGuide = () => {
     ];
 
     const projectsData = [
-        { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system." },
-        { title: "Real-Estate Website", desc: "Modern property listing platform using Supabase & Next.js." },
-        { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup." },
-        { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls." },
+        { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system.", cmd: "cd projects"},
+        { title: "Real-Estate Website", desc: "Modern property listing platform using Supabase & Next.js.", cmd: "cd projects" },
+        { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup.", cmd: "cd projects"},
+        { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls.", cmd: "cd projects"},
     ];
 
     return (
@@ -142,10 +143,14 @@ export const QuickStartGuide = () => {
                     <h3 className="text-white font-bold text-sm bg-orange-500/20 inline-block px-2 py-1 mb-2 text-orange-300">03 // PROJECTS</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-2 border-orange-500/30">
                         {projectsData.map((project, i) => (
-                            <div key={i} className="bg-white/5 p-2 border border-white/5 hover:border-orange-500/50 transition-colors">
-                                <p className="text-orange-400 font-bold text-xs">{project.title}</p>
+                            <button
+                                key={i}
+                                onClick={() => fireCommand(project.cmd)}
+                                className="bg-white/5 p-2 border border-white/5 hover:border-orange-500/50 hover:bg-orange-500/10 transition-colors text-left text-orange-300 cursor-pointer group"
+                            >
+                                <p className="font-bold text-xs group-hover:text-white transition-colors">{project.title}</p>
                                 <p className="text-white/60 text-[10px] mt-1">{project.desc}</p>
-                            </div>
+                            </button>
                         ))}
                     </div>
                     <p className="text-xs text-white/40 italic mt-3 pl-3">
@@ -157,24 +162,35 @@ export const QuickStartGuide = () => {
                 <section className="mt-6">
                     <h3 className="text-white font-bold text-sm bg-[var(--color-hacker-green)]/20 inline-block px-2 py-1 mb-2 text-[var(--color-hacker-green)]">04 // SYSTEM_LOGS</h3>
                     <div className="pl-3 border-l-2 border-[var(--color-hacker-green)]/30">
-                        <div className="bg-white/5 p-3 border border-white/5 hover:border-[var(--color-hacker-green)]/50 transition-colors group">
+                        <button
+                            onClick={() => fireCommand("cd logs")}
+                            className="bg-white/5 p-3 border border-white/5 hover:border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/10 transition-colors group text-left w-full cursor-pointer"
+                        >
                             <div className="flex items-center gap-2 mb-2">
-                                <span className="w-2 h-2 bg-[var(--color-hacker-green)] rounded-full animate-pulse"></span>
-                                <p className="text-white font-mono text-xs uppercase tracking-widest">Recent Entry Found: [2026-03-08_system_init.md]</p>
+                                <span className="w-2 h-2 bg-[var(--color-hacker-green)] rounded-full group-hover:animate-ping"></span>
+                                <p className="text-white font-mono text-xs uppercase tracking-widest group-hover:text-[var(--color-hacker-green)] transition-colors">
+                                    Read Latest Entry: [2026-03-08_system_init.md]
+                                </p>
                             </div>
-                            <p className="text-white/60 text-[10px] leading-relaxed">Personal dev logs, technical deep-dives, and system update history are stored within the encrypted log directory.</p>
-                        </div>
-                        <p className="text-xs text-white/40 italic mt-3">
-                            * To access, type:
-                            <code className="text-[var(--color-hacker-green)] ml-2">cd logs</code> -{">"} <code className="text-[var(--color-hacker-green)] ml-1">ls</code> -{">"} <code className="text-[var(--color-hacker-green)] ml-2">cd [month]</code> -{">"} <code className="text-[var(--color-hacker-green)] ml-1">cat [file_name]</code>
-                        </p>
+                            <p className="text-white/60 text-[10px] leading-relaxed">
+                                Personal dev logs, technical deep-dives, and system update history are stored within the encrypted log directory.
+                            </p>
+                        </button>
+
                     </div>
                 </section>
 
                 {/* FOOTER */}
-                <div className="mt-6 pt-3 border-t border-[var(--color-hacker-green)]/30 text-center flex justify-between items-center">
+                <div className="mt-8 pt-4 border-t border-[var(--color-hacker-green)]/30 text-center flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-white/50">SYSTEM.TOUR_COMPLETE</p>
-                    <p className="text-xs text-[var(--color-hacker-green)] animate-pulse font-bold">ENJOY_YOUR_STAY //</p>
+
+                    {/* The Giant Clickable ls Button */}
+                    <button
+                        onClick={() => fireCommand("ls")}
+                        className="bg-[var(--color-hacker-green)] text-black px-6 py-2 font-bold font-mono text-sm hover:bg-white transition-colors uppercase tracking-widest animate-pulse"
+                    >
+                        Initialize File System (ls)
+                    </button>
                 </div>
             </div>
         </div>

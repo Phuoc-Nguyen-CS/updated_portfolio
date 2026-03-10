@@ -4,7 +4,7 @@ import React from "react";
 import { VFS } from "../data/vfs";
 import { EXECUTABLES } from "../data/executables";
 import { resolvePath } from "../utils/path_resolver";
-import { fireCommand } from "../utils/terminal"; // <-- 1. Our Event Bus is imported!
+import { fireCommand } from "../utils/terminal"; 
 
 interface ExplorerProps {
     currentPath: string;

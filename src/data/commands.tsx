@@ -24,61 +24,6 @@ export const COMMANDS: Record<
     ) => CommandResponse> = {
 
     // 01. LS: Context Aware listing (Now supports 'ls /projects')
-    // ls: (args, cwd = "/", _setCwd, sessionFiles) => {
-    //     const target = args[0] || ".";
-    //     const absolutePath = resolvePath(cwd, target);
-
-    //     const targetFolder = VFS[absolutePath];
-    //     if (!targetFolder) return <span className="text-red-500">ls: cannot access '{target}': No such file or directory</span>;
-
-    //     // 1. Grab static files from VFS
-    //     const staticChildren = targetFolder.children;
-
-    //     // 2. Filter sessionFiles to only those matching the absolute target path
-    //     const localSessionFiles = Object.keys(sessionFiles || {}).filter(
-    //         (fileName) => sessionFiles[fileName].path === absolutePath
-    //     );
-
-    //     // Combine both arrays and remove duplicates
-    //     const combinedItems = Array.from(new Set([...staticChildren, ...localSessionFiles])).sort((a, b) => a.localeCompare(b));
-
-    //     // UI LOGIC: Vertical layout for logs, grid for standard folders
-    //     const isBlogDirectory = absolutePath.startsWith("/logs");
-    //     const containerClass = isBlogDirectory
-    //         ? "flex flex-col space-y-1 mt-2 glow-text"
-    //         : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text";
-
-    //     return (
-    //         <div className={containerClass}>
-    //             {combinedItems.map((item) => {
-    //                 // Reconstruct child path to check if it's a directory
-    //                 const childAbsPath = absolutePath === "/" ? `/${item}` : `${absolutePath}/${item}`;
-    //                 const isDir = !!VFS[childAbsPath];
-
-    //                 // Default coloring
-    //                 let colorClass = isDir
-    //                     ? "text-[var(--color-hacker-green)] font-bold"
-    //                     : "text-white";
-
-    //                 // Specific highlight for root files
-    //                 if (["readme.md", "about.txt", "resume.txt"].includes(item.toLowerCase())) {
-    //                     colorClass = "text-yellow-400 font-bold animate-pulse brightness-125";
-    //                 }
-
-    //                 if (isBlogDirectory && !isDir) {
-    //                     colorClass = "text-green-300";
-    //                 }
-
-    //                 return (
-    //                     <span key={item} className={`${colorClass} truncate`}>
-    //                         {isBlogDirectory && !isDir && <span className="text-green-500/90 mr-2">[-]</span>}
-    //                         {item}{isDir && "/"}
-    //                     </span>
-    //                 );
-    //             })}
-    //         </div>
-    //     );
-    // },
     ls: (args, cwd = "/", _setCwd, sessionFiles) => {
         const target = args[0] || ".";
         const absolutePath = resolvePath(cwd, target);
@@ -90,17 +35,6 @@ export const COMMANDS: Record<
     },
 
     // 02. CD: Directory-only navigation guard
-    // cd: (args, cwd = "/", setCwd) => {
-    //     const target = args[0] || "~";
-    //     const absolutePath = resolvePath(cwd, target);
-
-    //     if (VFS[absolutePath] && VFS[absolutePath].type === "dir") {
-    //         if (setCwd) setCwd(absolutePath);
-    //         return "";
-    //     } else {
-    //         return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
-    //     }
-    // },
     cd: (args, cwd = "/", setCwd, sessionFiles) => {
         const target = args[0] || "~";
         const absolutePath = resolvePath(cwd, target);
@@ -120,7 +54,7 @@ export const COMMANDS: Record<
         const target = args[0].trim();
         const absolutePath = resolvePath(cwd, target);
 
-        // 1. Check Session RAM first (in case they edited a file)
+        // Check Session RAM first (in case they edited a file)
         // Since sessionFiles keys are just filenames, we need to extract the filename and dir from the absolute path
         const pathParts = absolutePath.split("/");
         const fileName = pathParts.pop() || "";
@@ -138,7 +72,7 @@ export const COMMANDS: Record<
             );
         }
 
-        // 2. Check Static Files (O(1) Dictionary Lookup!)
+        // Check Static Files (O(1) Dictionary Lookup!)
         if (FILE_CONTENT[absolutePath]) {
             return (
                 <div className="flex flex-col space-y-4">
@@ -151,7 +85,7 @@ export const COMMANDS: Record<
             );
         }
 
-        // 3. Error Guards
+        // Error Guards
         if (VFS[absolutePath]) {
             return <span className="text-red-500">cat: {target}: Is a directory</span>;
         }
@@ -170,17 +104,17 @@ export const COMMANDS: Record<
         const target = args[0].replace(/\/+$/, "");
         const absolutePath = resolvePath(cwd, target);
 
-        // 1. PROTECT SYSTEM FILES (O(1) Lookup)
+        // PROTECT SYSTEM FILES 
         if (FILE_CONTENT[absolutePath] || EXECUTABLES[absolutePath]) {
             return <span className="text-red-500">rm: cannot remove '{target}': Permission denied</span>;
         }
 
-        // 2. PROTECT DIRECTORIES
+        // PROTECT DIRECTORIES
         if (VFS[absolutePath]) {
             return <span className="text-red-500">rm: cannot remove '{target}': Is a directory</span>;
         }
 
-        // 3. DELETE USER FILES
+        // DELETE USER FILES
         const pathParts = absolutePath.split("/");
         const fileName = pathParts.pop() || "";
         const dirPath = pathParts.length > 0 ? pathParts.join("/") || "/" : "/";

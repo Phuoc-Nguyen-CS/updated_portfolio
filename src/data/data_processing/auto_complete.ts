@@ -1,4 +1,4 @@
-// src/data/autocomplete.ts
+// src/data/auto_complete.ts
 import { VFS } from "../vfs";
 import { EXECUTABLES } from "../executables";
 import { COMMAND_LIST } from "../commands";
@@ -20,7 +20,7 @@ export const getAutoComplete = (
 
     const parts = rawInput.split(" ");
 
-    // --- 1. SINGLE WORD AUTOCOMPLETE (Commands & Executables) ---
+    // --- SINGLE WORD AUTOCOMPLETE (Commands & Executables) ---
     if (parts.length === 1) {
         const word = parts[0];
 
@@ -55,7 +55,7 @@ export const getAutoComplete = (
         return null;
     }
 
-    // --- 2. TWO WORD AUTOCOMPLETE (cd, cat, vim, rm) ---
+    // --- TWO WORD AUTOCOMPLETE (cd, cat, vim, rm) ---
     else if (parts.length === 2) {
         const baseCmd = parts[0].toLowerCase();
         const target = parts[1];
@@ -97,7 +97,7 @@ export const getAutoComplete = (
 
         matches.sort();
 
-        // 3. Return the exact mapped string
+        // Return the exact mapped string
         if (matches.length === 1) {
             const match = matches[0];
             const itemAbsPath = resolvePath(searchAbsPath, match);

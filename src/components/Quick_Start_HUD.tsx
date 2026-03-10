@@ -1,6 +1,6 @@
 // src/components/QuickStartHUD.tsx
 import React, { useEffect, useRef } from "react";
-
+import { fireCommand } from "../utils/terminal";
 interface HUDProps {
     onAction?: (cmd: string) => void;
 }
@@ -93,20 +93,23 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                             <p className="text-[var(--color-hacker-green)] font-bold text-sm">Not familiar with Terminals?</p>
                             <p className="text-white/70 text-xs">Run the automated portfolio tour.</p>
                         </div>
-                        <div className="bg-black border border-[var(--color-hacker-green)] px-3 py-1 shrink-0">
-                            <span className="text-white text-xs font-mono">Type: </span>
+                        <button
+                            onClick={() => fireCommand("quickstart")}
+                            className="bg-black border border-[var(--color-hacker-green)] px-3 py-1 shrink-0 cursor-pointer hover:bg-[var(--color-hacker-green)]/20 transition-colors text-left group"
+                        >
+                            <span className="text-white text-xs font-mono group-hover:text-[var(--color-hacker-green)] transition-colors">Click here: </span>
                             <span className="text-[var(--color-hacker-green)] font-bold font-mono animate-pulse">quickstart</span>
-                        </div>
+                        </button>
                     </div>
 
                     {/* SUGGESTED EXECUTION SEQUENCE */}
                     <div className="pt-4 mt-2 border-t border-[var(--color-hacker-green)]/30">
                         <p className="text-sm text-yellow-400 font-bold mb-3 flex items-center gap-2 tracking-widest uppercase">
-                            <span className="animate-pulse">{">>"}</span> RECRUITER_FAST_TRACK:
+                            <span className="animate-pulse">{">>"}</span> GET_TO_KNOW_ME:
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                            {/* 1. THE RESUME (Experience) */}
+                            {/* 1. Resume  */}
                             <div
                                 onClick={() => onAction?.("cat resume.txt")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
@@ -118,7 +121,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                                 <span className="text-white/60 text-[10px]">Review my tech stack & work history.</span>
                             </div>
 
-                            {/* 2. THE PORTFOLIO (Projects) */}
+                            {/* 2. Projects */}
                             <div
                                 onClick={() => onAction?.("ls projects/")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
@@ -130,7 +133,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                                 <span className="text-white/60 text-[10px]">Explore my shipped applications.</span>
                             </div>
 
-                            {/* 3. THE ANALYTICS (Competence) */}
+                            {/* 3. Leetcode */}
                             <div
                                 onClick={() => onAction?.("./leetcode.exe")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
@@ -142,13 +145,13 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                                 <span className="text-white/60 text-[10px]">Check my live algorithm statistics.</span>
                             </div>
 
-                            {/* 4. THE CTA (Contact) */}
+                            {/* 4. Contact */}
                             <div
-                                onClick={() => onAction?.("cat contact.txt")}
+                                onClick={() => onAction?.("./contact.exe")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-red-400 transition-colors">
-                                    <span>cat contact.txt</span>
+                                    <span>./contact.exe</span>
                                     <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
                                 </p>
                                 <span className="text-white/60 text-[10px]">Get my email and social links.</span>

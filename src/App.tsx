@@ -1,12 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-// import type { CommandResponse } from "./data/types";
-// import { COMMANDS, COMMAND_LIST} from "./data/commands";
-// import { FILE_CONTENT } from "./data/system_files";
-// import { EXECUTABLES } from "./data/executables";
-// import { VFS } from "./data/vfs";
 import { VimEditor } from "./VimEditor";
 import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
-import { getAutoComplete} from "./data/data_processing/autocomplete";
+import { getAutoComplete} from "./data/data_processing/auto_complete";
 import { processCommand } from "./data/data_processing/command_processor";
 
 /**
@@ -201,20 +196,20 @@ export default function App() {
       }, i * 40);
     });
   };
-  
+
   // =========================================================
   // GLOBAL COMMAND LISTENER (Handles button executions)
   // =========================================================
 
-  // 1. Create a mutable ref to always hold the freshest version of the function
+  // Create a mutable ref to always hold the freshest version of the function
   const triggerCommandRef = useRef(triggerCommand);
 
-  // 2. Keep the ref updated on every single render
+  //  Keep the ref updated on every single render
   useEffect(() => {
     triggerCommandRef.current = triggerCommand;
   }, [triggerCommand]);
 
-  // 3. The actual event listener (Replaces your old block)
+  //  The actual event listener (Replaces your old block)
   useEffect(() => {
     const handleGlobalCommand = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
@@ -244,7 +239,7 @@ export default function App() {
     >
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
-      {/* 1. VIM EDITOR */}
+      {/* VIM EDITOR */}
       {/* We keep this conditionally rendered so it mounts fresh every time it opens */}
       {vimMode.active && (
         <VimEditor
@@ -269,7 +264,7 @@ export default function App() {
         />
       )}
 
-      {/* 2. MAIN TERMINAL */}
+      {/* MAIN TERMINAL */}
       {/* We dynamically add 'hidden' if Vim is active, otherwise 'block'. 
           This keeps it in the DOM, preventing animations from re-firing! */}
       <div className={`max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10 ${vimMode.active ? 'hidden' : 'block'}`}>
