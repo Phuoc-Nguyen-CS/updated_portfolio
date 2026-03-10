@@ -8,7 +8,7 @@ import type { CommandResponse } from "./types";
    ========================================================= */
 
 export const FILE_CONTENT: Record<string, () => CommandResponse> = {
-    "about.txt": () => (
+    "/about.txt": () => (
         <div className="space-y-1">
             <p>NAME: PHUOC NGUYEN</p>
             <p>UNDERGRADUATE: CSU_FULLERTON ... SUCCESS</p>
@@ -32,7 +32,7 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
             <p className="text-white/90 italic text-sm">"sos.txt"</p>
         </div>
     ),
-    "resume.txt": () => (
+    "/resume.txt": () => (
         <div className="mt-2 space-y-6 text-sm sm:text-base max-w-4xl">
             {/* HEADER SECTION */}
             <div className="border-b border-white/20 pb-4">
@@ -205,7 +205,7 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
             </div>
         </div>
     ),
-    "README.md": () => (
+    "/README.md": () => (
         <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
             <p className="text-white font-bold mb-2 underline">// REPOSITORY_ENTRIES</p>
             <ul className="space-y-2">

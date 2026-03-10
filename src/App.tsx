@@ -24,7 +24,7 @@ export default function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [input, setInput] = useState("quickstart");
+  const [input, setInput] = useState("");
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -154,9 +154,8 @@ export default function App() {
   };
 
   // Processes the entered command and updates history 
-  const handleCommand = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    const result = processCommand(input, cwd, setCwd, sessionFiles, setSessionFiles);
+  const executeCommand = (cmdToRun: string) => {
+    const result = processCommand(cmdToRun, cwd, setCwd, sessionFiles, setSessionFiles);
 
     if (result) {
       if (result.action === "clear") {
@@ -170,8 +169,8 @@ export default function App() {
       } else if (result.action === "vim") {
         setVimMode({ active: true, file: result.vimFile! });
       } else if (result.action === "output") {
-        setHistory((prev) => [...prev, { cmd: input, out: result.output!, cwd }]);
-        setHistoryStack((prev) => [...prev, input]);
+        setHistory((prev) => [...prev, { cmd: cmdToRun, out: result.output!, cwd }]);
+        setHistoryStack((prev) => [...prev, cmdToRun]);
         setHistoryIndex(-1);
       }
     }
@@ -180,17 +179,49 @@ export default function App() {
     setSuggestions([]);
   };
 
+  // Input Handler (Fires when you press Enter)
+  const handleCommand = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    executeCommand(input);
+  };
+
+  // Ghost Typer
+  const triggerCommand = (cmd: string) => {
+    if (isBooting) return; // Don't allow clicking while the system is booting
+
+    let currentText = "";
+    inputRef.current?.blur(); // Hide mobile keyboard while auto-typing
+
+    // Loop through the string and type it character by character
+    cmd.split("").forEach((char, i) => {
+      setTimeout(() => {
+        currentText += char;
+        setInput(currentText);
+
+        // Once the last character is typed, wait a split second and execute
+        if (i === cmd.length - 1) {
+          setTimeout(() => {
+            executeCommand(cmd);
+            inputRef.current?.focus(); // Give control back to the user
+          }, 300);
+        }
+      }, i * 40); 
+    });
+  };
+
   // --- Render ---
   return (
     <div
       style={{ backgroundColor: 'var(--color-hacker-bg)', color: 'var(--color-hacker-green)' }}
       className="h-full w-full font-mono cursor-text overflow-y-auto no-scrollbar selection:bg-[var(--color-hacker-green)] selection:text-[var(--color-hacker-bg)] overflow-x-hidden"
-      onClick={handleContainerClick}
+      // FIX: Only trigger the focus click if Vim is closed!
+      onClick={vimMode.active ? undefined : handleContainerClick}
     >
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
-      {/* Vim Editor */}
-      {vimMode.active ? (
+      {/* 1. VIM EDITOR */}
+      {/* We keep this conditionally rendered so it mounts fresh every time it opens */}
+      {vimMode.active && (
         <VimEditor
           file={vimMode.file}
           initialContent={sessionFiles[vimMode.file]?.content}
@@ -201,7 +232,7 @@ export default function App() {
                 ...prev,
                 [vimMode.file]: {
                   content: newContent,
-                  path: cwd // This is the "Anchor" that ls uses to find the file
+                  path: cwd
                 }
               }));
             }
@@ -211,60 +242,79 @@ export default function App() {
             setTimeout(() => inputRef.current?.focus(), 100);
           }}
         />
-      ) : (
-          <div className="max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10">
+      )}
 
-            {/* Terminal History Output */}
-            <div className="space-y-4">
-              {history.map((entry, i) => (
-                <div key={i} className="break-words animate-in fade-in duration-300 max-w-full overflow-x-hidden">
-                  {entry.cmd && (
-                    <div className="flex items-center opacity-50 text-xs md:text-sm">
-                      <span className="mr-2 text-white/100 font-bold">
-                        guest@portfolio:~{entry.cwd === "/" ? "" : entry.cwd}$
-                      </span>
-                      <span className="text-white font-bold italic">{entry.cmd}</span>
-                    </div>
-                  )}
-                  <div className="glow-text mt-1 whitespace-pre-wrap">
-                    {entry.out}
-                  </div>
+      {/* 2. MAIN TERMINAL */}
+      {/* We dynamically add 'hidden' if Vim is active, otherwise 'block'. 
+          This keeps it in the DOM, preventing animations from re-firing! */}
+      <div className={`max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10 ${vimMode.active ? 'hidden' : 'block'}`}>
+
+        {/* Terminal History Output */}
+        <div className="space-y-4">
+          {history.map((entry, i) => (
+            <div key={i} className="break-words animate-in fade-in duration-300 max-w-full overflow-x-hidden">
+              {entry.cmd && (
+                <div className="flex items-center opacity-50 text-xs md:text-sm">
+                  <span className="mr-2 text-white/100 font-bold">
+                    guest@portfolio:~{entry.cwd === "/" ? "" : entry.cwd}$
+                  </span>
+                  <span className="text-white font-bold italic">{entry.cmd}</span>
                 </div>
-              ))}
-            </div>
-
-            {/* Tab-Completion Suggestions UI */}
-            {!isBooting && suggestions.length > 0 && (
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
-                {suggestions.map((s) => (
-                  <span key={s} className="text-xs md:text-sm">{s}</span>
-                ))}
+              )}
+              <div className="glow-text mt-1 whitespace-pre-wrap">
+                {React.isValidElement(entry.out) && typeof entry.out.type === 'function'
+                  ? React.cloneElement(
+                    entry.out as React.ReactElement<{ onAction?: (cmd: string) => void }>,
+                    { onAction: triggerCommand }
+                  )
+                  : entry.out
+                }
               </div>
-            )}
+            </div>
+          ))}
+        </div>
 
-            {/* Command Input Area */}
-            {!isBooting && (
-              <form onSubmit={handleCommand} className="flex items-start mt-4 pb-12 animate-in fade-in duration-700">
-                <span className="mr-2 font-bold shrink-0 animate-pulse">❯</span>
-                <div className="relative flex-grow">
-                  <input
-                    ref={inputRef}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => setTimeout(scrollToBottom, 300)}
-                    type="text"
-                    style={{ color: 'var(--color-hacker-green)' }}
-                    className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    autoComplete="off"
-                    autoCapitalize="none"
-                    spellCheck="false"
-                    autoFocus
-                  />
+        {/* Tab-Completion Suggestions UI */}
+        {!isBooting && suggestions.length > 0 && (
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
+            {suggestions.map((s) => (
+              <span key={s} className="text-xs md:text-sm">{s}</span>
+            ))}
+          </div>
+        )}
 
-                  {/* Custom Blinking Block Cursor */}
-                  {/* <div className="flex break-all min-h-[1.5rem]">
-                <span className="invisible">{input}</span>
+        {/* Command Input Area */}
+        {!isBooting && (
+          <form onSubmit={handleCommand} className="flex items-start mt-4 pb-12 animate-in fade-in duration-700">
+            <span className="mr-2 font-bold shrink-0 animate-pulse text-[var(--color-hacker-green)]">❯</span>
+            <div className="relative flex-grow">
+
+              {/* GHOST TEXT LAYER */}
+              {!input && (
+                <span className="absolute inset-0 z-0 text-white/30 italic pointer-events-none whitespace-nowrap">
+                  type 'quickstart' or 'help' and press enter to begin...
+                </span>
+              )}
+
+              {/* Hidden Input */}
+              <input
+                ref={inputRef}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setTimeout(scrollToBottom, 300)}
+                type="text"
+                style={{ color: 'var(--color-hacker-green)' }}
+                className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck="false"
+                autoFocus
+              />
+
+              {/* Custom Blinking Cursor */}
+              <div className="flex min-h-[1.5rem] pointer-events-none relative z-20">
+                <span className="invisible whitespace-pre-wrap break-all">{input}</span>
                 <span
                   style={{
                     backgroundColor: 'var(--color-hacker-green)',
@@ -272,25 +322,16 @@ export default function App() {
                   }}
                   className="w-2 h-5 animate-pulse shrink-0"
                 />
-              </div> */}
-                  <div className="flex min-h-[1.5rem] pointer-events-none">
-                    <span className="invisible whitespace-pre-wrap break-all">{input}</span>
-                    <span
-                      style={{
-                        backgroundColor: 'var(--color-hacker-green)',
-                        boxShadow: '0 0 8px var(--color-hacker-green)'
-                      }}
-                      className="w-2 h-5 animate-pulse shrink-0"
-                    />
-                  </div>
-                </div>
-              </form>
-            )}
+              </div>
 
-            {/* Scroll Anchor */}
-            <div ref={bottomRef} />
-          </div>
-      )}
+            </div>
+          </form>
+        )}
+
+        <div ref={bottomRef} />
+      </div>
+      {/* End of Main Terminal */}
+
     </div>
   );
 }

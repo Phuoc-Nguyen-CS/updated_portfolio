@@ -3,6 +3,7 @@ import { VFS } from "../vfs";
 import { EXECUTABLES } from "../executables";
 import { COMMAND_LIST } from "../commands";
 import { FILE_CONTENT } from "../system_files";
+import { resolvePath } from "../../utils/path";
 
 interface AutocompleteResult {
     newInput: string | null;
@@ -18,21 +19,27 @@ export const getAutoComplete = (
     if (!rawInput) return null;
 
     const parts = rawInput.split(" ");
-    const currentFolder = VFS[cwd as keyof typeof VFS];
-    if (!currentFolder || !currentFolder.children) return null;
 
+    // --- 1. SINGLE WORD AUTOCOMPLETE (Commands & Executables) ---
     if (parts.length === 1) {
         const word = parts[0];
 
         // Autocomplete ./executables
         if (word.startsWith("./")) {
             const target = word.slice(2);
+            const currentFolder = VFS[cwd];
+            if (!currentFolder) return null;
+
             const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
             const allItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
 
             const matches = allItems
-                .filter(item => Object.keys(EXECUTABLES).includes(item))
-                .filter(item => item.startsWith(target))
+                .filter(item => {
+                    // Convert child to absolute path to check EXECUTABLES dictionary!
+                    const absPath = resolvePath(cwd, item);
+                    return !!EXECUTABLES[absPath];
+                })
+                .filter(item => item.toLowerCase().startsWith(target))
                 .map(item => `./${item}`)
                 .sort();
 
@@ -47,49 +54,55 @@ export const getAutoComplete = (
 
         return null;
     }
+
+    // --- 2. TWO WORD AUTOCOMPLETE (cd, cat, vim, rm) ---
     else if (parts.length === 2) {
         const baseCmd = parts[0].toLowerCase();
         const target = parts[1];
 
+        // Figure out what directory they are currently typing in
         const lastSlashIndex = target.lastIndexOf("/");
-        const searchDirRaw = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex) : "";
-        const partialName = lastSlashIndex !== -1 ? target.substring(lastSlashIndex + 1).toLowerCase() : target.toLowerCase();
         const prefixToKeep = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex + 1) : "";
+        const partialName = lastSlashIndex !== -1 ? target.substring(lastSlashIndex + 1).toLowerCase() : target.toLowerCase();
+        const rawSearchDir = lastSlashIndex !== -1 ? target.substring(0, lastSlashIndex) : ".";
 
-        let searchPath = cwd;
-        if (searchDirRaw !== "") {
-            searchPath = searchDirRaw.startsWith("/") ? searchDirRaw : (cwd === "/" ? `/${searchDirRaw}` : `${cwd}/${searchDirRaw}`);
-        }
+        // Resolve the directory they are searching in!
+        const searchAbsPath = resolvePath(cwd, rawSearchDir);
+        const targetFolder = VFS[searchAbsPath];
 
-        searchPath = searchPath.replace(/\/+$/, "");
-        if (searchPath === "") searchPath = "/";
-
-        const targetFolder = VFS[searchPath as keyof typeof VFS];
         if (!targetFolder) return { newInput: null, suggestions: [] };
 
         const staticChildren = targetFolder.children || [];
-        const targetSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchPath);
+        const targetSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchAbsPath);
         const targetItems = Array.from(new Set([...staticChildren, ...targetSessionFiles]));
 
         let matches: string[] = [];
 
+        // Check based on the command
         if (baseCmd === "cd") {
             matches = targetItems.filter(item => {
-                const itemPath = searchPath === "/" ? `/${item}` : `${searchPath}/${item}`;
-                return VFS[itemPath as keyof typeof VFS]?.type === "dir" && item.toLowerCase().startsWith(partialName);
-            }).sort();
+                const itemAbsPath = resolvePath(searchAbsPath, item);
+                return !!VFS[itemAbsPath] && item.toLowerCase().startsWith(partialName);
+            });
         } else if (baseCmd === "cat" || baseCmd === "vim") {
             matches = targetItems.filter(item => {
-                const isFile = Object.keys(FILE_CONTENT).includes(item) || targetSessionFiles.includes(item);
-                return isFile && item.toLowerCase().startsWith(partialName);
-            }).sort();
+                const itemAbsPath = resolvePath(searchAbsPath, item);
+                const isSystemFile = !!FILE_CONTENT[itemAbsPath];
+                const isSessionFile = targetSessionFiles.includes(item);
+                return (isSystemFile || isSessionFile) && item.toLowerCase().startsWith(partialName);
+            });
         } else if (baseCmd === "rm") {
-            matches = targetSessionFiles.filter(item => item.toLowerCase().startsWith(partialName)).sort();
+            matches = targetSessionFiles.filter(item => item.toLowerCase().startsWith(partialName));
         }
 
+        matches.sort();
+
+        // 3. Return the exact mapped string
         if (matches.length === 1) {
             const match = matches[0];
-            const isDir = !match.includes(".");
+            const itemAbsPath = resolvePath(searchAbsPath, match);
+            const isDir = !!VFS[itemAbsPath];
+
             return { newInput: `${baseCmd} ${prefixToKeep}${match}${isDir ? "/" : ""}`, suggestions: [] };
         } else if (matches.length > 1) {
             return { newInput: null, suggestions: matches };

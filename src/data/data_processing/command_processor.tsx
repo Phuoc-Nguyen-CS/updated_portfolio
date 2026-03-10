@@ -5,6 +5,7 @@ import { COMMANDS } from "../commands";
 import { EXECUTABLES } from "../executables";
 import { FILE_CONTENT } from "../system_files";
 import { VFS } from "../vfs";
+import { resolvePath } from "../../utils/path";
 
 export interface CommandResult {
     action: "clear" | "restart" | "vim" | "output";
@@ -26,48 +27,48 @@ export const processCommand = (
     const baseCmd = inputParts[0];
     const args = inputParts.slice(1);
 
-    // 1. System Utilities
     if (baseCmd === "clear") return { action: "clear" };
     if (baseCmd === "restart") return { action: "restart" };
 
-    // 2. Vim Editor Guard
+    // --- 2. UPGRADED VIM GUARD ---
     if (baseCmd === "vim") {
         const rawTarget = args[0];
-        const currentFolder = VFS[cwd as keyof typeof VFS];
-
         if (!rawTarget) return { action: "vim", vimFile: "[No Name]" };
 
-        const parts = rawTarget.split("/");
-        const targetFile = parts.pop() || "";
+        // Convert whatever they typed into an absolute path!
+        const absolutePath = resolvePath(cwd, rawTarget);
 
-        const isProtected =
-            Object.keys(FILE_CONTENT).some(k => k.toLowerCase() === targetFile.toLowerCase()) ||
-            Object.keys(EXECUTABLES).some(k => k.toLowerCase() === targetFile.toLowerCase());
+        // Check if the absolutePath exists as a key in either database
+        const isProtected = (absolutePath in FILE_CONTENT) || (absolutePath in EXECUTABLES);
 
         if (isProtected) {
-            return { action: "output", output: <span className="text-red-500">bash: vim: {targetFile}: Permission denied (system file is read-only)</span> };
+            return { action: "output", output: <span className="text-red-500">bash: vim: {rawTarget}: Permission denied (system file is read-only)</span> };
         }
 
-        if (currentFolder?.children.includes(targetFile) && !targetFile.includes('.')) {
-            return { action: "output", output: <span className="text-red-500">bash: vim: {targetFile}: Is a directory</span> };
+        // Check if they are trying to VIM a directory
+        if (VFS[absolutePath]) {
+            return { action: "output", output: <span className="text-red-500">bash: vim: {rawTarget}: Is a directory</span> };
         }
 
-        return { action: "vim", vimFile: targetFile };
+        const fileName = absolutePath.split("/").pop() || "[No Name]";
+
+        return { action: "vim", vimFile: fileName };
     }
 
     let output: CommandResponse;
 
-    // 3. Executables Guard (./)
+    // --- 3. UPGRADED EXECUTABLES GUARD ---
     if (baseCmd.startsWith("./")) {
-        const file = baseCmd.slice(2);
-        const currentFolder = VFS[cwd as keyof typeof VFS];
+        // Even if they type ./projects/leetcode.exe, we extract the target and resolve it
+        const rawTarget = baseCmd.slice(2);
+        const absolutePath = resolvePath(cwd, rawTarget);
 
-        if (!currentFolder || !currentFolder.children.includes(file)) {
-            output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
-        } else if (EXECUTABLES[file]) {
-            output = EXECUTABLES[file]();
+        if (EXECUTABLES[absolutePath]) {
+            output = EXECUTABLES[absolutePath]();
+        } else if (VFS[absolutePath]) {
+            output = <span className="text-red-500">bash: {baseCmd}: Is a directory</span>;
         } else {
-            output = <span className="text-red-500">bash: {baseCmd}: Permission denied (not executable)</span>;
+            output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
         }
     }
     // 4. Standard Commands

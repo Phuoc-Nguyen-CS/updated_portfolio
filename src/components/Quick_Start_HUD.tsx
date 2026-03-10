@@ -1,7 +1,11 @@
 // src/components/QuickStartHUD.tsx
 import React, { useEffect, useRef } from "react";
 
-export const QuickStartHUD: React.FC = () => {
+interface HUDProps {
+    onAction?: (cmd: string) => void;
+}
+
+export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
     const hudRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -98,28 +102,56 @@ export const QuickStartHUD: React.FC = () => {
                     {/* SUGGESTED EXECUTION SEQUENCE */}
                     <div className="pt-4 mt-2 border-t border-[var(--color-hacker-green)]/30">
                         <p className="text-sm text-yellow-400 font-bold mb-3 flex items-center gap-2 tracking-widest uppercase">
-                            <span className="animate-pulse">{">>"}</span> RECOMMENDED_EXECUTION_SEQUENCE:
+                            <span className="animate-pulse">{">>"}</span> RECRUITER_FAST_TRACK:
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                            <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-white/10 transition-colors">
-                                <span className="text-white font-mono font-bold block mb-1">cat resume.txt</span>
-                                <span className="text-white/60">Lets explore some of the things I've created.</span>
+                            {/* 1. THE RESUME (Experience) */}
+                            <div
+                                onClick={() => onAction?.("cat resume.txt")}
+                                className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
+                            >
+                                <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-blue-400 transition-colors">
+                                    <span>cat resume.txt</span>
+                                    <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
+                                </p>
+                                <span className="text-white/60 text-[10px]">Review my tech stack & work history.</span>
                             </div>
 
-                            <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-white/10 transition-colors">
-                                <span className="text-white font-mono font-bold block mb-1">cd logs</span>
-                                <span className="text-white/60">Keep up to date with what I'm doing.</span>
+                            {/* 2. THE PORTFOLIO (Projects) */}
+                            <div
+                                onClick={() => onAction?.("ls projects/")}
+                                className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
+                            >
+                                <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-[var(--color-hacker-green)] transition-colors">
+                                    <span>ls projects/</span>
+                                    <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
+                                </p>
+                                <span className="text-white/60 text-[10px]">Explore my shipped applications.</span>
                             </div>
 
-                            <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-white/10 transition-colors">
-                                <span className="text-white font-mono font-bold block mb-1">./leetcode.exe</span>
-                                <span className="text-white/60">Check my live Leetcode Progression.</span>
+                            {/* 3. THE ANALYTICS (Competence) */}
+                            <div
+                                onClick={() => onAction?.("./leetcode.exe")}
+                                className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
+                            >
+                                <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-yellow-400 transition-colors">
+                                    <span>./leetcode.exe</span>
+                                    <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
+                                </p>
+                                <span className="text-white/60 text-[10px]">Check my live algorithm statistics.</span>
                             </div>
 
-                            <div className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-white/10 transition-colors">
-                                <span className="text-white font-mono font-bold block mb-1">vim test.txt</span>
-                                <span className="text-white/60">Test the built-in text editor capabilities.</span>
+                            {/* 4. THE CTA (Contact) */}
+                            <div
+                                onClick={() => onAction?.("cat contact.txt")}
+                                className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
+                            >
+                                <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-red-400 transition-colors">
+                                    <span>cat contact.txt</span>
+                                    <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
+                                </p>
+                                <span className="text-white/60 text-[10px]">Get my email and social links.</span>
                             </div>
                         </div>
                     </div>

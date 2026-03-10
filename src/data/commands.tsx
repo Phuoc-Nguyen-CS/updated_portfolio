@@ -10,7 +10,7 @@ import { HelpManual, QuickStartGuide } from "./commands/guides";
 /* =========================================================
     COMMAND LOGIC
     Defines the executable behavior for terminal commands
-    (ls, cd, cat, etc.). Handles VFS navigation.
+    (ls, cd, cat, etc.). Handles VFS navigation using Absolute Paths.
    ========================================================= */
 export const COMMANDS: Record<
     string,
@@ -22,24 +22,27 @@ export const COMMANDS: Record<
         setSessionFiles?: React.Dispatch<React.SetStateAction<Record<string, { content: string[], path: string }>>>
     ) => CommandResponse> = {
 
-    // 01. LS: Context Aware listing
-    ls: (_args, cwd = "/", _setCwd, sessionFiles) => {
-        const currentFolder = VFS[cwd as keyof typeof VFS];
-        if (!currentFolder) return <span className="text-red-500">ERR: DIRECTORY_NOT_FOUND [{cwd}]</span>;
+    // 01. LS: Context Aware listing (Now supports 'ls /projects')
+    ls: (args, cwd = "/", _setCwd, sessionFiles) => {
+        const target = args[0] || ".";
+        const absolutePath = resolvePath(cwd, target);
+
+        const targetFolder = VFS[absolutePath];
+        if (!targetFolder) return <span className="text-red-500">ls: cannot access '{target}': No such file or directory</span>;
 
         // 1. Grab static files from VFS
-        // 2. Filter sessionFiles to only those matching the current path
-        const staticChildren = currentFolder.children;
+        const staticChildren = targetFolder.children;
+
+        // 2. Filter sessionFiles to only those matching the absolute target path
         const localSessionFiles = Object.keys(sessionFiles || {}).filter(
-            (fileName) => sessionFiles[fileName].path === cwd
+            (fileName) => sessionFiles[fileName].path === absolutePath
         );
 
         // Combine both arrays and remove duplicates
         const combinedItems = Array.from(new Set([...staticChildren, ...localSessionFiles])).sort((a, b) => a.localeCompare(b));
 
-        // UI LOGIC: If we are inside a specific log folder.
-        // use a vertical flex-col layout. Otherwise, use the standard grid.
-        const isBlogDirectory = cwd.startsWith("/logs/");
+        // UI LOGIC: Vertical layout for logs, grid for standard folders
+        const isBlogDirectory = absolutePath.startsWith("/logs");
         const containerClass = isBlogDirectory
             ? "flex flex-col space-y-1 mt-2 glow-text"
             : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text";
@@ -47,7 +50,9 @@ export const COMMANDS: Record<
         return (
             <div className={containerClass}>
                 {combinedItems.map((item) => {
-                    const isDir = !item.includes('.');
+                    // Reconstruct child path to check if it's a directory
+                    const childAbsPath = absolutePath === "/" ? `/${item}` : `${absolutePath}/${item}`;
+                    const isDir = !!VFS[childAbsPath];
 
                     // Default coloring
                     let colorClass = isDir
@@ -55,7 +60,7 @@ export const COMMANDS: Record<
                         : "text-white";
 
                     // Specific highlight for root files
-                    if (item.toLowerCase() === "readme.md" || item.toLowerCase() === "about.txt" || item.toLowerCase() === "resume.txt") {
+                    if (["readme.md", "about.txt", "resume.txt"].includes(item.toLowerCase())) {
                         colorClass = "text-yellow-400 font-bold animate-pulse brightness-125";
                     }
 
@@ -76,18 +81,11 @@ export const COMMANDS: Record<
 
     // 02. CD: Directory-only navigation guard
     cd: (args, cwd = "/", setCwd) => {
-        if (!args || args.length === 0) {
-            if (setCwd) setCwd("/");
-            return "";
-        }
+        const target = args[0] || "~";
+        const absolutePath = resolvePath(cwd, target);
 
-        const target = args[0].trim();
-        const newPath = resolvePath(cwd, target);
-
-        const targetObj = VFS[newPath as keyof typeof VFS];
-
-        if (targetObj && targetObj.type === "dir") {
-            if (setCwd) setCwd(newPath);
+        if (VFS[absolutePath] && VFS[absolutePath].type === "dir") {
+            if (setCwd) setCwd(absolutePath);
             return "";
         } else {
             return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
@@ -96,100 +94,92 @@ export const COMMANDS: Record<
 
     // 03. CAT: Readable file-only guard
     cat: (args, cwd = "/", _setCwd, sessionFiles) => {
-        if (!args || args.length === 0) return "cat: missing file operand";
+        if (!args || args.length === 0) return <span className="text-red-500">cat: missing file operand</span>;
 
-        const inputTarget = args[0].trim();
+        const target = args[0].trim();
+        const absolutePath = resolvePath(cwd, target);
 
-        // 1. Separate the path from the filename
-        const parts = inputTarget.split("/");
-        const targetFileName = parts.pop() || "";
-        const targetDirRaw = parts.join("/");
+        // 1. Check Session RAM first (in case they edited a file)
+        // Since sessionFiles keys are just filenames, we need to extract the filename and dir from the absolute path
+        const pathParts = absolutePath.split("/");
+        const fileName = pathParts.pop() || "";
+        const dirPath = pathParts.length > 0 ? pathParts.join("/") || "/" : "/";
 
-        // 2. Resolve the target directory path using our new D.R.Y. utility
-        const targetDirPath = resolvePath(cwd, targetDirRaw);
-
-        // 3. Find the target folder in the VFS
-        const targetFolder = VFS[targetDirPath as keyof typeof VFS];
-
-        if (!targetFolder) {
-            return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
-        }
-
-        // 4. Check Session RAM
-        const actualSessionKey = Object.keys(sessionFiles || {}).find(
-            key => key.toLowerCase() === targetFileName.toLowerCase() && sessionFiles[key].path === targetDirPath
+        const sessionFileKey = Object.keys(sessionFiles || {}).find(
+            key => key.toLowerCase() === fileName.toLowerCase() && sessionFiles[key].path === dirPath
         );
 
-        if (actualSessionKey) {
+        if (sessionFileKey) {
             return (
                 <div className="whitespace-pre-wrap mt-1">
-                    {sessionFiles[actualSessionKey].content.join("\n")}
+                    {sessionFiles[sessionFileKey].content.join("\n")}
                 </div>
             );
         }
 
-        // 5. Match against the VFS target directory
-        const actualKey = targetFileName.toLowerCase();
-        const vfsMatch = targetFolder.children.find(c => c.toLowerCase() === actualKey);
-
-        if (vfsMatch && !vfsMatch.includes('.')) {
-            return <span className="text-red-500">cat: {inputTarget}: Is a directory</span>;
+        // 2. Check Static Files (O(1) Dictionary Lookup!)
+        if (FILE_CONTENT[absolutePath]) {
+            return FILE_CONTENT[absolutePath]();
         }
 
-        if (!vfsMatch) {
-            return <span className="text-red-500">cat: {inputTarget}: No such file or directory</span>;
+        // 3. Error Guards
+        if (VFS[absolutePath]) {
+            return <span className="text-red-500">cat: {target}: Is a directory</span>;
         }
 
-        const fileContentKey = Object.keys(FILE_CONTENT).find(k => k.toLowerCase() === vfsMatch.toLowerCase()) || vfsMatch;
-
-        if (FILE_CONTENT[fileContentKey]) {
-            return FILE_CONTENT[fileContentKey]();
+        if (EXECUTABLES[absolutePath]) {
+            return <span className="text-red-500">cat: {target}: Permission denied (Binary executable)</span>;
         }
 
-        return <span className="text-red-500">cat: {inputTarget}: Permission denied</span>;
+        return <span className="text-red-500">cat: {target}: No such file or directory</span>;
     },
 
     // 04. RM: Remove user created files
     rm: (args, cwd, _setCwd, sessionFiles, setSessionFiles) => {
-        if (!args.length) return "rm: missing operand";
-        const file = args[0].replace(/\/+$/, "");
+        if (!args || args.length === 0) return <span className="text-red-500">rm: missing operand</span>;
 
-        // 1. PROTECT SYSTEM FILES (Metadata Safety)
-        if (Object.keys(FILE_CONTENT).includes(file) || Object.keys(EXECUTABLES).includes(file)) {
-            return <span className="text-red-500">rm: cannot remove '{file}': Permission denied</span>;
+        const target = args[0].replace(/\/+$/, "");
+        const absolutePath = resolvePath(cwd, target);
+
+        // 1. PROTECT SYSTEM FILES (O(1) Lookup)
+        if (FILE_CONTENT[absolutePath] || EXECUTABLES[absolutePath]) {
+            return <span className="text-red-500">rm: cannot remove '{target}': Permission denied</span>;
         }
 
         // 2. PROTECT DIRECTORIES
-        const currentFolder = VFS[cwd as keyof typeof VFS];
-        if (currentFolder?.children.includes(file) && !file.includes('.')) {
-            return <span className="text-red-500">rm: cannot remove '{file}': Is a directory</span>;
+        if (VFS[absolutePath]) {
+            return <span className="text-red-500">rm: cannot remove '{target}': Is a directory</span>;
         }
 
         // 3. DELETE USER FILES
-        if (sessionFiles[file] && sessionFiles[file].path === cwd) {
+        const pathParts = absolutePath.split("/");
+        const fileName = pathParts.pop() || "";
+        const dirPath = pathParts.length > 0 ? pathParts.join("/") || "/" : "/";
+
+        if (sessionFiles[fileName] && sessionFiles[fileName].path === dirPath) {
             if (setSessionFiles) {
                 setSessionFiles((prev: any) => {
                     const newState = { ...prev };
-                    delete newState[file];
+                    delete newState[fileName];
                     return newState;
                 });
                 return ``; // Success (Linux rm is silent on success)
             }
         }
 
-        return <span className="text-red-500">rm: cannot remove '{file}': No such file or directory</span>;
+        return <span className="text-red-500">rm: cannot remove '{target}': No such file or directory</span>;
     },
 
     // 05. HELP: For those that will definitely need help
     help: () => <HelpManual />,
 
-    // 04. QUICKSTART: The Non-Tech Guided Tour
+    // 06. QUICKSTART: The Non-Tech Guided Tour
     quickstart: () => <QuickStartGuide />,
 
-    // 05. Restart: Replays the animation in the beginning
+    // 07. Restart: Replays the animation in the beginning
     restart: () => "SYSTEM RESTART INITIATED...",
 
-    // 0.6 Clear: frees up the screen
+    // 08. Clear: frees up the screen
     clear: () => "Clearing terminal buffer..."
 };
 

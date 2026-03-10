@@ -7,7 +7,7 @@ import leetcodeData from "./leetcode_stats.json";
     What happens when the user EXECUTES the files.
    ========================================================= */
 export const EXECUTABLES: Record<string, () => CommandResponse> = {
-    "leetcode.exe": () => {
+    "/leetcode.exe": () => {
         const stats = [
             { label: "EASY", count: parseInt(leetcodeData.easy), total: 28, color: "bg-green-500" },
             { label: "MEDIUM", count: parseInt(leetcodeData.medium), total: 101, color: "bg-yellow-500" },
@@ -44,7 +44,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         );
     },
 
-    "contact.exe": () => (
+    "/contact.exe": () => (
         <div className="mt-2 space-y-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
             <p className="text-white font-bold underline">// SECURE_COMMUNICATION_LINE</p>
             <p>Initiate direct email transfer?</p>
@@ -62,7 +62,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         </div>
     ),
 
-    "github.exe": () => (
+    "/github.exe": () => (
         <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
             <p className="text-white font-bold mb-2 underline">// EXTERNAL_SOURCE_REDIRECT</p>
             <div className="space-y-1 mb-4">
@@ -85,7 +85,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
     /* =========================================================
         PROJECT SIMULATIONS
        ========================================================= */
-    "maple_discord_bot.py": () => (
+    "/projects/maple_discord_bot.py": () => (
         <div className="mt-2 border-l-2 border-[#5865F2] pl-4 bg-[#5865F2]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
             <p className="text-[#5865F2] font-bold font-mono uppercase">[*] Initializing Discord.py Wrapper...</p>
             <p className="text-white/70 font-mono text-xs mt-1">Authenticating token... [OK]</p>
@@ -109,7 +109,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         </div>
     ),
 
-    "gesture_detection.py": () => (
+    "/project/gesture_detection.py": () => (
         <div className="mt-2 border-l-2 border-orange-500 pl-4 bg-orange-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
             <p className="text-orange-400 font-bold font-mono uppercase">[*] Loading TensorFlow/Keras Models...</p>
             <p className="text-white/70 font-mono text-xs mt-1">Importing OpenCV2... [OK]</p>
@@ -135,7 +135,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         </div>
     ),
 
-    "cebu_real_estate.js": () => (
+    "/projects/cebu_real_estate.js": () => (
         <div className="mt-2 border-l-2 border-cyan-500 pl-4 bg-cyan-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
             <p className="text-cyan-400 font-bold font-mono uppercase">[*] Initializing Next.js / Supabase Client...</p>
             <p className="text-white/70 font-mono text-xs mt-1">Fetching property listings from Postgres... [OK]</p>
@@ -167,7 +167,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
             </a>
         </div>
     ),
-    "terminal_portfolio.tsx": () => (
+    "/projects/terminal_portfolio.tsx": () => (
         <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4 bg-[var(--color-hacker-green)]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
             <p className="text-[var(--color-hacker-green)] font-bold font-mono uppercase">[*] Bootstrapping MIR_OS Environment...</p>
             <p className="text-white/70 font-mono text-xs mt-1">Compiling React components... [OK]</p>
