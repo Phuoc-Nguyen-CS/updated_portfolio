@@ -1,5 +1,5 @@
 // src/data/system_files.tsx
-import type { CommandResponse } from "./types";
+// import { SystemHints } from "../components/system_hints"; No need for it anymore
 
 /* =========================================================
     FILE_CONTENT
@@ -7,7 +7,8 @@ import type { CommandResponse } from "./types";
     These are no longer standalone executable commands.
    ========================================================= */
 
-export const FILE_CONTENT: Record<string, () => CommandResponse> = {
+
+export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
     "/about.txt": () => (
         <div className="space-y-1">
             <p>NAME: PHUOC NGUYEN</p>
@@ -156,6 +157,7 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
                             <li>• Engineered an automated CI/CD pipeline using Github Actions and Repository Dispatch events to sync real-time updates.</li>
                         </ul>
                     </div>
+                    
                 </div>
             </section>
             {/* SKILLS & CERTS */}
@@ -199,13 +201,12 @@ export const FILE_CONTENT: Record<string, () => CommandResponse> = {
                     </div>
                 </div>
             </section>
-
             <div className="pt-4 opacity-75 text-[16px] text-center border-t border-white/10 uppercase tracking-widest">
                 [ END OF SECURE TRANSMISSION ]
             </div>
         </div>
     ),
-    "/README.md": () => (
+    "/projects/README.md": () => (
         <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
             <p className="text-white font-bold mb-2 underline">// REPOSITORY_ENTRIES</p>
             <ul className="space-y-2">

@@ -6,6 +6,7 @@ import { EXECUTABLES } from "./executables";
 import { VFS } from "./vfs";
 import { resolvePath } from "../utils/path";
 import { HelpManual, QuickStartGuide } from "./commands/guides";
+import { DirectoryExplorer } from "../components/directory_explorer";
 
 /* =========================================================
     COMMAND LOGIC
@@ -23,70 +24,90 @@ export const COMMANDS: Record<
     ) => CommandResponse> = {
 
     // 01. LS: Context Aware listing (Now supports 'ls /projects')
+    // ls: (args, cwd = "/", _setCwd, sessionFiles) => {
+    //     const target = args[0] || ".";
+    //     const absolutePath = resolvePath(cwd, target);
+
+    //     const targetFolder = VFS[absolutePath];
+    //     if (!targetFolder) return <span className="text-red-500">ls: cannot access '{target}': No such file or directory</span>;
+
+    //     // 1. Grab static files from VFS
+    //     const staticChildren = targetFolder.children;
+
+    //     // 2. Filter sessionFiles to only those matching the absolute target path
+    //     const localSessionFiles = Object.keys(sessionFiles || {}).filter(
+    //         (fileName) => sessionFiles[fileName].path === absolutePath
+    //     );
+
+    //     // Combine both arrays and remove duplicates
+    //     const combinedItems = Array.from(new Set([...staticChildren, ...localSessionFiles])).sort((a, b) => a.localeCompare(b));
+
+    //     // UI LOGIC: Vertical layout for logs, grid for standard folders
+    //     const isBlogDirectory = absolutePath.startsWith("/logs");
+    //     const containerClass = isBlogDirectory
+    //         ? "flex flex-col space-y-1 mt-2 glow-text"
+    //         : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text";
+
+    //     return (
+    //         <div className={containerClass}>
+    //             {combinedItems.map((item) => {
+    //                 // Reconstruct child path to check if it's a directory
+    //                 const childAbsPath = absolutePath === "/" ? `/${item}` : `${absolutePath}/${item}`;
+    //                 const isDir = !!VFS[childAbsPath];
+
+    //                 // Default coloring
+    //                 let colorClass = isDir
+    //                     ? "text-[var(--color-hacker-green)] font-bold"
+    //                     : "text-white";
+
+    //                 // Specific highlight for root files
+    //                 if (["readme.md", "about.txt", "resume.txt"].includes(item.toLowerCase())) {
+    //                     colorClass = "text-yellow-400 font-bold animate-pulse brightness-125";
+    //                 }
+
+    //                 if (isBlogDirectory && !isDir) {
+    //                     colorClass = "text-green-300";
+    //                 }
+
+    //                 return (
+    //                     <span key={item} className={`${colorClass} truncate`}>
+    //                         {isBlogDirectory && !isDir && <span className="text-green-500/90 mr-2">[-]</span>}
+    //                         {item}{isDir && "/"}
+    //                     </span>
+    //                 );
+    //             })}
+    //         </div>
+    //     );
+    // },
     ls: (args, cwd = "/", _setCwd, sessionFiles) => {
         const target = args[0] || ".";
         const absolutePath = resolvePath(cwd, target);
 
-        const targetFolder = VFS[absolutePath];
-        if (!targetFolder) return <span className="text-red-500">ls: cannot access '{target}': No such file or directory</span>;
-
-        // 1. Grab static files from VFS
-        const staticChildren = targetFolder.children;
-
-        // 2. Filter sessionFiles to only those matching the absolute target path
-        const localSessionFiles = Object.keys(sessionFiles || {}).filter(
-            (fileName) => sessionFiles[fileName].path === absolutePath
-        );
-
-        // Combine both arrays and remove duplicates
-        const combinedItems = Array.from(new Set([...staticChildren, ...localSessionFiles])).sort((a, b) => a.localeCompare(b));
-
-        // UI LOGIC: Vertical layout for logs, grid for standard folders
-        const isBlogDirectory = absolutePath.startsWith("/logs");
-        const containerClass = isBlogDirectory
-            ? "flex flex-col space-y-1 mt-2 glow-text"
-            : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 glow-text";
-
-        return (
-            <div className={containerClass}>
-                {combinedItems.map((item) => {
-                    // Reconstruct child path to check if it's a directory
-                    const childAbsPath = absolutePath === "/" ? `/${item}` : `${absolutePath}/${item}`;
-                    const isDir = !!VFS[childAbsPath];
-
-                    // Default coloring
-                    let colorClass = isDir
-                        ? "text-[var(--color-hacker-green)] font-bold"
-                        : "text-white";
-
-                    // Specific highlight for root files
-                    if (["readme.md", "about.txt", "resume.txt"].includes(item.toLowerCase())) {
-                        colorClass = "text-yellow-400 font-bold animate-pulse brightness-125";
-                    }
-
-                    if (isBlogDirectory && !isDir) {
-                        colorClass = "text-green-300";
-                    }
-
-                    return (
-                        <span key={item} className={`${colorClass} truncate`}>
-                            {isBlogDirectory && !isDir && <span className="text-green-500/90 mr-2">[-]</span>}
-                            {item}{isDir && "/"}
-                        </span>
-                    );
-                })}
-            </div>
-        );
+        if (VFS[absolutePath]) {
+            return <DirectoryExplorer currentPath={absolutePath} sessionFiles={sessionFiles} />;
+        }
+        return <span className="text-red-500">ls: cannot access '{target}': No such file or directory</span>;
     },
 
     // 02. CD: Directory-only navigation guard
-    cd: (args, cwd = "/", setCwd) => {
+    // cd: (args, cwd = "/", setCwd) => {
+    //     const target = args[0] || "~";
+    //     const absolutePath = resolvePath(cwd, target);
+
+    //     if (VFS[absolutePath] && VFS[absolutePath].type === "dir") {
+    //         if (setCwd) setCwd(absolutePath);
+    //         return "";
+    //     } else {
+    //         return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
+    //     }
+    // },
+    cd: (args, cwd = "/", setCwd, sessionFiles) => {
         const target = args[0] || "~";
         const absolutePath = resolvePath(cwd, target);
 
         if (VFS[absolutePath] && VFS[absolutePath].type === "dir") {
             if (setCwd) setCwd(absolutePath);
-            return "";
+            return <DirectoryExplorer currentPath={absolutePath} sessionFiles={sessionFiles} />;
         } else {
             return <span className="text-red-500">bash: cd: {target}: No such file or directory</span>;
         }
@@ -119,7 +140,15 @@ export const COMMANDS: Record<
 
         // 2. Check Static Files (O(1) Dictionary Lookup!)
         if (FILE_CONTENT[absolutePath]) {
-            return FILE_CONTENT[absolutePath]();
+            return (
+                <div className="flex flex-col space-y-4">
+                    {/* 1. Print the actual file content */}
+                    <div>{FILE_CONTENT[absolutePath]()}</div>
+
+                    {/* 2. Print the directory buttons below it! */}
+                    <DirectoryExplorer currentPath={dirPath} sessionFiles={sessionFiles} />
+                </div>
+            );
         }
 
         // 3. Error Guards

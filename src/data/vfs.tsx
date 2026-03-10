@@ -31,12 +31,12 @@ logEntries.forEach((entry) => {
     const folderPath = `/logs/${folderName}`;
     const fileName = `${entry.id}.md`.toLowerCase();
 
-    // 1. Ensure the parent (/logs) knows about the child (March2026)
+    // Ensure the parent (/logs) knows about the child (March2026)
     if (VFS["/logs"] && !VFS["/logs"].children.includes(folderName)) {
         VFS["/logs"].children.push(folderName);
     }
 
-    // 2. Create the actual directory entry for the child
+    // Create the actual directory entry for the child
     if (!VFS[folderPath]) {
         VFS[folderPath] = {
             type: "dir",
@@ -44,13 +44,15 @@ logEntries.forEach((entry) => {
         };
     }
 
-    // 3. Add the file to the child's children list
+    // Add the file to the child's children list
     if (!VFS[folderPath].children.includes(fileName)) {
         VFS[folderPath].children.push(fileName);
     }
 
-    // 4. Map the file content
-    FILE_CONTENT[fileName] = () => (
+    const absoluteFilePath = `${folderPath}/${fileName}`;
+
+    // Map the file content
+    FILE_CONTENT[absoluteFilePath] = () => (
         <div className="mt-2 max-w-3xl animate-in fade-in slide-in-from-left-2 duration-500">
             <div className="border-l-4 border-[var(--color-hacker-green)] pl-4 py-1 mb-6 bg-[var(--color-hacker-green)]/5">
                 <h1 className="text-white font-bold text-lg md:text-xl uppercase tracking-wide">

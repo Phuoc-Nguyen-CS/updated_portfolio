@@ -1,7 +1,7 @@
 // src/data/boot_sequence.tsx
 import React from "react";
-import { AsciiAnimator } from "../../components/Ascii_Animator";
-import { QuickStartHUD } from "../../components/Quick_Start_HUD";
+import { AsciiAnimator } from "../../components/ascii_animator";
+import { QuickStartHUD } from "../../components/quick_start_hud";
 
 export type BootLog = {
     text: string | React.ReactNode;

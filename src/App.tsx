@@ -178,13 +178,6 @@ export default function App() {
     setInput("");
     setSuggestions([]);
   };
-
-  // Input Handler (Fires when you press Enter)
-  const handleCommand = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    executeCommand(input);
-  };
-
   // Ghost Typer
   const triggerCommand = (cmd: string) => {
     if (isBooting) return; // Don't allow clicking while the system is booting
@@ -205,8 +198,40 @@ export default function App() {
             inputRef.current?.focus(); // Give control back to the user
           }, 300);
         }
-      }, i * 40); 
+      }, i * 40);
     });
+  };
+  
+  // =========================================================
+  // GLOBAL COMMAND LISTENER (Handles button executions)
+  // =========================================================
+
+  // 1. Create a mutable ref to always hold the freshest version of the function
+  const triggerCommandRef = useRef(triggerCommand);
+
+  // 2. Keep the ref updated on every single render
+  useEffect(() => {
+    triggerCommandRef.current = triggerCommand;
+  }, [triggerCommand]);
+
+  // 3. The actual event listener (Replaces your old block)
+  useEffect(() => {
+    const handleGlobalCommand = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        // 4. Call the .current property of the ref!
+        triggerCommandRef.current(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('run-cmd', handleGlobalCommand);
+    return () => window.removeEventListener('run-cmd', handleGlobalCommand);
+  }, []);
+
+  // Input Handler (Fires when you press Enter)
+  const handleCommand = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    executeCommand(input);
   };
 
   // --- Render ---
