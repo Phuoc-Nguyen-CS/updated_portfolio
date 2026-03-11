@@ -10,22 +10,27 @@ export type BootLog = {
 };
 
 export const BOOT_SEQUENCE: BootLog[] = [
-    { text: "INITIALIZING PORTFOLIO KERNEL V0.0.6...", delay: 400 },
-    { text: "CPU: OCTA-CORE NEURAL PROCESSOR DETECTED", delay: 150 },
-    { text: "MEM: 64GB VIRTUAL RAM ALLOCATED... [ OK ]", delay: 200, color: "text-white/80" },
-    { text: "CHECKING SYSTEM INTEGRITY... [ SUCCESS ]", delay: 300, color: "text-white/80" },
-    { text: "------------------------------------------------", delay: 50 },
-    { text: "[*] MOUNTING FILE SYSTEM... /dev/sda1 ON /root", delay: 600 },
-    { text: "[*] LOADING CORE MODULES:", delay: 100 },
-    { text: "    > MIR_OS_KERNEL... LOADED", delay: 50, color: "text-yellow-400" },
-    { text: "    > TYPESCRIPT... LOADED", delay: 50, color: "text-yellow-400" },
-    { text: "    > REACT_DOM_ENGINE... LOADED", delay: 50, color: "text-yellow-400" },
-    { text: "    > TAILWIND_CSS_STYLING... LOADED", delay: 300, color: "text-yellow-400" },
-    { text: "ESTABLISHING SECURE CONNECTION TO SERVER...", delay: 800 },
-    { text: "CONNECTION SUCCESSFUL.", delay: 200, color: "text-[var(--color-hacker-green)] font-bold" },
-    { text: "ENCRYPTING CHANNEL VIA AES-256-GCM... DONE", delay: 400 },
-    { text: "PARSING BIOMETRIC DATA...", delay: 1000 },
-    { text: "IDENTITY VERIFIED. WELCOME GUEST.", delay: 500, color: "text-[var(--color-hacker-green)] font-bold animate-pulse" },
+  { text: " [ SYSTEM_INTEGRITY_CHECK ] ", delay: 400, color: "text-[var(--color-hacker-green)] underline opacity-80" },
+
+  {
+    text: " VFS_MOUNT ..... [==========] [ OK ]",
+    delay: 150,
+    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+  },
+  {
+    text: " CORE_LOAD ..... [========..] [ OK ]",
+    delay: 150,
+    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+  },
+  {
+    text: " USER_AUTH ..... [====......] [ .. ]",
+    delay: 600,
+    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+  },
+
+  { text: "------------------------------------------------", delay: 100, color: "text-green-900/30" },
+  { text: " >> SESSION_ESTABLISHED: GUEST", delay: 300, color: "text-[var(--color-hacker-green)] font-black animate-pulse tracking-tighter" },
+
     // --- ASCII ART ---
     {
         delay: 4500,
