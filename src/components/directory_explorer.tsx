@@ -62,7 +62,7 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath, sessio
                     } else if (isExe) {
                         colorClass = "text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/30 border-yellow-400/30";
                         prefix = "[EXE]";
-                    } else if (["readme.md", "about.txt", "resume.txt"].includes(item.toLowerCase())) {
+                    } else if (["about.txt", "resume.txt"].includes(item.toLowerCase())) {
                         colorClass = "text-blue-300 bg-blue-500/10 hover:bg-blue-500/30 border-blue-500/30";
                         prefix = "[SYS]";
                     }
