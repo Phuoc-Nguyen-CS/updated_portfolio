@@ -10,7 +10,7 @@ export type BootLog = {
 };
 
 export const BOOT_SEQUENCE: BootLog[] = [
-    { text: "INITIALIZING PORTFOLIO KERNEL V0.0.5...", delay: 400 },
+    { text: "INITIALIZING PORTFOLIO KERNEL V0.0.6...", delay: 400 },
     { text: "CPU: OCTA-CORE NEURAL PROCESSOR DETECTED", delay: 150 },
     { text: "MEM: 64GB VIRTUAL RAM ALLOCATED... [ OK ]", delay: 200, color: "text-white/80" },
     { text: "CHECKING SYSTEM INTEGRITY... [ SUCCESS ]", delay: 300, color: "text-white/80" },

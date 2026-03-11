@@ -206,51 +206,51 @@ export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
             </div>
         </div>
     ),
-    "/projects/README.md": () => (
-        <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
-            <p className="text-white font-bold mb-2 underline">// REPOSITORY_ENTRIES</p>
-            <ul className="space-y-2">
-                <li>
-                    <a
-                        href="https://github.com/Jameboyyy/CLS-Properties"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
-                    >
-                        {"[01] Cebu Real-Estate Property Website (JavaScript)"}
-                    </a>
-                </li>
-                <li>
-                    <a
-                        href="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
-                    >
-                        {"[02] Terminal Portfolio (TypeScript)"}
-                    </a>
-                </li>
-                <li>
-                    <a
-                        href="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
-                    >
-                        {"[03] Maplestory Discord Bot (Python)"}
-                    </a>
-                </li>
-                <li>
-                    <a
-                        href="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
-                    >
-                        {"[04] Hand Gesture Detection Program (Python)"}
-                    </a>
-                </li>
-            </ul>
-        </div>
-    )
+    // "/projects/README.md": () => (
+    //     <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
+    //         <p className="text-white font-bold mb-2 underline">// REPOSITORY_ENTRIES</p>
+    //         <ul className="space-y-2">
+    //             <li>
+    //                 <a
+    //                     href="https://github.com/Jameboyyy/CLS-Properties"
+    //                     target="_blank"
+    //                     rel="noreferrer"
+    //                     className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+    //                 >
+    //                     {"[01] Cebu Real-Estate Property Website (JavaScript)"}
+    //                 </a>
+    //             </li>
+    //             <li>
+    //                 <a
+    //                     href="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
+    //                     target="_blank"
+    //                     rel="noreferrer"
+    //                     className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+    //                 >
+    //                     {"[02] Terminal Portfolio (TypeScript)"}
+    //                 </a>
+    //             </li>
+    //             <li>
+    //                 <a
+    //                     href="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
+    //                     target="_blank"
+    //                     rel="noreferrer"
+    //                     className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+    //                 >
+    //                     {"[03] Maplestory Discord Bot (Python)"}
+    //                 </a>
+    //             </li>
+    //             <li>
+    //                 <a
+    //                     href="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher"
+    //                     target="_blank"
+    //                     rel="noreferrer"
+    //                     className="hover:bg-[var(--color-hacker-green)] hover:text-black p-1 transition-all"
+    //                 >
+    //                     {"[04] Hand Gesture Detection Program (Python)"}
+    //                 </a>
+    //             </li>
+    //         </ul>
+    //     </div>
+    // )
 };

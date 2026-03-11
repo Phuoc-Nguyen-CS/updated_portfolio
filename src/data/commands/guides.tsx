@@ -1,6 +1,6 @@
 // src/data/guides.tsx
 import React, { useEffect, useRef } from "react";
-import { fireCommand } from "../../utils/terminal";
+import { fireCommand, fireSequence } from "../../utils/terminal";
 
 /* =========================================================
     HELP MANUAL
@@ -25,7 +25,7 @@ export const HelpManual = () => {
         <div className="mt-2 space-y-4 max-w-3xl border-l-2 border-yellow-500 pl-4 animate-in fade-in slide-in-from-left-4 duration-500 overflow-hidden">
             <div>
                 <p className="text-yellow-400 font-bold uppercase tracking-widest underline decoration-2">
-                    // SYSTEM_MANUAL_V0.0.5
+                    // SYSTEM_MANUAL_V0.0.6
                 </p>
                 <p className="text-white/60 text-xs italic">"I.. might be stuck in VIM.. if you see this send help!"</p>
             </div>
@@ -103,10 +103,10 @@ export const QuickStartGuide = () => {
     ];
 
     const projectsData = [
-        { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system.", cmd: "cd projects"},
-        { title: "Real-Estate Website", desc: "Modern property listing platform using Supabase & Next.js.", cmd: "cd projects" },
-        { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup.", cmd: "cd projects"},
-        { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls.", cmd: "cd projects"},
+        { title: "MIR_OS Terminal", desc: "This highly interactive web-based operating system.", cmd: ["cd /projects", "./terminal_portfolio.tsx"]},
+        { title: "Real-Estate Website", desc: "Modern property listing platform using Supabase & Next.js.", cmd: ["cd /projects", "./cebu_real_estate.js"] },
+        { title: "Maplestory Discord Bot", desc: "Python automation tool using OCR and BeautifulSoup.", cmd: ["cd /projects", "./maple_discord_bot.py"] },
+        { title: "AI Gesture Control", desc: "Hand-tracking via OpenCV/TensorFlow for PC media controls.", cmd: ["cd /projects", "./gesture_detection.py"] },
     ];
 
     return (
@@ -156,7 +156,7 @@ export const QuickStartGuide = () => {
                         {projectsData.map((project, i) => (
                             <button
                                 key={i}
-                                onClick={() => fireCommand(project.cmd)}
+                                onClick={() => fireSequence(project.cmd)}
                                 className="bg-white/5 p-2 border border-white/5 hover:border-orange-500/50 hover:bg-orange-500/10 transition-colors text-left text-orange-300 cursor-pointer group"
                             >
                                 <p className="font-bold text-xs group-hover:text-white transition-colors">{project.title}</p>
@@ -174,7 +174,7 @@ export const QuickStartGuide = () => {
                     <h3 className="text-white font-bold text-sm bg-[var(--color-hacker-green)]/20 inline-block px-2 py-1 mb-2 text-[var(--color-hacker-green)]">04 // SYSTEM_LOGS</h3>
                     <div className="pl-3 border-l-2 border-[var(--color-hacker-green)]/30">
                         <button
-                            onClick={() => fireCommand("cd logs")}
+                            onClick={() => fireCommand("cd /logs")}
                             className="bg-white/5 p-3 border border-white/5 hover:border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/10 transition-colors group text-left w-full cursor-pointer"
                         >
                             <div className="flex items-center gap-2 mb-2">
