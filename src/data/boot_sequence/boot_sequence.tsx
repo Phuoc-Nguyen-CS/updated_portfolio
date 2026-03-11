@@ -28,7 +28,7 @@ export const BOOT_SEQUENCE: BootLog[] = [
     color: "text-[var(--color-hacker-green)] glow-text font-bold"
   },
 
-  { text: "------------------------------------------------", delay: 100, color: "text-green-900/30" },
+  { text: "-------------------------------------------", delay: 100, color: "text-green-900/30" },
   { text: " >> SESSION_ESTABLISHED: GUEST", delay: 300, color: "text-[var(--color-hacker-green)] font-black animate-pulse tracking-tighter" },
 
     // --- ASCII ART ---
