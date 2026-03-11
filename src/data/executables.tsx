@@ -16,7 +16,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
 
         return (
             <div className="mt-2 space-y-3 border-l-2 border-[var(--color-hacker-green)] pl-4">
-                <p className="text-white font-bold underline text-sm sm:text-base">// ALGORITHMIC_PROGRESS_SYNCED</p>
+                <p className="text-white font-bold underline text-sm sm:text-base">// LEETCODE_SYNCED</p>
                 {stats.map((stat) => {
                     const percentage = Math.round((stat.count / stat.total) * 100);
                     return (
@@ -78,7 +78,7 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
             >
                 [OPEN_REPOS]
             </a>
-            <p className="text-[10px] text-white/40 mt-2 italic">Note: Handshake will initialize in a new tab.</p>
+            <p className="text-[10px] text-white/40 mt-2 italic">Note: Clicking will initialize in a new tab.</p>
         </div>
     ),
 

@@ -26,7 +26,7 @@ export default function App() {
   const [isBooting, setIsBooting] = useState(true);
   const [cwd, setCwd] = useState("/");
   const [vimMode, setVimMode] = useState<{ active: boolean; file: string }>({ active: false, file: ""});
-  const [sessionFiles, setSessionFiles] = useState<Record<string, { content: string[], path: string }>>({}); // Stores user created data in session
+  const [sessionFiles, setSessionFiles] = useState<Record<string, { content: string[], path: string }>>({});
 
   // Mobile fix
   useEffect(() => {
@@ -214,7 +214,6 @@ export default function App() {
     const handleGlobalCommand = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
       if (customEvent.detail) {
-        // 4. Call the .current property of the ref!
         triggerCommandRef.current(customEvent.detail);
       }
     };

@@ -1,6 +1,6 @@
 // src/components/QuickStartHUD.tsx
 import React, { useEffect, useRef } from "react";
-import { fireCommand } from "../utils/terminal";
+import { fireCommand, fireSequence } from "../utils/terminal";
 interface HUDProps {
     onAction?: (cmd: string) => void;
 }
@@ -135,7 +135,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
 
                             {/* 3. Leetcode */}
                             <div
-                                onClick={() => onAction?.("./leetcode.exe")}
+                                onClick={() => fireSequence(["cd /", "./leetcode.exe"])}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-yellow-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-yellow-400 transition-colors">
@@ -147,7 +147,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
 
                             {/* 4. Contact */}
                             <div
-                                onClick={() => onAction?.("./contact.exe")}
+                                onClick={() => fireSequence(["cd /", "./contact.exe"])}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-red-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-red-400 transition-colors">
