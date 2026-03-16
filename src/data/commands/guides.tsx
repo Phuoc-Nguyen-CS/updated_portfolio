@@ -124,7 +124,7 @@ export const QuickStartGuide = () => {
                 <div className="mb-6">
                     <h3 className="text-white font-bold text-sm bg-[var(--color-hacker-green)]/20 inline-block px-2 py-1 mb-2">01 // ROOT_OWNER:</h3>
                     <div className="text-white/80 text-sm pl-3 border-l-2 border-white/20 space-y-3">
-                        <p>Hi, I'm Phuoc Nguyen. I'm a developer passionate about building robust applications and designing unique interactive experiences.</p>
+                        <p>Hi, I'm Phuoc Nguyen. I'm a developer that loves to create programs from a wide variety of languages</p>
                         <div className="space-y-1.5 mt-2 text-xs sm:text-sm font-mono">
                             <p className="flex gap-2"><span className="text-[var(--color-hacker-green)] font-bold">»</span><span><strong className="text-white">EDUCATION:</strong> CSU Fullerton (GPA: 3.6)</span></p>
                             <p className="flex gap-2"><span className="text-[var(--color-hacker-green)] font-bold">»</span><span><strong className="text-white">ACADEMIC_FOCUS:</strong> Data Science, AI, & Big Data</span></p>
@@ -184,7 +184,7 @@ export const QuickStartGuide = () => {
                                 </p>
                             </div>
                             <p className="text-white/60 text-[10px] leading-relaxed">
-                                Personal dev logs, technical deep-dives, and system update history are stored within the encrypted log directory.
+                                Personal dev logs and system update history are stored within the encrypted log directory.
                             </p>
                         </button>
 
