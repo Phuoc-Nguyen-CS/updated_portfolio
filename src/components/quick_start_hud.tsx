@@ -101,7 +101,19 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                             <span className="text-[var(--color-hacker-green)] font-bold font-mono animate-pulse">quickstart</span>
                         </button>
                     </div>
-
+                    {/* 5. Featured Standalone: Blog */}
+                    <div
+                        onClick={() => onAction?.("ls logs/")}
+                        className="mt-3 bg-purple-500/5 p-2 border-l-2 border-purple-500/50 hover:bg-purple-500/20 cursor-pointer transition-all group relative overflow-hidden"
+                    >
+                        <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-purple-400 transition-colors relative z-10">
+                            <span className="text-sm">ls logs/</span>
+                            <span className="text-[9px] bg-purple-500/20 px-2 py-0.5 rounded-sm tracking-widest border border-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity">[FEATURED_DEV_LOGS]</span>
+                        </p>
+                        <span className="text-white/60 text-[10px] relative z-10 block">
+                            Read the challenges I encounter when making new projects, and how I overcome them!
+                        </span>
+                    </div>
                     {/* SUGGESTED EXECUTION SEQUENCE */}
                     <div className="pt-4 mt-2 border-t border-[var(--color-hacker-green)]/30">
                         <p className="text-sm text-yellow-400 font-bold mb-3 flex items-center gap-2 tracking-widest uppercase">
