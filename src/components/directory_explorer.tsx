@@ -1,18 +1,18 @@
-// src/components/directory_explorer.tsx
-
 import React from "react";
-import { VFS } from "../data/vfs";
+import { useTerminal } from "../context/terminal_context"; 
 import { EXECUTABLES } from "../data/executables";
-import { resolvePath } from "../utils/path_resolver";
+import { resolvePath } from "../utils/path"; 
 import { fireCommand } from "../utils/terminal"; 
 
 interface ExplorerProps {
     currentPath: string;
-    sessionFiles?: Record<string, any>;
 }
 
-export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath, sessionFiles = {} }) => {
-    const folder = VFS[currentPath];
+export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath }) => {
+    // We still use vfs and sessionFiles from context for dynamic rendering
+    const { vfs, sessionFiles } = useTerminal();
+
+    const folder = vfs[currentPath];
     if (!folder) return null;
 
     const staticChildren = folder.children;
@@ -31,9 +31,9 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath, sessio
             </p>
 
             <div className="flex flex-wrap gap-2 text-sm font-mono">
-                {/* GO BACK BUTTON */}
                 {!isRoot && (
                     <button
+                        // FIX: Restore fireCommand to get the typing animation back
                         onClick={() => fireCommand(`cd ..`)}
                         className="bg-white/5 hover:bg-white/20 text-white/80 px-3 py-1.5 border border-white/10 transition-colors flex items-center gap-2"
                         title="Go up one directory"
@@ -42,11 +42,10 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath, sessio
                     </button>
                 )}
 
-                {/* GENERATE THE FILE/FOLDER BUTTONS */}
                 {combinedItems.map((item) => {
                     const childAbsPath = resolvePath(currentPath, item);
 
-                    const isDir = !!VFS[childAbsPath];
+                    const isDir = vfs[childAbsPath]?.type === 'dir';
                     const isExe = !!EXECUTABLES[childAbsPath];
 
                     let cmd = `cat ${childAbsPath}`;
@@ -70,6 +69,7 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath, sessio
                     return (
                         <button
                             key={item}
+                            // FIX: Restore fireCommand to get the typing animation back
                             onClick={() => fireCommand(cmd)}
                             className={`${colorClass} px-3 py-1.5 border transition-all flex items-center gap-2`}
                             title={`Run: ${cmd}`}

@@ -1,87 +1,70 @@
-// src/data/command_processor.tsx
-import React from "react";
+/**
+ * @file command_processor.tsx
+ * Why: We updated the signature to include 'sessionFiles'. This allows 
+ * navigation and file-read commands to consider user-created data 
+ * without violating the "Pure Function" rule.
+ */
 import type { CommandResponse } from "../types";
 import { COMMANDS } from "../commands";
 import { EXECUTABLES } from "../executables";
 import { FILE_CONTENT } from "../system_files";
-import { VFS } from "../vfs";
 import { resolvePath } from "../../utils/path";
 
-export interface CommandResult {
-    action: "clear" | "restart" | "vim" | "output";
-    output?: CommandResponse;
-    vimFile?: string;
-}
-
 export const processCommand = (
-    input: string,
+    input: string, 
     cwd: string,
-    setCwd: (path: string) => void,
-    sessionFiles: Record<string, { content: string[], path: string }>,
-    setSessionFiles: React.Dispatch<React.SetStateAction<Record<string, { content: string[], path: string }>>>
-): CommandResult | null => {
+    sessionFiles: Record<string, { content: string[], path: string }>
+): CommandResponse => {
     const rawInput = input.trim();
-    if (rawInput === "") return null;
+    if (rawInput === "") return { output: "" };
 
-    const inputParts = rawInput.toLowerCase().split(/\s+/);
-    const baseCmd = inputParts[0];
+    const inputParts = rawInput.split(/\s+/);
+    const baseCmd = inputParts[0].toLowerCase();
     const args = inputParts.slice(1);
 
-    if (baseCmd === "clear") return { action: "clear" };
-    if (baseCmd === "restart") return { action: "restart" };
+    if (baseCmd === "clear") return { output: "", systemAction: "CLEAR" };
+    if (baseCmd === "restart") return { output: "", systemAction: "RESTART" };
 
-    // --- VIM GUARD ---
+    // --- VIM HANDLER ---
     if (baseCmd === "vim") {
-        const rawTarget = args[0];
-        if (!rawTarget) return { action: "vim", vimFile: "[No Name]" };
-
-        // Convert whatever they typed into an absolute path!
+        const rawTarget = args[0] || "[No Name]";
         const absolutePath = resolvePath(cwd, rawTarget);
-
-        // Check if the absolutePath exists as a key in either database
         const isProtected = (absolutePath in FILE_CONTENT) || (absolutePath in EXECUTABLES);
-
+        
         if (isProtected) {
-            return { action: "output", output: <span className="text-red-500">bash: vim: {rawTarget}: Permission denied (system file is read-only)</span> };
+            return { output: <span className="text-red-500">bash: vim: {rawTarget}: Permission denied</span> };
         }
 
-        // Check if they are trying to VIM a directory
-        if (VFS[absolutePath]) {
-            return { action: "output", output: <span className="text-red-500">bash: vim: {rawTarget}: Is a directory</span> };
-        }
-
-        const fileName = absolutePath.split("/").pop() || "[No Name]";
-
-        return { action: "vim", vimFile: fileName };
+        return { output: "", systemAction: "VIM", meta: { vimFile: rawTarget } };
     }
 
-    let output: CommandResponse;
-
-    // --- EXECUTABLES GUARD ---
+    // --- EXECUTABLE ENGINE ---
     if (baseCmd.startsWith("./")) {
-        // Even if they type ./projects/leetcode.exe, we extract the target and resolve it
         const rawTarget = baseCmd.slice(2);
         const absolutePath = resolvePath(cwd, rawTarget);
 
         if (EXECUTABLES[absolutePath]) {
-            output = EXECUTABLES[absolutePath]();
-        } else if (VFS[absolutePath]) {
-            output = <span className="text-red-500">bash: {baseCmd}: Is a directory</span>;
-        } else {
-            output = <span className="text-red-500">bash: {baseCmd}: No such file or directory</span>;
+            /**
+             * Why: Executables might return a full CommandResponse (with actions) 
+             * or just a ReactNode. We normalize the output here to satisfy 
+             * the return type of the processor.
+             */
+            const execResult = EXECUTABLES[absolutePath]();
+            return typeof execResult === 'object' && 'output' in execResult 
+                ? execResult 
+                : { output: execResult };
         }
-    }
-    // Standard Commands
-    else {
-        output = COMMANDS[baseCmd]
-            ? COMMANDS[baseCmd](args, cwd, setCwd, sessionFiles, setSessionFiles)
-            : (
-                <div className="text-red-500">
-                    <p>ERR: COMMAND_NOT_FOUND [{baseCmd}]</p>
-                    <p className="text-white/50 text-xs mt-1">Type <span className="text-yellow-400 underline">help</span> for a list of available protocols.</p>
-                </div>
-            );
+        return { output: <span className="text-red-500">bash: {baseCmd}: Not found</span> };
     }
 
-    return { action: "output", output };
+    // --- STANDARD COMMANDS ---
+    const commandFn = COMMANDS[baseCmd];
+    if (commandFn) {
+        // Why: We now pass all 3 required arguments to satisfy the CommandFunction contract.
+        return commandFn(args, cwd, sessionFiles);
+    }
+
+    return {
+        output: <div className="text-red-500">ERR: COMMAND_NOT_FOUND [{baseCmd}]</div>
+    };
 };

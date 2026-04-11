@@ -1,39 +1,48 @@
+/**
+ * @file App.tsx
+ * Why: Refactored to act strictly as the "View" layer. All heavy logic, state 
+ * management (CWD, History), and command processing have been offloaded to the 
+ * TerminalProvider. This component now only handles UI concerns: animations, 
+ * scrolling, keyboard inputs, and rendering the context data.
+ */
 import React, { useState, useRef, useEffect } from "react";
 import { VimEditor } from "./VimEditor";
 import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
-import { getAutoComplete} from "./data/data_processing/auto_complete";
-import { processCommand } from "./data/data_processing/command_processor";
-
-/**
- * Represents a single entry in the terminal history.
- */
-interface HistoryItem {
-  cmd: string; // The command entered by the user
-  out: string | React.ReactNode; // The output (string or JSX component)
-  cwd: string; // Snapshot of the directory
-}
+import { getAutoComplete } from "./data/data_processing/auto_complete";
+import { useTerminal } from "./context/terminal_context";
 
 export default function App() {
-  // --- Refs & State ---
+  // --- 1. GLOBAL PLUMBING (The New Engine) ---
+  const { 
+    history, 
+    cwd, 
+    executeCommand, 
+    activeEditorFile, 
+    closeEditor, 
+    sessionFiles, 
+    saveSessionFile 
+  } = useTerminal();
+
+  // --- 2. LOCAL UI STATE (Only visual/input concerns) ---
   const hasBooted = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+
   const [input, setInput] = useState("");
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
-  const [cwd, setCwd] = useState("/");
-  const [vimMode, setVimMode] = useState<{ active: boolean; file: string }>({ active: false, file: ""});
-  const [sessionFiles, setSessionFiles] = useState<Record<string, { content: string[], path: string }>>({});
+  
+  // Why: We isolate boot logs from 'history' so the system 'clear' command 
+  // doesn't have to worry about accidentally deleting or re-triggering boot sequences.
+  const [bootLogs, setBootLogs] = useState<React.ReactNode[]>([]);
 
-  // Mobile fix
+  // Mobile viewport fix
   useEffect(() => {
     const setViewportHeight = () => {
       const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
-      // Force scroll to bottom when viewport changes (keyboard toggle)
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
@@ -47,23 +56,15 @@ export default function App() {
     };
   }, []);
   
-  // AUTO-SCROLL LOGIC
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // --- Effects ---
-
-  // Auto-scroll to bottom on every history update
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [history]);
-
   useEffect(() => {
     scrollToBottom();
-  }, [history, suggestions]);
+  }, [history, bootLogs, suggestions]);
 
-  // Runs the simulated boot sequence on component mount
+  // --- BOOT SEQUENCE LOGIC ---
   useEffect(() => {
     if (!isBooting || hasBooted.current) return;
     hasBooted.current = true;
@@ -73,20 +74,12 @@ export default function App() {
     const printNextLine = () => {
       if (currentLine < BOOT_SEQUENCE.length) {
         const log = BOOT_SEQUENCE[currentLine];
+        const logOutput = typeof log.text === "string"
+            ? <span className={log.color || "text-white/80 italic"}>{log.text}</span>
+            : log.text;
 
-        setHistory((prev) => [
-          ...prev,
-          {
-            cmd: "",
-            cwd: "/",
-            out: typeof log.text === "string"
-              ? <span className={log.color || "text-white/80 italic"}>{log.text}</span>
-              : log.text,
-          }
-        ]);
-
+        setBootLogs((prev) => [...prev, logOutput]);
         currentLine++;
-        // Use the custom delay for this specific line!
         setTimeout(printNextLine, log.delay);
       } else {
         setIsBooting(false);
@@ -96,29 +89,20 @@ export default function App() {
     printNextLine();
   }, [isBooting]);
 
-  // Focuses the terminal input once booting is finished 
   useEffect(() => {
     if (!isBooting) inputRef.current?.focus();
   }, [isBooting]);
 
-  // --- Handlers ---
   const handleContainerClick = () => {
     if (!isBooting) inputRef.current?.focus();
   };
 
-  // Handles special keys: Tab (Autocomplete), Up/Down (History)
+  // --- KEYBOARD & INPUT HANDLING ---
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    /* ---------------------------------------------------------
-    Enforces strict Linux-style filtering:
-    - cd: Only suggests directories
-    - cat/vim: Only suggests readable files (from FILE_CONTENT)
-    - ./: Only suggests executable files (from EXECUTABLES)
-   --------------------------------------------------------- */
-    // 01. Tab Autocomplete
     if (e.key === "Tab") {
       e.preventDefault();
+      // Why: We pass the sessionFiles from context so autocomplete knows about user files
       const result = getAutoComplete(input, cwd, sessionFiles);
-
       if (result) {
         if (result.newInput) setInput(result.newInput);
         setSuggestions(result.suggestions);
@@ -126,7 +110,6 @@ export default function App() {
       return;
     }
 
-    // 02. COMMAND HISTORY NAVIGATION
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (historyStack.length === 0) return;
@@ -148,68 +131,50 @@ export default function App() {
     }
   };
 
-  // Processes the entered command and updates history 
-  const executeCommand = (cmdToRun: string) => {
-    const result = processCommand(cmdToRun, cwd, setCwd, sessionFiles, setSessionFiles);
+  // Input Form Submit
+  const handleCommand = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-    if (result) {
-      if (result.action === "clear") {
-        setHistory([]);
-      } else if (result.action === "restart") {
-        setHistory([]);
-        setHistoryStack([]);
-        setIsBooting(true);
-        hasBooted.current = false;
-        setCwd("/");
-      } else if (result.action === "vim") {
-        setVimMode({ active: true, file: result.vimFile! });
-      } else if (result.action === "output") {
-        setHistory((prev) => [...prev, { cmd: cmdToRun, out: result.output!, cwd }]);
-        setHistoryStack((prev) => [...prev, cmdToRun]);
-        setHistoryIndex(-1);
-      }
-    }
-
+    executeCommand(input); // Hits the global engine
+    
+    // UI cleanups
+    setHistoryStack((prev) => [...prev, input]);
+    setHistoryIndex(-1);
     setInput("");
     setSuggestions([]);
   };
-  // Ghost Typer
+
+  // Ghost Typer (For clickable UI elements)
   const triggerCommand = (cmd: string) => {
-    if (isBooting) return; // Don't allow clicking while the system is booting
+    if (isBooting) return; 
 
     let currentText = "";
-    inputRef.current?.blur(); // Hide mobile keyboard while auto-typing
+    inputRef.current?.blur(); 
 
-    // Loop through the string and type it character by character
     cmd.split("").forEach((char, i) => {
       setTimeout(() => {
         currentText += char;
         setInput(currentText);
 
-        // Once the last character is typed, wait a split second and execute
         if (i === cmd.length - 1) {
           setTimeout(() => {
-            executeCommand(cmd);
-            inputRef.current?.focus(); // Give control back to the user
+            executeCommand(cmd); // Global Engine
+            setHistoryStack((prev) => [...prev, cmd]);
+            setInput("");
+            inputRef.current?.focus();
           }, 300);
         }
       }, i * 40);
     });
   };
 
-  // =========================================================
-  // GLOBAL COMMAND LISTENER (Handles button executions)
-  // =========================================================
-
-  // Create a mutable ref to always hold the freshest version of the function
+  // Keep triggerCommand fresh for global events
   const triggerCommandRef = useRef(triggerCommand);
-
-  //  Keep the ref updated on every single render
   useEffect(() => {
     triggerCommandRef.current = triggerCommand;
   }, [triggerCommand]);
 
-  //  The actual event listener (Replaces your old block)
   useEffect(() => {
     const handleGlobalCommand = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
@@ -217,83 +182,72 @@ export default function App() {
         triggerCommandRef.current(customEvent.detail);
       }
     };
-
     window.addEventListener('run-cmd', handleGlobalCommand);
     return () => window.removeEventListener('run-cmd', handleGlobalCommand);
   }, []);
 
-  // Input Handler (Fires when you press Enter)
-  const handleCommand = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    executeCommand(input);
-  };
-
-  // --- Render ---
   return (
     <div
       style={{ backgroundColor: 'var(--color-hacker-bg)', color: 'var(--color-hacker-green)' }}
       className="h-full w-full font-mono cursor-text overflow-y-auto no-scrollbar selection:bg-[var(--color-hacker-green)] selection:text-[var(--color-hacker-bg)] overflow-x-hidden"
-      // FIX: Only trigger the focus click if Vim is closed!
-      onClick={vimMode.active ? undefined : handleContainerClick}
+      onClick={activeEditorFile ? undefined : handleContainerClick}
     >
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
-      {/* VIM EDITOR */}
-      {/* We keep this conditionally rendered so it mounts fresh every time it opens */}
-      {vimMode.active && (
+      {/* --- VIM EDITOR --- */}
+      {activeEditorFile && (
         <VimEditor
-          file={vimMode.file}
-          initialContent={sessionFiles[vimMode.file]?.content}
-          onClose={(msg, newContent) => {
-            setVimMode({ active: false, file: "" });
+          file={activeEditorFile}
+          initialContent={sessionFiles[activeEditorFile]?.content}
+          onClose={(_msg, newContent) => {
             if (newContent) {
-              setSessionFiles(prev => ({
-                ...prev,
-                [vimMode.file]: {
-                  content: newContent,
-                  path: cwd
-                }
-              }));
+              // Hit the global context to save the file
+              saveSessionFile(activeEditorFile, newContent);
             }
-            if (msg) {
-              setHistory(prev => [...prev, { cmd: "", out: <span className="text-yellow-400">{msg}</span>, cwd }]);
-            }
+            // Signal the context to unlock the terminal
+            if (closeEditor) closeEditor();
             setTimeout(() => inputRef.current?.focus(), 100);
           }}
         />
       )}
 
-      {/* MAIN TERMINAL */}
-      {/* We dynamically add 'hidden' if Vim is active, otherwise 'block'. 
-          This keeps it in the DOM, preventing animations from re-firing! */}
-      <div className={`max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10 ${vimMode.active ? 'hidden' : 'block'}`}>
+      {/* --- MAIN TERMINAL --- */}
+      <div className={`max-w-5xl mx-auto p-4 md:p-10 text-sm md:text-base mb-20 relative z-10 ${activeEditorFile ? 'hidden' : 'block'}`}>
 
-        {/* Terminal History Output */}
         <div className="space-y-4">
-          {history.map((entry, i) => (
-            <div key={i} className="break-words animate-in fade-in duration-300 max-w-full overflow-x-hidden">
-              {entry.cmd && (
+          {/* 1. Render Boot Sequence First */}
+          <div className="flex flex-col items-start justify-center">
+            {bootLogs.map((log, i) => (
+              <div key={`boot-${i}`} className="animate-in fade-in duration-300 max-w-full overflow-x-hidden glow-text whitespace-pre-wrap">
+                {log}
+              </div>
+            ))}
+          </div>
+
+          {/* 2. Render Command History */}
+          {history.map((entry) => (
+            <div key={entry.id} className="break-words animate-in fade-in duration-300 max-w-full overflow-x-hidden">
+              {entry.input && (
                 <div className="flex items-center opacity-50 text-xs md:text-sm">
                   <span className="mr-2 text-white/100 font-bold">
-                    guest@portfolio:~{entry.cwd === "/" ? "" : entry.cwd}$
+                    guest@portfolio:~{entry.cwdAtExecution === "/" ? "" : entry.cwdAtExecution}$
                   </span>
-                  <span className="text-white font-bold italic">{entry.cmd}</span>
+                  <span className="text-white font-bold italic">{entry.input}</span>
                 </div>
               )}
               <div className="glow-text mt-1 whitespace-pre-wrap">
-                {React.isValidElement(entry.out) && typeof entry.out.type === 'function'
+                {React.isValidElement(entry.output) && typeof entry.output.type === 'function'
                   ? React.cloneElement(
-                    entry.out as React.ReactElement<{ onAction?: (cmd: string) => void }>,
+                    entry.output as React.ReactElement<{ onAction?: (cmd: string) => void }>,
                     { onAction: triggerCommand }
                   )
-                  : entry.out
+                  : entry.output
                 }
               </div>
             </div>
           ))}
         </div>
 
-        {/* Tab-Completion Suggestions UI */}
         {!isBooting && suggestions.length > 0 && (
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
             {suggestions.map((s) => (
@@ -302,20 +256,15 @@ export default function App() {
           </div>
         )}
 
-        {/* Command Input Area */}
         {!isBooting && (
           <form onSubmit={handleCommand} className="flex items-start mt-4 pb-12 animate-in fade-in duration-700">
             <span className="mr-2 font-bold shrink-0 animate-pulse text-[var(--color-hacker-green)]">❯</span>
             <div className="relative flex-grow">
-
-              {/* GHOST TEXT LAYER */}
               {!input && (
                 <span className="absolute inset-0 z-0 text-white/30 italic pointer-events-none whitespace-nowrap">
                   type 'quickstart' or 'help' and press enter to begin...
                 </span>
               )}
-
-              {/* Hidden Input */}
               <input
                 ref={inputRef}
                 onKeyDown={handleKeyDown}
@@ -330,8 +279,6 @@ export default function App() {
                 spellCheck="false"
                 autoFocus
               />
-
-              {/* Custom Blinking Cursor */}
               <div className="flex min-h-[1.5rem] pointer-events-none relative z-20">
                 <span className="invisible whitespace-pre-wrap break-all">{input}</span>
                 <span
@@ -342,15 +289,11 @@ export default function App() {
                   className="w-2 h-5 animate-pulse shrink-0"
                 />
               </div>
-
             </div>
           </form>
         )}
-
         <div ref={bottomRef} />
       </div>
-      {/* End of Main Terminal */}
-
     </div>
   );
 }

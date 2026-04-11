@@ -23,7 +23,7 @@ export const BOOT_SEQUENCE: BootLog[] = [
     color: "text-[var(--color-hacker-green)] glow-text font-bold"
   },
   {
-    text: " USER_AUTH ..... [====......] [ .. ]",
+    text: " USER_AUTH ..... [=====.....] [ .. ]",
     delay: 600,
     color: "text-[var(--color-hacker-green)] glow-text font-bold"
   },

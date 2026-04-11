@@ -1,11 +1,8 @@
 // src/components/QuickStartHUD.tsx
 import React, { useEffect, useRef } from "react";
 import { fireCommand, fireSequence } from "../utils/terminal";
-interface HUDProps {
-    onAction?: (cmd: string) => void;
-}
 
-export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
+export const QuickStartHUD: React.FC = () => {
     const hudRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -34,9 +31,11 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                     animation: materialize 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 }
             `}</style>
-
-            <div ref={hudRef} className="mt-2 border border-white/20 p-4 bg-black/30 max-w-2xl opacity-0 animate-materialize">
-                <p className="text-sm md:text-lg font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between items-end">
+                <div 
+                    ref={hudRef} 
+                    className="mt-2 mx-auto w-full max-w-2xl border border-white/20 p-4 bg-black/30 opacity-0 animate-materialize"
+                >
+                   <p className="text-sm md:text-lg font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between items-end">
                     <span>[MIR_OS] QUICK_START_GUIDE</span>
                     <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.6</span>
                 </p>
@@ -103,7 +102,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                     </div>
                     {/* 5. Featured Standalone: Blog */}
                     <div
-                        onClick={() => onAction?.("ls logs/")}
+                        onClick={() => fireCommand("ls logs/")}
                         className="mt-3 bg-purple-500/5 p-2 border-l-2 border-purple-500/50 hover:bg-purple-500/20 cursor-pointer transition-all group relative overflow-hidden"
                     >
                         <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-purple-400 transition-colors relative z-10">
@@ -123,7 +122,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                             {/* 1. Resume  */}
                             <div
-                                onClick={() => onAction?.("cat resume.txt")}
+                                onClick={() => fireCommand("cat resume.txt")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-blue-400 transition-colors">
@@ -135,7 +134,7 @@ export const QuickStartHUD: React.FC<HUDProps> = ({ onAction }) => {
 
                             {/* 2. Projects */}
                             <div
-                                onClick={() => onAction?.("ls projects/")}
+                                onClick={() => fireCommand("ls projects/")}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-[var(--color-hacker-green)] transition-colors">
