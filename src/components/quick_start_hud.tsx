@@ -37,7 +37,7 @@ export const QuickStartHUD: React.FC = () => {
                 >
                    <p className="text-sm md:text-lg font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between items-end">
                     <span>[MIR_OS] QUICK_START_GUIDE</span>
-                    <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.6</span>
+                    <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.8</span>
                 </p>
 
                 <div className="space-y-4">

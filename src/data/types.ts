@@ -1,24 +1,33 @@
 /**
  * @file types.ts
- * @description Centralized type definitions for the MIR_OS environment.
- * Why: We use 'import type' to satisfy 'verbatimModuleSyntax', ensuring 
- * that type-only dependencies are erased during the Vite build process,
- * preventing runtime reference errors.
+ * @description The Architectural Blueprint for MIR_OS.
+ * This file centralizes the "contracts" between the system's logic and its UI.
+ * By strictly defining interfaces, we ensure that the Engine (Provider)
+ * and the Logic (Processor/Commands) can grow independently without
+ * creating breaking changes.
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Represents a single node in a Virtual File System (VFS)
+ * @property {'dir' | 'file'} type - Distinguishes between a container and its leaf nodes
+ * @property {string[]} children - For containers (directores), a list of child node names
+*/
 export interface VFSNode {
     type: 'dir' | 'file';
     children: string[];
 }
 
+/**
+ * The full map of MIR_OS file systems.
+ * Keyed by absolute paths (e.g., "projects/portfolio") for quick O(1) lookups
+ */
 export type VirtualFileSystem = Record<string, VFSNode>;
 
 /***                                         
- * Represents a single interactoin cycle within the terminal history.
- * We store the directory state at the time of execution to ensure
- * historical prompts (e.g. `~/projects $`) do not dynamically update
- * if the user changes directores later.
+ * Represents a single entry in the terminal's historical record.
+ * @property {string} cwdAtExecution - We are able to snapshot the directory at the time
+ * of execution to ensure historical command prompts
  */
 export interface CommandRecord {
     id: string;
@@ -28,21 +37,20 @@ export interface CommandRecord {
 }
 
 /***
- * The unified contract for all commmand modules.
- * Instead of monolithic parsing, individual commands (ls, cd) will
- * accept this context and return a standardized response.
+ * Standardized input context for terminal command logic
  */
 export interface CommandContext {
     rawInput: string;
     args: string[];
     currentCwd: string;
-    //vfs: VirtualFileSystem; // Added later
 }
 
 /**
- * The standard interface for all command logic functions.
- * Why: By restricting the arguments to only 'args' and 'cwd', we ensure 
- * that commands cannot side-effect the application state directly.
+ * The Pure Function for all MIR_OS commands
+ * @param {string[]} args - Argument passed after the base cmd (e.g. cd, ./, cat, etc.)
+ * @param {string} cwd - The current working directory
+ * @param {Record} sessionFiles - The user's session potentially containing user-created files
+ * @returns {CommandResponse} A declarative instruction for the system engine
  */
 export type CommandFunction = (
     args: string[], 
@@ -51,9 +59,9 @@ export type CommandFunction = (
 ) => CommandResponse;
 
 /**
- * Defines the acceptable state mutations a command can request.
- * Commands shouldn't mutate state directly; they return this payload 
- * for the TerminalProvider to safely apply.
+ * Packet of Intent returned by the command
+ * Instead of a command directly changing the state, it returns these instructions
+ * The TerminalProvider then applies these changes safely in the React lifecycle
  */
 export interface CommandResponse {
     output: ReactNode | string;
@@ -66,7 +74,8 @@ export interface CommandResponse {
 }
 
 /**
- * The shape of our Global Plumbing system.
+ * The unified interface
+ * Defines our data and methods that are available to any component in the tree.
  */
 export interface TerminalContextType {
     history: CommandRecord[];
