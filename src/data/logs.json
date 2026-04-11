@@ -1,5 +1,26 @@
 [
   {
+    "id": "2026-04-10-resolving_circular_dependencies",
+    "title": "Resolving Circular Dependencies",
+    "date": "2026-04-10",
+    "folder": "terminal_portfolio",
+    "content": [
+      "# Update: Global Context & Stateful VFS",
+      "- **Focus**: Scalability & Architectural Integrity",
+      "- **Status**: Deployed",
+      "### 1. The Goal",
+      "As the system grew, the method of passing data (prop-drilling) was becoming a maintenance nightmare. My goal was to move from a \"scripted\" terminal to a true Global OS State. I wanted a centralized system where any component—whether it’s a could interact with the OS without needing to know the complex logic behind it. Right now, a command would have to run down multiple files to do a singular task.",
+      "### 2. The Challenge",
+      "The biggest hurdle was State Fragmentation. My Virtual File System (VFS) was static, and my command logic was \"dirty\" meaning commands were directly reaching out to change the UI state. This created a massive synchronization issue: if a user created a file in Vim, the ls command didn't know it existed because it was looking at a hard-coded file instead of a live state. We were also teetering on the edge of \"Circular Dependencies,\" where files were importing each other in an infinite loop that would eventually crash the build.",
+      "### 3. The Solution",
+      "The Global Terminal Context: I implemented a TerminalProvider using the React Context API. This acts as the \"Central Engine,\" holding the CWD, command history, and the VFS in a single source of truth. Now, components just \"hook\" into the OS to get DIRECTLY what they need.",
+      "The Pure Command Pattern: I refactored the command_processor into a pure logic engine. Instead of commands directly changing the directory or deleting files, they now return a \"Packet of Intent\" (a CommandResponse). The Engine reads this packet and executes the state mutation safely, decoupling the logic from the UI.",
+      "Stateful VFS & Session RAM: I moved the entire file system into React state. By merging the static \"System Files\" with a volatile \"Session RAM,\" the environment now reacts in real-time. When you save a file in the editor or delete a log, the DirectoryExplorer updates instantly because it’s observing the live state.",
+      "### 4. The Result",
+      "The architecture is now production-grade and \"fast-fail\" protected. By enforcing strict TypeScript interfaces and a decoupled data flow, the system is incredibly easy to extend. I can build new features—like a network monitor by connecting them to the existing structure."
+    ]
+  },
+  {
     "id": "2026-03-31-grabbing_data_and_planning",
     "title": "Grabbing Data And Planning",
     "date": "2026-03-31",
