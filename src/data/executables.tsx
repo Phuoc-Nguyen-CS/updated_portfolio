@@ -1,11 +1,7 @@
 /**
  * @file executables.tsx
  * @description Defines the behavior for simulated binary executions (./file).
- * Why: Every entry is normalized to return a CommandResponse object. This 
- * ensures that "executables" can interact with the system engine (e.g., 
- * triggering state changes) just like native CLI commands.
  */
-import React from "react";
 import type { CommandResponse } from "./types";
 import leetcodeData from "./leetcode_stats.json";
 
