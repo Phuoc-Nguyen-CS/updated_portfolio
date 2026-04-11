@@ -17,7 +17,7 @@
       "The Pure Command Pattern: I refactored the command_processor into a pure logic engine. Instead of commands directly changing the directory or deleting files, they now return a \"Packet of Intent\" (a CommandResponse). The Engine reads this packet and executes the state mutation safely, decoupling the logic from the UI.",
       "Stateful VFS & Session RAM: I moved the entire file system into React state. By merging the static \"System Files\" with a volatile \"Session RAM,\" the environment now reacts in real-time. When you save a file in the editor or delete a log, the DirectoryExplorer updates instantly because it’s observing the live state.",
       "### 4. The Result",
-      "The architecture is now production-grade and \"fast-fail\" protected. By enforcing strict TypeScript interfaces and a decoupled data flow, the system is incredibly easy to extend. I can build new features—like a network monitor by connecting them to the existing structure."
+      "The architecture is now no longer holds a circular dependency. By enforcing strict TypeScript interfaces and a decoupled data flow, the system is now easier to extend if any future features were to be added."
     ]
   },
   {
