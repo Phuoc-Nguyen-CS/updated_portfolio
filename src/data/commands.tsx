@@ -2,7 +2,6 @@
  * @file commands.tsx
  * @description The Command Registry for MIR_OS.
  */
-import React from "react"; // FIX 1: Required for returning JSX payloads
 import type { CommandFunction, CommandResponse } from "./types";
 import { FILE_CONTENT } from "./system_files";
 import { EXECUTABLES } from "./executables";
@@ -14,13 +13,12 @@ import { DirectoryExplorer } from "../components/directory_explorer";
 
 export const COMMANDS: Record<string, CommandFunction> = {
 
-    ls: (args, cwd, sessionFiles): CommandResponse => {
+    ls: (args, cwd): CommandResponse => {
         const target = args[0] || ".";
         const absolutePath = resolvePath(cwd, target);
 
         if (VFS[absolutePath]) {
             return {
-                // FIX 2: Removed the broken sessionFiles prop. It uses Context now!
                 output: <DirectoryExplorer currentPath={absolutePath} />
             };
         }
@@ -29,14 +27,12 @@ export const COMMANDS: Record<string, CommandFunction> = {
         };
     },
 
-    cd: (args, cwd, sessionFiles): CommandResponse => {
+    cd: (args, cwd): CommandResponse => {
         const target = args[0] || "/";
         const absolutePath = resolvePath(cwd, target);
 
-        // FIX 3: Safety check. Some VFS setups use "dir" while others use "directory"
         if (VFS[absolutePath] && (VFS[absolutePath].type === "dir" || VFS[absolutePath].type === "directory")) {
             return {
-                // FIX 2: Removed the broken sessionFiles prop.
                 output: <DirectoryExplorer currentPath={absolutePath} />,
                 newCwd: absolutePath
             };
