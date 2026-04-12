@@ -114,7 +114,7 @@ export const TerminalProvider: FC<{ children: ReactNode }> = ({ children }) => {
             saveSessionFile   
         }}>
             {children}
-        </TerminalContext.Provider>
+        </TerminalContext.Provider> 
     );
 };
 
