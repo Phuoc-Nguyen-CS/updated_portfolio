@@ -2,9 +2,8 @@
  * @file types.ts
  * @description The Architectural Blueprint for MIR_OS.
  * This file centralizes the "contracts" between the system's logic and its UI.
- * By strictly defining interfaces, we ensure that the Engine (Provider)
- * and the Logic (Processor/Commands) can grow independently without
- * creating breaking changes.
+ * Ensures that the Engine (Provider) and the Logic (Processor/Commands) 
+ * can grow independently without creating breaking changes.
  */
 import type { ReactNode } from 'react';
 
