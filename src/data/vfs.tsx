@@ -14,7 +14,7 @@ export const VFS: Record<string, { type: string; children: string[] }> = {
     },
     "/projects": {
         type: "dir",
-        children: ["cebu_real_estate.js", "terminal_portfolio.tsx", "maple_discord_bot.py", "gesture_detection.py"]
+        children: ["cebu_real_estate.js", "terminal_portfolio.tsx", "maple_discord_bot.py", "gesture_detection.py", "league_of_legends_drafting_tool.py"]
     },
     "/logs": {
         type: "dir",

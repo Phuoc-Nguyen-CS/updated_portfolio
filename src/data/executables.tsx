@@ -1,15 +1,22 @@
 /**
- * @file executables.tsx
- * @description Defines the behavior for simulated binary executions (./file).
- */
+* @file executables.tsx
+* @description Defines the behavior for simulated binary executions (./file).
+* Maps absolute path to logic functions, we mimic the behavior for binary executions.  
+*/
 import type { CommandResponse } from "./types";
 import leetcodeData from "./leetcode_stats.json";
+import { ProjectSimulation } from "../components/project_simulation";
 
 /* =========================================================
-    EXECUTABLES (For './')
-    What happens when the user EXECUTES the files.
+    EXECUTABLES (Triggered via './[file]')
+    These are essentially standalone "micro-apps" within the OS.
    ========================================================= */
 export const EXECUTABLES: Record<string, () => CommandResponse> = {
+    /**
+     * LEETCODE.EXE
+     * Provides a live-simulated dashboard of algorithm progress.
+     * Parses local JSON data to generate dynamic progress bars.
+     */
     "/leetcode.exe": () => {
         const stats = [
             { label: "EASY", count: parseInt(leetcodeData.easy), total: 28, color: "bg-green-500" },
@@ -49,6 +56,11 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         };
     },
 
+    /**
+     * CONTACT.EXE
+     * Handles external communication protocols.
+     * Provides a direct mailto link styled as a system execution.
+     */
     "/contact.exe": () => ({
         output: (
             <div className="mt-2 space-y-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
@@ -69,6 +81,10 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
         )
     }),
 
+    /**
+     * GITHUB.EXE
+     * Links to our github for users to get a quick access to it!
+     */      
     "/github.exe": () => ({
         output: (
             <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4">
@@ -93,121 +109,133 @@ export const EXECUTABLES: Record<string, () => CommandResponse> = {
 
     /* =========================================================
         PROJECT SIMULATIONS
+        Each of these provides a unique "boot log" for specific repos.
        ========================================================= */
+
     "/projects/maple_discord_bot.py": () => ({
         output: (
-            <div className="mt-2 border-l-2 border-[#5865F2] pl-4 bg-[#5865F2]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
-                <p className="text-[#5865F2] font-bold font-mono uppercase">[*] Initializing Discord.py Wrapper...</p>
-                <p className="text-white/70 font-mono text-xs mt-1">Authenticating token... [OK]</p>
-                <p className="text-white/70 font-mono text-xs">Connecting to Discord Gateway... [OK]</p>
-                <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1 animate-pulse">Scrapping Data for Tesseract to extract</p>
-
-                <div className="mt-4 text-xs space-y-1 border-t border-[#5865F2]/30 pt-2">
-                    <p className="text-white font-bold mb-2">REGISTERED_SLASH_COMMANDS:</p>
-                    <p className="text-white/70"><span className="text-yellow-400 font-bold">/track</span> [user] - Fetch daily exp gain.</p>
-                    <p className="text-white/70"><span className="text-yellow-400 font-bold">/culvert</span> [user] - Fetch weekly culvert scores.</p>
+            <ProjectSimulation
+                title="Initializing Discord.py Wrapper..."
+                themeColor="#5865F2"
+                githubUrl="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
+                bootLogs={[
+                    "Authenticating token... [OK]",
+                    "Connecting to Discord Gateway... [OK]",
+                ]}
+            >
+                <div className="text-xs space-y-1 border-t border-white/10 pt-2">
+                    <p className="text-white font-bold mb-2 uppercase">Registered Commands:</p>
+                    <p className="text-white/70"><span className="text-yellow-400">/track</span> - Daily EXP gain</p>
+                    <p className="text-white/70"><span className="text-yellow-400">/culvert</span> - Weekly scores</p>
                 </div>
-
-                <a
-                    href="https://github.com/Phuoc-Nguyen-CS/DiscordMapleBot"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block px-3 py-1 bg-[#5865F2] text-white font-bold hover:bg-white hover:text-[#5865F2] transition-colors text-xs"
-                >
-                    [OPEN_SOURCE_CODE]
-                </a>
-            </div>
+            </ProjectSimulation>
         )
     }),
 
     "/projects/gesture_detection.py": () => ({
         output: (
-            <div className="mt-2 border-l-2 border-orange-500 pl-4 bg-orange-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
-                <p className="text-orange-400 font-bold font-mono uppercase">[*] Loading TensorFlow/Keras Models...</p>
-                <p className="text-white/70 font-mono text-xs mt-1">Importing OpenCV2... [OK]</p>
-                <p className="text-white/70 font-mono text-xs">Initializing MediaPipe Hand Tracking... [OK]</p>
-                <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1">Camera Feed: ACTIVE (Simulated)</p>
-
-                <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-orange-300/80">
+            <ProjectSimulation
+                title="Loading TensorFlow/Keras Models..."
+                themeColor="#f97316"
+                githubUrl="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume"
+                bootLogs={[
+                    "Importing OpenCV2... [OK]",
+                    "Initializing MediaPipe... [OK]",
+                ]}
+            >
+                <div className="bg-black/50 p-2 font-mono text-[10px] text-orange-300/80">
                     <p className="animate-pulse">{">"} TARGET ACQUIRED: Hand_01</p>
-                    <p>{">"} CONFIDENCE_SCORE: 0.982</p>
-                    <p>{">"} BOUNDING_BOX: [X: 142, Y: 89, W: 210, H: 250]</p>
-                    <p className="text-white font-bold mt-1">{">"} DETECTED_GESTURE: "VOLUME_UP"</p>
-                    <p className="text-[var(--color-hacker-green)]">{">"} EXECUTING SYSTEM COMMAND... SUCCESS</p>
+                    <p className="text-white font-bold mt-1">{">"} DETECTED: "VOLUME_UP"</p>
                 </div>
-
-                <a
-                    href="https://github.com/Phuoc-Nguyen-CS/Hand-Gesture-Volume-Control-and-Webpage-Launcher"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block px-3 py-1 bg-orange-500 text-black font-bold hover:bg-white hover:text-orange-600 transition-colors text-xs"
-                >
-                    [OPEN_SOURCE_CODE]
-                </a>
-            </div>
+            </ProjectSimulation>
         )
     }),
 
     "/projects/cebu_real_estate.js": () => ({
         output: (
-            <div className="mt-2 border-l-2 border-cyan-500 pl-4 bg-cyan-500/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
-                <p className="text-cyan-400 font-bold font-mono uppercase">[*] Initializing Next.js / Supabase Client...</p>
-                <p className="text-white/70 font-mono text-xs mt-1">Fetching property listings from Postgres... [OK]</p>
-                <p className="text-[var(--color-hacker-green)] font-bold font-mono text-xs mt-1">Status: 200 OK (38ms)</p>
-
-                <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-cyan-300/80 overflow-hidden">
-                    <pre className="whitespace-pre-wrap break-words">{`
-                    {
-                        "properties": [
-                            {
-                            "id": "CEB-01",
-                            "type": "Condominium",
-                            "location": "Cebu Park",
-                            "status": "Available"
-                            },
-                            ...
-                        ]
-                    }`}
-                    </pre>
-                </div>
-
-                <a
-                    href="https://github.com/Jameboyyy/CLS-Properties"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block px-3 py-1 bg-cyan-500 text-black font-bold hover:bg-white hover:text-cyan-600 transition-colors text-xs"
-                >
-                    [OPEN_SOURCE_CODE]
-                </a>
+            <ProjectSimulation
+                title="[*] Initializing Next.js / Supabase Client..."
+                themeColor="#03991c"
+                githubUrl="https://github.com/Jameboyyy/CLS-Properties"
+                bootLogs={[
+                    "Fetching property listings from Supabase... [OK]",
+                    "Status: 200 [OK]",
+                ]}
+            >
+            <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-cyan-300/80 overflow-hidden">
+                <pre className="whitespace-pre-wrap break-words">{`
+                {
+                    "properties": [
+                        {
+                        "id": "CEB-01",
+                        "type": "Condominium",
+                        "location": "Cebu Park",
+                        "status": "Available"
+                        },
+                        ...
+                    ]
+                }`}
+                </pre>
             </div>
+            </ProjectSimulation >
         )
     }),
 
     "/projects/terminal_portfolio.tsx": () => ({
         output: (
-            <div className="mt-2 border-l-2 border-[var(--color-hacker-green)] pl-4 bg-[var(--color-hacker-green)]/5 py-3 animate-in fade-in slide-in-from-left-2 duration-500">
-                <p className="text-[var(--color-hacker-green)] font-bold font-mono uppercase">[*] Bootstrapping MIR_OS Environment...</p>
-                <p className="text-white/70 font-mono text-xs mt-1">Compiling React components... [OK]</p>
-                <p className="text-white/70 font-mono text-xs">Injecting Virtual File System (VFS)... [OK]</p>
-                <p className="text-white/70 font-mono text-xs">Mounting Dynamic Blog Data... [OK]</p>
-                <p className="text-yellow-400 font-bold font-mono text-xs mt-1 animate-pulse">SYSTEM STATUS: FULLY_OPERATIONAL</p>
-
-                <div className="mt-3 bg-black/50 p-2 font-mono text-[10px] text-[var(--color-hacker-green)]/80 border border-[var(--color-hacker-green)]/20">
-                    <p>{">"} VITE v5.0.0 ready in 142ms</p>
+            <ProjectSimulation
+                title="Bootstrapping MIR_OS Environment..."
+                themeColor="var(--color-hacker-green)"
+                githubUrl="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
+                bootLogs={[
+                    "Compiling React components... [OK]",
+                    "Injecting Virtual File System (VFS)... [OK]",
+                    "Mounting Dynamic Blog Data... [OK]",
+                    "SYSTEM STATUS: FULLY_OPERATIONAL"
+                ]}
+            >
+                <div className="bg-black/50 p-3 font-mono text-[10px] text-[var(--color-hacker-green)]/80 border border-[var(--color-hacker-green)]/20 shadow-inner">
+                    <p className="flex justify-between"><span>{">"} VITE v5.0.0</span> <span className="text-white/40">142ms</span></p>
                     <p>{">"} Local: http://localhost:5173/</p>
                     <p>{">"} TailwindCSS loading... SUCCESSFUL</p>
-                    <p className="text-white mt-2 font-bold">{">"} Vercel Hosting... STABLE</p>
+                    <p className="text-white mt-2 font-bold tracking-widest">{">"} VERCEL_HOSTING: STABLE</p>
                 </div>
+            </ProjectSimulation>
+        )
+    }),
 
-                <a
-                    href="https://github.com/Phuoc-Nguyen-CS/updated_portfolio"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block px-3 py-1 bg-[var(--color-hacker-green)] text-black font-bold hover:bg-white transition-colors text-xs"
-                >
-                    [OPEN_SOURCE_CODE]
-                </a>
-            </div>
+    "/projects/league_of_legends_drafting_tool.py": () => ({
+        output: (
+            <ProjectSimulation
+                title="Initializing Competitive Draft Engine..."
+                themeColor="#C89B3C" 
+                githubUrl="https://github.com/Phuoc-Nguyen-CS/LOLChampionSuggestor"
+                bootLogs={[
+                    "Loading XGBoost Model v1.2.4... [OK]",
+                    "Connecting to Supabase Match-Data... [OK]",
+                    "Fetching Riot API Metadata... [OK]",
+                ]}
+            >
+                <div className="space-y-3">
+                    <div className="text-[11px] text-white/70 italic border-l border-white/20 pl-3">
+                        Machine Learning engine designed to interpret match data and recommend
+                        champion picks based on team synergy and counter-matchups.
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                        <div className="bg-black/40 p-2 border border-[#C89B3C]/20">
+                            <p className="text-[#C89B3C] font-bold mb-1 underline">CORE_STACK</p>
+                            <p>Python / XGBoost</p>
+                            <p>Supabase</p>
+                        </div>
+                        <div className="bg-black/40 p-2 border border-[#C89B3C]/20">
+                            <p className="text-[#C89B3C] font-bold mb-1 underline">ANALYSIS_MODE</p>
+                            <p>Win-Rate Prediction</p>
+                            <p>Synergy Scoring</p>
+                        </div>
+                    </div>
+                </div>
+            </ProjectSimulation>
         )
     }),
 };
