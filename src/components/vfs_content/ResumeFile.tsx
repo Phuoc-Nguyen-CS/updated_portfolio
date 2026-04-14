@@ -3,7 +3,7 @@ import type { Project } from '../../data/types';
 
 const ALL_PROJECTS: Project[] = [
     {
-        title: "Competitive Gaming Draft Analysis Engine",
+        title: "LOL Drafting Phase Tool",
         tech: "Python / XGBoost / Supabase / RIOTAPI",
         description: "A <span class='text-white-500 font-bold'>predictive model</span> that analyzes data from the RIOT API to find the best champion on a variety of factors for the given draft"
     },
@@ -91,9 +91,9 @@ export const ResumeFile = () => (
             <p className="text-blue-400 font-black text-xs md:text-base tracking-[0.2em] mb-4 md:mb-8 flex items-center gap-4">
                 <span className="w-8 md:w-16 h-1 bg-blue-500"></span> 03. REPOSITORY_PROJECTS
             </p>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8 pl-4 md:pl-10 border-l-2 md:border-l-4 border-white/10 ml-1">
-                {ALL_PROJECTS.map((p, i) => (
-                    <ProjectCard key={i} project={p} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8 pl-4 md:pl-10 border-l-2 md:border-l-4 border-white/10 ml-1 items-start">
+                {ALL_PROJECTS.map((project, index) => (
+                    <ProjectCard key={index} project={project} />
                 ))}
             </div>
         </section>
