@@ -33,7 +33,6 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath }) => {
             <div className="flex flex-wrap gap-2 text-sm font-mono">
                 {!isRoot && (
                     <button
-                        // FIX: Restore fireCommand to get the typing animation back
                         onClick={() => fireCommand(`cd ..`)}
                         className="bg-white/5 hover:bg-white/20 text-white/80 px-3 py-1.5 border border-white/10 transition-colors flex items-center gap-2"
                         title="Go up one directory"
@@ -69,7 +68,6 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath }) => {
                     return (
                         <button
                             key={item}
-                            // FIX: Restore fireCommand to get the typing animation back
                             onClick={() => fireCommand(cmd)}
                             className={`${colorClass} px-3 py-1.5 border transition-all flex items-center gap-2`}
                             title={`Run: ${cmd}`}

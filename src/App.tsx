@@ -1,9 +1,10 @@
 /**
  * @file App.tsx
- * Why: Refactored to act strictly as the "View" layer. All heavy logic, state 
- * management (CWD, History), and command processing have been offloaded to the 
- * TerminalProvider. This component now only handles UI concerns: animations, 
- * scrolling, keyboard inputs, and rendering the context data.
+ * @description The "View Layer" (UI/UX) of MIR_OS.
+ * This component is strictly decoupled from system logic. It acts as a 
+ * reactive shell that consumes data from the TerminalProvider and renders it 
+ * to the DOM. It handles visual concerns: animations, auto-scrolling, 
+ * the custom blinking cursor, and the boot sequence.
  */
 import React, { useState, useRef, useEffect } from "react";
 import { VimEditor } from "./VimEditor";
@@ -12,7 +13,9 @@ import { getAutoComplete } from "./data/data_processing/auto_complete";
 import { useTerminal } from "./context/terminal_context";
 
 export default function App() {
-  // --- 1. GLOBAL PLUMBING (The New Engine) ---
+  // --- GLOBAL Engine (Context Hook) ---
+  // We extract the OS state. App.tsx doesn't know "how" to execute a command;
+  // it just knows to call executeCommand() when the user hits Enter.
   const { 
     history, 
     cwd, 
@@ -23,7 +26,7 @@ export default function App() {
     saveSessionFile 
   } = useTerminal();
 
-  // --- 2. LOCAL UI STATE (Only visual/input concerns) ---
+  // --- LOCAL UI STATE (Visual Only)) ---
   const hasBooted = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -33,9 +36,6 @@ export default function App() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
-  
-  // Why: We isolate boot logs from 'history' so the system 'clear' command 
-  // doesn't have to worry about accidentally deleting or re-triggering boot sequences.
   const [bootLogs, setBootLogs] = useState<React.ReactNode[]>([]);
 
   // Mobile viewport fix
@@ -64,7 +64,10 @@ export default function App() {
     scrollToBottom();
   }, [history, bootLogs, suggestions]);
 
-  // --- BOOT SEQUENCE LOGIC ---
+  /**
+   * INITIAL SYSTEM BOOT
+   * Simulated loading sequence. We use a controlled interval to push strings into local state.
+   */
   useEffect(() => {
     if (!isBooting || hasBooted.current) return;
     hasBooted.current = true;
@@ -97,11 +100,14 @@ export default function App() {
     if (!isBooting) inputRef.current?.focus();
   };
 
-  // --- KEYBOARD & INPUT HANDLING ---
+  /**
+     * KEYBOARD & INPUT HANDLERS
+     * Logic: Intercepts 'Enter' for execution and 'Tab' for autocomplete.
+     */
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Autocomplete logic
     if (e.key === "Tab") {
       e.preventDefault();
-      // Why: We pass the sessionFiles from context so autocomplete knows about user files
       const result = getAutoComplete(input, cwd, sessionFiles);
       if (result) {
         if (result.newInput) setInput(result.newInput);
@@ -110,6 +116,7 @@ export default function App() {
       return;
     }
 
+    // History
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (historyStack.length === 0) return;
@@ -136,7 +143,7 @@ export default function App() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    executeCommand(input); // Hits the global engine
+    executeCommand(input);
     
     // UI cleanups
     setHistoryStack((prev) => [...prev, input]);
@@ -159,7 +166,7 @@ export default function App() {
 
         if (i === cmd.length - 1) {
           setTimeout(() => {
-            executeCommand(cmd); // Global Engine
+            executeCommand(cmd); 
             setHistoryStack((prev) => [...prev, cmd]);
             setInput("");
             inputRef.current?.focus();
@@ -169,7 +176,6 @@ export default function App() {
     });
   };
 
-  // Keep triggerCommand fresh for global events
   const triggerCommandRef = useRef(triggerCommand);
   useEffect(() => {
     triggerCommandRef.current = triggerCommand;

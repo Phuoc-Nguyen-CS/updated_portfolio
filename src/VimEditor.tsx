@@ -1,15 +1,25 @@
+/**
+ * @file VimEditor.tsx
+ * @description An interactive, simulated Vim environment within MIR_OS.
+ * This component acts as an isolated interactive scene. Instead of relying on 
+ * the global Terminal Context for every keystroke, it manages its own local 
+ * State Machine (Normal, Insert, Command). It only communicates with the 
+ * parent OS when the application is launched or closed (via the onClose contract).
+ */
 import React, { useState, useEffect, useRef } from "react";
 
 /* ---------------------------------------------------------
-    VIM_FILE_METADATA
-    Centralizes special behaviors for specific files.
+    FILE CONFIGURATION REGISTRY (Metadata)
+    By centralizing file-specific behaviors (easter eggs, read-only guards)
+    into a configuration object, we avoid polluting the render logic with 
+    complex if/else chains. This follows the "Data-Driven Design" pattern.
    --------------------------------------------------------- */
 const FILE_SPECIAL_LOGIC: Record<string, {
     defaultContent: string[];
     exitMessage?: string;
     isReadOnly?: boolean;
 }> = {
-    "sos.txt": {
+    "text.txt": {
         defaultContent: [
             "Day 400.",
             "I am still trapped in this editor.",
@@ -18,7 +28,7 @@ const FILE_SPECIAL_LOGIC: Record<string, {
         exitMessage: "ACHIEVEMENT UNLOCKED: 'FREE AT LAST'"
     },
     "resume.txt": {
-        defaultContent: [], 
+        defaultContent: [],
         isReadOnly: true
     },
     "leetcode.exe": {
@@ -27,13 +37,18 @@ const FILE_SPECIAL_LOGIC: Record<string, {
     }
 };
 
+/**
+ * The Strict Contract between the OS Engine and the Vim Application.
+ */
 interface VimEditorProps {
     file: string;
-    initialContent?: string[];
+    initialContent?: string[]; // Represents data injected from Session RAM
     onClose: (systemMessage?: string, newContent?: string[]) => void;
 }
 
 export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onClose }) => {
+    // --- 1. LOCAL STATE MACHINE ---
+    // Vim operates on strict modes. This state dictates how keystrokes are interpreted.
     const [mode, setMode] = useState<"NORMAL" | "INSERT" | "COMMAND">("NORMAL");
     const [content, setContent] = useState<string[]>([""]);
     const [cmdInput, setCmdInput] = useState("");
@@ -43,8 +58,11 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
     const meta = FILE_SPECIAL_LOGIC[file];
 
     /* ---------------------------------------------------------
-        SYNC_BUFFER
-        Priority: 1. Session RAM | 2. Special Logic | 3. Blank
+        MEMORY SYNC BUFFER
+        Why: Handles the initialization priority. 
+        Priority 1: User's previously saved edits (Session RAM).
+        Priority 2: Hardcoded system easter eggs (Meta).
+        Priority 3: A blank new file.
        --------------------------------------------------------- */
     useEffect(() => {
         if (initialContent) {
@@ -54,17 +72,25 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
         } else {
             setContent([""]);
         }
+        // Immediately lock the browser focus into the editor sandbox
         containerRef.current?.focus();
     }, [file, initialContent, meta]);
 
+    /**
+     * THE EVENT INTERCEPTOR (Keylogger Engine)
+     * Why: Overrides default browser behaviors to simulate terminal interaction.
+     * Routes keystrokes based on the active state of the FSM (mode).
+     */
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevents browser scrolling or shortcuts
         setErrorMsg("");
 
+        // STATE: NORMAL MODE (Navigation & Command Initiation)
         if (mode === "NORMAL") {
             if (e.key === "i") {
                 if (meta?.isReadOnly) {
                     setErrorMsg("W10: Warning: Changing a readonly file");
+                    // Mimic real Vim behavior: flash warning, then allow insert anyway (if forced)
                     setTimeout(() => setMode("INSERT"), 800);
                 } else {
                     setMode("INSERT");
@@ -76,6 +102,7 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
             }
         }
 
+        // STATE: INSERT MODE (Text Mutation)
         else if (mode === "INSERT") {
             if (e.key === "Escape") setMode("NORMAL");
             else if (e.key === "Enter") setContent(prev => [...prev, ""]);
@@ -100,14 +127,15 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
             }
         }
 
+        // STATE: COMMAND MODE (System Exits & Writes)
         else if (mode === "COMMAND") {
             if (e.key === "Escape") setMode("NORMAL");
             else if (e.key === "Enter") {
                 const cmd = cmdInput.trim();
 
-                // Logic for exit commands
+                // Contract Execution: Passing data back to the OS Engine
                 if (cmd === "q" || cmd === "q!") {
-                    onClose(meta?.exitMessage); // Uses config message if exists
+                    onClose(meta?.exitMessage);
                 }
                 else if (cmd === "wq" || cmd === "w") {
                     onClose(`"${file}" written to session buffer.`, content);
@@ -127,7 +155,8 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
         }
     };
 
-    /* Rendering logic remains the same (emptyLines, glow-text, status bar) */
+    /* --- VIEW RENDERING --- */
+    // Generates the aesthetic '~' for empty buffer lines at the bottom of the screen
     const emptyLines = Array.from({ length: Math.max(0, 20 - content.length) }).map((_, i) => (
         <div key={`empty-${i}`} className="text-blue-500 font-bold opacity-40">~</div>
     ));
@@ -140,8 +169,7 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
             className="h-full w-full bg-[var(--color-hacker-bg)] text-[var(--color-hacker-green)] p-0 font-mono outline-none flex flex-col justify-between absolute inset-0 z-50 overflow-hidden"
         >
             <div className="flex-grow flex pt-2 glow-text overflow-hidden">
-
-                {/* LINE NUMBER GUTTER */}
+                {/* 1. LINE NUMBER GUTTER */}
                 <div className="w-10 flex flex-col items-end pr-3 border-r border-white/10 select-none text-white/20">
                     {content.map((_, i) => (
                         <div key={`num-${i}`} className="min-h-[1.5rem] leading-6">
@@ -151,11 +179,12 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
                     {emptyLines}
                 </div>
 
-                {/* TEXT AREA */}
+                {/* 2. MAIN TEXT AREA */}
                 <div className="flex-grow pl-4 whitespace-pre-wrap overflow-hidden">
                     {content.map((line, i) => (
                         <div key={i} className="min-h-[1.5rem] flex items-center leading-6">
                             {line}
+                            {/* Contextual Cursor: Only shows on the active line during INSERT */}
                             {mode === "INSERT" && i === content.length - 1 && (
                                 <span className="w-2 h-5 bg-[var(--color-hacker-green)] animate-pulse ml-1" />
                             )}
@@ -164,7 +193,7 @@ export const VimEditor: React.FC<VimEditorProps> = ({ file, initialContent, onCl
                 </div>
             </div>
 
-            {/* STATUS BAR */}
+            {/* 3. DYNAMIC STATUS BAR */}
             <div className="flex justify-between items-center text-[10px] sm:text-xs bg-[var(--color-hacker-green)] text-black px-2 py-0.5 font-bold uppercase tracking-tighter">
                 <div className="flex gap-4">
                     {mode === "COMMAND" ? (
