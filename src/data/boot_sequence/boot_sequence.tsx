@@ -2,6 +2,7 @@
 import React from "react";
 import { AsciiAnimator } from "../../components/ascii_animator";
 import { QuickStartHUD } from "../../components/quick_start_hud";
+import { BootLoadingLine } from "../../components/boot_loading_line";
 
 export type BootLog = {
     text: string | React.ReactNode;
@@ -10,26 +11,25 @@ export type BootLog = {
 };
 
 export const BOOT_SEQUENCE: BootLog[] = [
-  { text: " [ SYSTEM_INTEGRITY_CHECK ] ", delay: 400, color: "text-[var(--color-hacker-green)] underline opacity-80" },
-
+  { text: " [ SYSTEM_BOOTUP_SEQUENCE ] ", delay: 600, color: "text-[var(--color-hacker-green)] underline opacity-80 tracking-widest" },
   {
-    text: " VFS_MOUNT ..... [==========] [ OK ]",
-    delay: 150,
-    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+    text: <BootLoadingLine label="VFS_MOUNT" duration={800} />,
+    delay: 1000
   },
   {
-    text: " CORE_LOAD ..... [========..] [ OK ]",
-    delay: 150,
-    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+    text: <BootLoadingLine label="CORE_LOAD" duration={1200} />,
+    delay: 1400
   },
   {
-    text: " USER_AUTH ..... [=====.....] [ .. ]",
-    delay: 600,
-    color: "text-[var(--color-hacker-green)] glow-text font-bold"
+    text: <BootLoadingLine label="USER_AUTH" duration={400} />,
+    delay: 200
   },
-
   { text: "-------------------------------------------", delay: 100, color: "text-green-900/30" },
-  { text: " >> SESSION_ESTABLISHED: GUEST", delay: 300, color: "text-[var(--color-hacker-green)] font-black animate-pulse tracking-tighter" },
+  {
+    text: " >> SESSION_ESTABLISHED: GUEST",
+    delay: 500,
+    color: "text-[var(--color-hacker-green)] font-black animate-pulse tracking-tighter"
+  },
 
     // --- ASCII ART ---
     {
