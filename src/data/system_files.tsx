@@ -99,7 +99,7 @@ export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
                 </div>
                 <div className="pl-4 md:pl-10 border-l-2 md:border-l-4 border-white/10 ml-1">
                     <p className="text-white font-black text-lg md:text-2xl mb-1">California State University, Long Beach</p>
-                    <p className="text-white/80 text-sm md:text-xl font-bold">M.S. Computer Science <span className="hidden md:inline text-blue-500 mx-2">|</span> <br className="md:hidden" /> GPA: 3.60</p>
+                    <p className="text-white/80 text-sm md:text-xl font-bold">M.S. Computer Science <span className="hidden md:inline text-blue-500 mx-2">|</span> <br className="md:hidden" /> GPA: N/A</p>
                     <p className="text-[10px] md:text-sm text-white/40 italic mt-2 md:mt-3 tracking-widest uppercase font-bold">Expected Grad May 2028</p>
                 </div>
             </section>
