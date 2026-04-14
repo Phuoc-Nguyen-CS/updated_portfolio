@@ -86,3 +86,10 @@ export interface TerminalContextType {
     sessionFiles: Record<string, { content: string[], path: string }>;
     saveSessionFile: (fileName: string, content: string[]) => void;
 }
+
+export interface Project {
+    title: string;
+    tech: string;
+    description: string;
+    featured?: boolean;
+}

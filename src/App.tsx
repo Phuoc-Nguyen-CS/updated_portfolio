@@ -7,7 +7,7 @@
  * the custom blinking cursor, and the boot sequence.
  */
 import React, { useState, useRef, useEffect } from "react";
-import { VimEditor } from "./VimEditor";
+import { VimEditor } from "./components/terminal/VimEditor";
 import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
 import { getAutoComplete } from "./data/data_processing/auto_complete";
 import { useTerminal } from "./context/terminal_context";
