@@ -1,6 +1,6 @@
 /**
  * @file command_processor.tsx
- * Why: We updated the signature to include 'sessionFiles'. This allows 
+ * We updated the signature to include 'sessionFiles'. This allows 
  * navigation and file-read commands to consider user-created data 
  * without violating the "Pure Function" rule.
  */
@@ -45,7 +45,7 @@ export const processCommand = (
 
         if (EXECUTABLES[absolutePath]) {
             /**
-             * Why: Executables might return a full CommandResponse (with actions) 
+             * Executables might return a full CommandResponse (with actions) 
              * or just a ReactNode. We normalize the output here to satisfy 
              * the return type of the processor.
              */
@@ -60,7 +60,7 @@ export const processCommand = (
     // --- STANDARD COMMANDS ---
     const commandFn = COMMANDS[baseCmd];
     if (commandFn) {
-        // Why: We now pass all 3 required arguments to satisfy the CommandFunction contract.
+        // We now pass all 3 required arguments to satisfy the CommandFunction contract.
         return commandFn(args, cwd, sessionFiles);
     }
 

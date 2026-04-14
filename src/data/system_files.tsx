@@ -97,6 +97,11 @@ export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
                     <p className="text-white/80 text-sm md:text-xl font-bold">B.S. Computer Science <span className="hidden md:inline text-blue-500 mx-2">|</span> <br className="md:hidden" /> GPA: 3.60</p>
                     <p className="text-[10px] md:text-sm text-white/40 italic mt-2 md:mt-3 tracking-widest uppercase font-bold">Dean’s List 21-23 // Grad May 2023</p>
                 </div>
+                <div className="pl-4 md:pl-10 border-l-2 md:border-l-4 border-white/10 ml-1">
+                    <p className="text-white font-black text-lg md:text-2xl mb-1">California State University, Long Beach</p>
+                    <p className="text-white/80 text-sm md:text-xl font-bold">M.S. Computer Science <span className="hidden md:inline text-blue-500 mx-2">|</span> <br className="md:hidden" /> GPA: 3.60</p>
+                    <p className="text-[10px] md:text-sm text-white/40 italic mt-2 md:mt-3 tracking-widest uppercase font-bold">Expected Grad May 2028</p>
+                </div>
             </section>
 
             {/* 02. WORK EXPERIENCE */}
@@ -122,7 +127,7 @@ export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-blue-500 font-bold">›</span>
-                                <span>Implemented <span className="text-white font-bold">SEO best practices</span> to enhance search visibility and optimized the site for peak performance on legacy mobile devices.</span>
+                                <span>Optimized web performance for legacy devices<span className="text-white font-bold"> by reducing</span> asset payload and <span className="text-white font-bold">implementing lazy loading.</span></span>
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-blue-500 font-bold">›</span>
@@ -164,6 +169,11 @@ export const FILE_CONTENT: Record<string, () => React.ReactNode> = {
                 <p className="text-blue-400 font-black text-xs md:text-base tracking-[0.2em] mb-4 md:mb-8 flex items-center gap-4">
                     <span className="w-8 md:w-16 h-1 bg-blue-500"></span> 03. REPOSITORY_PROJECTS
                 </p>
+                <div className="bg-white/5 p-4 md:p-8 border border-white/10 rounded-sm hover:border-blue-500/50 transition-colors">
+                        <p className="text-white font-black mb-1 uppercase text-xs md:text-base tracking-widest">Competitive Gaming Draft Analysis Engine</p>
+                        <p className="text-[9px] md:text-xs text-blue-400 font-bold mb-4">Python / XGBoost / Supabase / RIOTAPI</p>
+                        <p className="text-xs md:text-sm text-white/70">A <span className="text-white-500 font-bold">predictive model</span> that analyzes data from the RIOT API to find the best champion on a variety of factors for the given draft</p>
+                    </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 pl-4 md:pl-10 border-l-2 md:border-l-4 border-white/10 ml-1">
                     <div className="bg-white/5 p-4 md:p-8 border border-white/10 rounded-sm hover:border-blue-500/50 transition-colors">
                         <p className="text-white font-black mb-1 uppercase text-xs md:text-base tracking-widest">Automation Tool</p>
