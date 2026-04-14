@@ -64,7 +64,7 @@ export const HelpManual = () => {
                 </div>
                 <div className="mt-4 pt-2 border-t border-white/5">
                     <p className="text-[var(--color-hacker-green)] text-[10px] sm:text-xs font-mono opacity-70">
-                        VIM EXIT SEQUENCE {">>"} <span className="text-white underline">[ESC]</span> then <span className="text-white">:wq</span>
+                        VIM EXIT SEQUENCE {">>"} <span className="text-white underline">[ESC]</span> then <span className="text-white">:wq  {">>"} then ENTER</span>
                     </p>
                 </div>
             </section>

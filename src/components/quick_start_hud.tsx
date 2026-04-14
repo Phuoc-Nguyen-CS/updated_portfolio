@@ -37,7 +37,7 @@ export const QuickStartHUD: React.FC = () => {
                 >
                    <p className="text-sm md:text-lg font-bold text-white mb-3 tracking-widest border-b border-white/20 pb-1 flex justify-between items-end">
                     <span>[MIR_OS] QUICK_START_GUIDE</span>
-                    <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.6</span>
+                    <span className="text-[var(--color-hacker-green)] opacity-50 text-xs font-mono">V.0.0.8</span>
                 </p>
 
                 <div className="space-y-4">
@@ -102,7 +102,7 @@ export const QuickStartHUD: React.FC = () => {
                     </div>
                     {/* 5. Featured Standalone: Blog */}
                     <div
-                        onClick={() => fireCommand("ls logs/")}
+                        onClick={() => fireSequence(["cd /", "ls logs/"])}
                         className="mt-3 bg-purple-500/5 p-2 border-l-2 border-purple-500/50 hover:bg-purple-500/20 cursor-pointer transition-all group relative overflow-hidden"
                     >
                         <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-purple-400 transition-colors relative z-10">
@@ -122,7 +122,7 @@ export const QuickStartHUD: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                             {/* 1. Resume  */}
                             <div
-                                onClick={() => fireCommand("cat resume.txt")}
+                                onClick={() => fireSequence(["cd /", "cat resume.txt"])}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-blue-500/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-blue-400 transition-colors">
@@ -134,11 +134,11 @@ export const QuickStartHUD: React.FC = () => {
 
                             {/* 2. Projects */}
                             <div
-                                onClick={() => fireCommand("ls projects/")}
+                                onClick={() => fireSequence(["cd /", "cd projects"])}
                                 className="bg-[var(--color-hacker-green)]/5 p-2 border-l-2 border-[var(--color-hacker-green)]/50 hover:bg-[var(--color-hacker-green)]/20 cursor-pointer transition-all group"
                             >
                                 <p className="text-white font-mono font-bold flex items-center justify-between mb-1 group-hover:text-[var(--color-hacker-green)] transition-colors">
-                                    <span>ls projects/</span>
+                                    <span>cd projects/</span>
                                     <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">[RUN]</span>
                                 </p>
                                 <span className="text-white/60 text-[10px]">Explore my shipped applications.</span>
