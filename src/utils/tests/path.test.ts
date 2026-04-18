@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolvePath } from './path';
+import { resolvePath } from '../path';
 
 /**
  * @file path.test.ts
