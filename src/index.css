@@ -1,72 +1,78 @@
 @import "tailwindcss";
 
 @theme {
-  /* Design Tokens */
-  --color-hacker-green: #00ff41;
-  --color-hacker-bg: #050505;
+    /* Design Tokens */
+    --color-hacker-green: #00ff41;
+    --color-hacker-blue: #00aaff;
+    --color-hacker-yellow: #ffdf00;
+    --color-hacker-red: #ff3131;
+    --color-hacker-orange: #ff9100;
+    --color-hacker-bg: #050505;
 
-  /* Fonts */
-  --font-mono: "Fira Code", "Courier New", monospace;
+    /* Fonts */
+    --font-mono: "Fira Code", "Courier New", monospace;
 
-  /* Custom Animations */
-  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    /* Custom Animations */
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* --- Base Styles --- */
 @layer base {
+    html,
+    body,
+    #root {
+        height: 100dvh;
+        width: 100vw;
+        /* Ensure strict width */
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        /* Prevent body scroll */
+        overscroll-behavior: none;
+        background-color: var(--color-hacker-bg);
+        color: var(--color-hacker-green);
+        font-family: var(--font-mono);
+    }
 
-  html,
-  body,
-  #root {
-    height: 100dvh;
-    width: 100vw;
-    /* Ensure strict width */
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    /* Prevent body scroll */
-    overscroll-behavior: none;
-    background-color: var(--color-hacker-bg);
-    color: var(--color-hacker-green);
-    font-family: var(--font-mono);
-  }
-
-  pre {
-    max-width: 100%;
-    overflow-x: hidden;
-  }
+    pre {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
 }
 
 /* --- Utility Components --- */
 @layer components {
+    /* CRT Scanline Overlay */
+    .scanlines {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 50;
 
-  /* CRT Scanline Overlay */
-  .scanlines {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 50;
-  
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-          rgba(0, 0, 0, 0.1) 50%);
-      background-size: 100% 4px;
+        background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%
+        );
+        background-size: 100% 4px;
     }
 
-  /* Neon Glow Effect */
-  .glow-text {
-    text-shadow: 0 0 5px rgba(0, 255, 65, 0.7), 0 0 10px rgba(0, 255, 65, 0.5);
-  }
+    /* Neon Glow Effect */
+    .glow-text {
+        text-shadow:
+            0 0 5px rgba(0, 255, 65, 0.7),
+            0 0 10px rgba(0, 255, 65, 0.5);
+    }
 
-  /* Stealth Scrollbar (Maintains functionality without the UI) */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    /* IE/Edge */
-    scrollbar-width: none;
-    /* Firefox */
-  }
+    /* Stealth Scrollbar (Maintains functionality without the UI) */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        /* IE/Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-    /* Chrome/Safari */
-  }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
+    }
 }
