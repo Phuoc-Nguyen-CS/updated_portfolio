@@ -34,7 +34,6 @@ export default function App() {
   const [input, setInput] = useState("");
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isBooting, setIsBooting] = useState(true);
   const [bootLogs, setBootLogs] = useState<React.ReactNode[]>([]);
 
@@ -64,7 +63,7 @@ export default function App() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [history, bootLogs, suggestions]);
+  }, [history, bootLogs]);
 
   /**
    * INITIAL SYSTEM BOOT
@@ -118,7 +117,6 @@ export default function App() {
       const result = getAutoComplete(input, cwd, sessionFiles);
       if (result) {
         if (result.newInput) setInput(result.newInput);
-        setSuggestions(result.suggestions);
       }
       return;
     }
@@ -156,8 +154,40 @@ export default function App() {
     setHistoryStack((prev) => [...prev, input]);
     setHistoryIndex(-1);
     setInput("");
-    setSuggestions([]);
   };
+
+  const handleInputChange = (value: string) => {
+    setInput(value);
+  };
+
+  const getGhostSuggestion = (value: string) => {
+    if (!value.trim()) return "";
+
+    const isBareCd = value.trim().toLowerCase() === "cd";
+    const lookupValue = isBareCd ? `${value} ` : value;
+    const result = getAutoComplete(lookupValue, cwd, sessionFiles);
+
+    if (result?.newInput && result.newInput.startsWith(value)) {
+      return result.newInput;
+    }
+
+    const firstSuggestion = result?.suggestions[0];
+    if (!firstSuggestion) return "";
+
+    if (isBareCd || value.endsWith(" ")) {
+      return `${value}${isBareCd ? " " : ""}${firstSuggestion}`;
+    }
+
+    const lastSpaceIndex = value.lastIndexOf(" ");
+    const typedTarget = value.slice(lastSpaceIndex + 1);
+    const completion = firstSuggestion.startsWith(typedTarget)
+      ? firstSuggestion.slice(typedTarget.length)
+      : "";
+
+    return completion ? `${value}${completion}` : "";
+  };
+
+  const ghostSuggestion = getGhostSuggestion(input);
 
   // Ghost Typer (For clickable UI elements)
   const triggerCommand = useCallback((cmd: string) => {
@@ -276,16 +306,6 @@ export default function App() {
           ))}
         </div>
 
-        {!isBooting && suggestions.length > 0 && (
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 opacity-70">
-            {suggestions.map((s) => (
-              <span key={s} className="text-xs md:text-sm">
-                {s}
-              </span>
-            ))}
-          </div>
-        )}
-
         {!isBooting && (
           <form
             onSubmit={handleCommand}
@@ -308,7 +328,7 @@ export default function App() {
                 style={{ color: "var(--color-hacker-green)" }}
                 className="bg-transparent border-none outline-none w-full glow-text caret-transparent absolute inset-0 z-10"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
                 autoComplete="off"
                 autoCapitalize="none"
                 spellCheck="false"
@@ -325,6 +345,11 @@ export default function App() {
                   }}
                   className="w-2 h-5 animate-pulse shrink-0"
                 />
+                {ghostSuggestion && ghostSuggestion.startsWith(input) && (
+                  <span className="text-white/25 whitespace-pre-wrap break-all">
+                    {ghostSuggestion.slice(input.length + 1)}
+                  </span>
+                )}
               </div>
             </div>
           </form>
