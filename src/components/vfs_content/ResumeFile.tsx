@@ -5,26 +5,22 @@ const ALL_PROJECTS: Project[] = [
   {
     title: "LOL Drafting Phase Tool",
     tech: "Python / XGBoost / Supabase / RIOTAPI",
-    description:
-      "A <span class='text-white font-bold'>predictive model</span> that analyzes data from the RIOT API to find the best champion on a variety of factors for the given draft",
+    description: <>A <span className="text-white font-bold">predictive model</span> that analyzes data from the RIOT API to find the best champion on a variety of factors for the given draft</>,
   },
   {
     title: "Automation Tool",
     tech: "Python / OpenCV / BS4 / Tesseract",
-    description:
-      "Boosted speed by <span class='text-white font-bold'>92%</span> via async refactoring and automated OCR data extraction.",
+    description: <>Boosted speed by <span className="text-white font-bold">92%</span> via async refactoring and automated OCR data extraction.</>,
   },
   {
     title: "Gesture Detection",
     tech: "Python / TensorFlow / MediaPipe",
-    description:
-      "Achieved <span class='text-white font-bold'>95% accuracy</span> in real-time hand-tracking and custom model training.",
+    description: <>Achieved <span className="text-white font-bold">95% accuracy</span> in real-time hand-tracking and custom model training.</>,
   },
   {
     title: "MIR_OS Portfolio",
     tech: "React / TS / Tailwind / GHA",
-    description:
-      "Engineered a <span class='text-white font-bold'>Virtual File System</span> with automated CI/CD pipelines.",
+    description: <>Engineered a <span className="text-white font-bold">Virtual File System</span> with automated CI/CD pipelines.</>,
   },
 ];
 

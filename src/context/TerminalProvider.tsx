@@ -1,5 +1,5 @@
 /**
- * @file terminal_context.tsx
+ * @file TerminalProvider.tsx
  * @description The Central Component for MIR_OS
  * The file implements the Global State Management for MIR_OS.
  * By using React Context API, we provide a while for the system to communicate directly.
@@ -16,6 +16,7 @@ import type {
 import { processCommand } from "../data/data_processing/command_processor";
 import { VFS as STATIC_VFS } from "../data/vfs";
 import { TerminalContext } from "./TerminalContext";
+import { getParentPath, resolvePath } from "../utils/path";
 
 /**
  * The Terminal Provider Component
@@ -63,21 +64,19 @@ export const TerminalProvider: FC<{ children: ReactNode }> = ({ children }) => {
         return;
       case "REMOVE_FILE":
         if (response.meta?.fileToDelete) {
-          const fileName = response.meta.fileToDelete;
+          const filePath = response.meta.fileToDelete;
 
           // Update our session
           setSessionFiles((prev) => {
             const next = { ...prev };
-            delete next[fileName];
+            delete next[filePath];
             return next;
           });
 
           // Update our VFS structure so 'ls' and UI reflects the change
           setVfs((prev) => {
             const next = { ...prev };
-            const absolutePath = Object.keys(next).find((path) =>
-              path.endsWith(fileName),
-            );
+            const absolutePath = Object.keys(next).find((path) => path === filePath);
             if (absolutePath) delete next[absolutePath];
             return next;
           });
@@ -101,9 +100,10 @@ export const TerminalProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   // Persists content from the Vim Editor into the system's memory
   const saveSessionFile = (fileName: string, content: string[]) => {
+    const filePath = resolvePath(cwd, fileName);
     setSessionFiles((prev) => ({
       ...prev,
-      [fileName]: { content, path: cwd },
+      [filePath]: { content, path: getParentPath(filePath) },
     }));
   };
 

@@ -90,6 +90,6 @@ export interface TerminalContextType {
 export interface Project {
     title: string;
     tech: string;
-    description: string;
+    description: ReactNode;
     featured?: boolean;
 }

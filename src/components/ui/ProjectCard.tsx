@@ -13,10 +13,9 @@ export const ProjectCard = ({ project }: { project: Project }) => (
 
     <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-in-out">
       <div className="overflow-hidden">
-        <p
-          className="text-xs md:text-sm text-white/70 pt-4 mt-2 border-t border-white/10 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: project.description }}
-        />
+        <p className="text-xs md:text-sm text-white/70 pt-4 mt-2 border-t border-white/10 leading-relaxed">
+          {project.description}
+        </p>
       </div>
     </div>
 

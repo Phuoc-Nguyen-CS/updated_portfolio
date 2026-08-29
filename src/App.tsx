@@ -6,7 +6,7 @@
  * to the DOM. It handles visual concerns: animations, auto-scrolling,
  * the custom blinking cursor, and the boot sequence.
  */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { VimEditor } from "./components/terminal/VimEditor";
 import { BOOT_SEQUENCE } from "./data/boot_sequence/boot_sequence";
 import { getAutoComplete } from "./data/data_processing/auto_complete";
@@ -160,7 +160,7 @@ export default function App() {
   };
 
   // Ghost Typer (For clickable UI elements)
-  const triggerCommand = (cmd: string) => {
+  const triggerCommand = useCallback((cmd: string) => {
     if (isBooting) return;
 
     let currentText = "";
@@ -181,7 +181,7 @@ export default function App() {
         }
       }, i * 40);
     });
-  };
+  }, [executeCommand, isBooting]);
 
   const triggerCommandRef = useRef(triggerCommand);
   useEffect(() => {

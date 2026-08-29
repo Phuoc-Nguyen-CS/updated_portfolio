@@ -25,3 +25,8 @@ export const resolvePath = (cwd: string, target: string): string => {
     // 3. Reconstruct the absolute path
     return "/" + stack.join("/");
 };
+
+export const getParentPath = (absolutePath: string): string => {
+    const index = absolutePath.lastIndexOf("/");
+    return index <= 0 ? "/" : absolutePath.slice(0, index);
+};

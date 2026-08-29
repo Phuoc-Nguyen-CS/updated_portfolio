@@ -54,15 +54,19 @@ export const VimEditor: React.FC<VimEditorProps> = ({
   initialContent,
   onClose,
 }) => {
+  const fileName = file.split("/").pop() || file;
+  const meta = FILE_SPECIAL_LOGIC[file] ?? FILE_SPECIAL_LOGIC[fileName];
+
   // --- LOCAL STATE MACHINE ---
   // Vim operates on strict modes. This state dictates how keystrokes are interpreted.
   const [mode, setMode] = useState<"NORMAL" | "INSERT" | "COMMAND">("NORMAL");
-  const [content, setContent] = useState<string[]>([""]);
+  const [content, setContent] = useState<string[]>(
+    () => initialContent ?? meta?.defaultContent ?? [""],
+  );
   const [cmdInput, setCmdInput] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const meta = FILE_SPECIAL_LOGIC[file];
 
   /* ---------------------------------------------------------
         MEMORY SYNC BUFFER
@@ -72,16 +76,9 @@ export const VimEditor: React.FC<VimEditorProps> = ({
         Priority 3: A blank new file.
        --------------------------------------------------------- */
   useEffect(() => {
-    if (initialContent) {
-      setContent(initialContent);
-    } else if (meta?.defaultContent) {
-      setContent(meta.defaultContent);
-    } else {
-      setContent([""]);
-    }
     // Immediately lock the browser focus into the editor sandbox
     containerRef.current?.focus();
-  }, [file, initialContent, meta]);
+  }, [file]);
 
   /**
    * THE EVENT INTERCEPTOR 

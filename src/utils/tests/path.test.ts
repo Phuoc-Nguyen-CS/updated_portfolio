@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolvePath } from '../path';
+import { getParentPath, resolvePath } from '../path';
 
 /**
  * @file path.test.ts
@@ -36,5 +36,10 @@ describe('Path Resolver Utility', () => {
         const cwd = '/projects/web';
         const target = '/home/resume.txt';
         expect(resolvePath(cwd, target)).toBe('/home/resume.txt');
+    });
+
+    it('should resolve a file parent path', () => {
+        expect(getParentPath('/projects/notes/todo.txt')).toBe('/projects/notes');
+        expect(getParentPath('/todo.txt')).toBe('/');
     });
 });

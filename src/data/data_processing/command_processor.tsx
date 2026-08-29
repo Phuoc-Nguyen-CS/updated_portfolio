@@ -12,6 +12,38 @@ import { FILE_CONTENT } from "../system_files";
 import { resolvePath } from "../../utils/path";
 import { VFS } from "../vfs";
 
+const tokenize = (input: string): string[] => {
+  const tokens: string[] = [];
+  let token = "";
+  let quote: "'" | '"' | null = null;
+  let escaped = false;
+
+  for (const char of input.trim()) {
+    if (escaped) {
+      token += char;
+      escaped = false;
+    } else if (char === "\\" && quote !== "'") {
+      escaped = true;
+    } else if (quote) {
+      if (char === quote) quote = null;
+      else token += char;
+    } else if (char === "'" || char === '"') {
+      quote = char;
+    } else if (/\s/.test(char)) {
+      if (token) {
+        tokens.push(token);
+        token = "";
+      }
+    } else {
+      token += char;
+    }
+  }
+
+  if (escaped) token += "\\";
+  if (token) tokens.push(token);
+  return tokens;
+};
+
 /**
  * The entry point for command evaluation.
  * @param {string} input - Raw text entered by the user.
@@ -31,7 +63,7 @@ export const processCommand = (
   // Tokenize the input:
   // baseCmd is the executable.
   // args is the parameters.
-  const inputParts = rawInput.split(/\s+/);
+  const inputParts = tokenize(rawInput);
   const baseCmd = inputParts[0].toLowerCase();
   const args = inputParts.slice(1);
 
@@ -72,7 +104,7 @@ export const processCommand = (
     return {
       output: "",
       systemAction: "VIM",
-      meta: { vimFile: rawTarget },
+      meta: { vimFile: absolutePath },
     };
   }
 

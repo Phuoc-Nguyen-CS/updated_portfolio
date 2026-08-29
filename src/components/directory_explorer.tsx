@@ -16,9 +16,9 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath }) => {
   if (!folder) return null;
 
   const staticChildren = folder.children;
-  const localSessionFiles = Object.keys(sessionFiles).filter(
-    (fileName) => sessionFiles[fileName].path === currentPath,
-  );
+  const localSessionFiles = Object.keys(sessionFiles)
+    .filter((filePath) => sessionFiles[filePath].path === currentPath)
+    .map((filePath) => filePath.split("/").pop() || filePath);
   const combinedItems = Array.from(
     new Set([...staticChildren, ...localSessionFiles]),
   ).sort((a, b) => a.localeCompare(b));
@@ -53,7 +53,7 @@ export const DirectoryExplorer: React.FC<ExplorerProps> = ({ currentPath }) => {
 
           let cmd = `cat ${childAbsPath}`;
           if (isDir) cmd = `cd ${childAbsPath}`;
-          if (isExe) cmd = `./${childAbsPath}`;
+          if (isExe) cmd = `./${item}`;
 
           let colorClass = "text-white bg-white/5 hover:bg-white/20 border-white/20";
           let prefix = "[TXT]";

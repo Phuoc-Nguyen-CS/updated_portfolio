@@ -1,7 +1,7 @@
 // src/data/auto_complete.ts
 import { VFS } from "../vfs";
 import { EXECUTABLES } from "../executables";
-import { COMMAND_LIST } from "../commands";
+import { COMMAND_LIST } from "../command_list";
 import { FILE_CONTENT } from "../system_files";
 import { resolvePath } from "../../utils/path";
 
@@ -30,7 +30,9 @@ export const getAutoComplete = (
             const currentFolder = VFS[cwd];
             if (!currentFolder) return null;
 
-            const localSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === cwd);
+            const localSessionFiles = Object.keys(sessionFiles)
+                .filter(f => sessionFiles[f].path === cwd)
+                .map(f => f.split("/").pop() || f);
             const allItems = Array.from(new Set([...currentFolder.children, ...localSessionFiles]));
 
             const matches = allItems
@@ -73,7 +75,9 @@ export const getAutoComplete = (
         if (!targetFolder) return { newInput: null, suggestions: [] };
 
         const staticChildren = targetFolder.children || [];
-        const targetSessionFiles = Object.keys(sessionFiles).filter(f => sessionFiles[f].path === searchAbsPath);
+        const targetSessionFiles = Object.keys(sessionFiles)
+            .filter(f => sessionFiles[f].path === searchAbsPath)
+            .map(f => f.split("/").pop() || f);
         const targetItems = Array.from(new Set([...staticChildren, ...targetSessionFiles]));
 
         let matches: string[] = [];

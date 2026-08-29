@@ -104,14 +104,12 @@ export const COMMANDS: Record<string, CommandFunction> = {
 
     // Path parsing for session lookup
     const pathParts = absolutePath.split("/");
-    const fileName = pathParts.pop() || "";
+    pathParts.pop();
     const dirPath = pathParts.length > 0 ? pathParts.join("/") || "/" : "/";
 
     // Session File Lookup
     const sessionFileKey = Object.keys(sessionFiles || {}).find(
-      (key) =>
-        key.toLowerCase() === fileName.toLowerCase() &&
-        sessionFiles[key].path === dirPath,
+      (key) => key.toLowerCase() === absolutePath.toLowerCase(),
     );
 
     if (sessionFileKey) {
@@ -194,14 +192,11 @@ export const COMMANDS: Record<string, CommandFunction> = {
       };
     }
 
-    const fileName = absolutePath.split("/").pop() || "";
-    const dirPath = absolutePath.split("/").slice(0, -1).join("/") || "/";
-
-    if (sessionFiles[fileName] && sessionFiles[fileName].path === dirPath) {
+    if (sessionFiles[absolutePath]) {
       return {
         output: "",
         systemAction: "REMOVE_FILE",
-        meta: { fileToDelete: fileName },
+        meta: { fileToDelete: absolutePath },
       };
     }
 
@@ -228,5 +223,3 @@ export const COMMANDS: Record<string, CommandFunction> = {
     systemAction: "CLEAR",
   }),
 };
-
-export const COMMAND_LIST = Object.keys(COMMANDS);
